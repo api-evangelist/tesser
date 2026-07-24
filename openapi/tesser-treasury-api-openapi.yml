@@ -1,0 +1,5068 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts Treasury API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: Treasury
+paths:
+  /v1/treasury/activity:
+    get:
+      operationId: treasury_getTreasuryActivity
+      parameters:
+      - name: page
+        required: true
+        in: query
+        schema:
+          type: number
+      - name: limit
+        required: true
+        in: query
+        schema:
+          type: number
+      - name: account_id
+        required: true
+        in: query
+        schema:
+          type: string
+      - name: completed_only
+        required: false
+        in: query
+        schema:
+          type: boolean
+      - name: types
+        required: false
+        in: query
+        description: Filter by activity type
+        schema:
+          enum:
+          - deposit
+          - withdrawal
+          - rebalance
+          type: string
+      responses:
+        '200':
+          description: ''
+      security:
+      - bearer: []
+      summary: Get treasury activity feed (deposits, withdrawals + rebalances)
+      tags:
+      - Treasury
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/balances:
+    get:
+      description: 'Get treasury balances grouped by currency. Each currency includes: available balance from managed accounts, pending review payment amounts, and rejected payment amounts. Optionally filter by specific currencies.'
+      operationId: treasury_getTreasuryBalances
+      parameters:
+      - name: currency
+        required: false
+        in: query
+        description: 'Filter by currency. Comma-separated for multiple values. Example: USDC,USDT'
+        schema:
+          example: USDC
+          type: string
+      - name: managed
+        required: false
+        in: query
+        description: Filter by managed status. 'true' for managed accounts only, 'false' for non-managed only, omit for all accounts.
+        schema:
+          example: 'true'
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TreasuryBalancesResponseDto'
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+      security:
+      - bearer: []
+      summary: Get treasury balances
+      tags:
+      - Treasury
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/deposits:
+    get:
+      description: Retrieve a paginated list of all deposits for the workspace.
+      operationId: treasury_getDeposits
+      parameters:
+      - name: ids
+        required: false
+        in: query
+        description: Filter by deposit IDs (comma-separated UUIDs)
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: to_account_id
+        required: false
+        in: query
+        description: Filter by destination account ID (desired.to.account_id).
+        schema:
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: Page number for pagination (1-based)
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        required: false
+        in: query
+        description: 'Number of items per page (default: 20)'
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: Deposits retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDepositsResponse'
+              example:
+                data:
+                - id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: null
+                  direction: inbound
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USD
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: null
+                      currency: USDC
+                      network: null
+                  estimated:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USD
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: '1000'
+                      currency: USDC
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  steps:
+                  - id: 8a4f2c1e-9b6d-4e35-b7a0-3c5d1e9f2b8a
+                    deposit_id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                      to:
+                        account_id: a81bc1f4-7e3d-4926-b04f-3d2e8a9c5f17
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: null
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  - id: 3b7e9d2f-1c4a-4f68-a5b0-6e8c1d3f9a2b
+                    deposit_id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: a81bc1f4-7e3d-4926-b04f-3d2e8a9c5f17
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                      to:
+                        account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                        amount: '1000'
+                        currency: USDC
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: null
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                  expires_at: '2024-03-01T14:00:00.000Z'
+                pagination:
+                  page: 1
+                  limit: 20
+                  total: 1
+                  total_pages: 1
+                  has_next: false
+                  has_prev: false
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: treasury-3134
+                    error_message: Currency pair MXN → ETH is not supported for OpenFX deposits
+                  - error_code: treasury-3135
+                    error_message: Source bank currency 'USD' does not match deposit from_currency
+                  - error_code: treasury-3136
+                    error_message: Failed to obtain OpenFX quote for MXN → USDC
+                  - error_code: treasury-3331
+                    error_message: Amount 16 USD is below the provider's minimum tradable amount of 100 USD
+                  - error_code: treasury-3332
+                    error_message: Amount 30000000 USD is above the provider's maximum tradable amount of 25000000 USD
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get deposits
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    post:
+      description: Create a deposit payment and get deposit instructions.
+      operationId: treasury_createDeposit
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDepositRequest'
+            examples:
+              default:
+                summary: Create deposit
+                value:
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USD
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      currency: USDC
+      responses:
+        '201':
+          description: Deposit created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDepositResponse'
+              example:
+                data:
+                  id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: null
+                  direction: inbound
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USD
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: null
+                      currency: USDC
+                      network: null
+                  estimated:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  steps: []
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                  expires_at: '2024-03-01T14:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: treasury-3134
+                    error_message: Currency pair MXN → ETH is not supported for OpenFX deposits
+                  - error_code: treasury-3135
+                    error_message: Source bank currency 'USD' does not match deposit from_currency
+                  - error_code: treasury-3136
+                    error_message: Failed to obtain OpenFX quote for MXN → USDC
+                  - error_code: treasury-3331
+                    error_message: Amount 16 USD is below the provider's minimum tradable amount of 100 USD
+                  - error_code: treasury-3332
+                    error_message: Amount 30000000 USD is above the provider's maximum tradable amount of 25000000 USD
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Create deposit
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/deposits/{id}:
+    get:
+      description: Retrieve a deposit payment by its unique identifier.
+      operationId: treasury_getDeposit
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Deposit ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Deposit retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDepositResponse'
+              examples:
+                circle:
+                  summary: Circle provider deposit
+                  value:
+                    data:
+                      id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                      workspace_id: b53f6690-3242-4942-9907-885779632832
+                      organization_reference_id: null
+                      direction: inbound
+                      desired:
+                        from:
+                          account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                          amount: '1000'
+                          currency: USD
+                          network: null
+                        to:
+                          account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                          amount: null
+                          currency: USDC
+                          network: null
+                      estimated:
+                        from:
+                          account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                          amount: '1000'
+                          currency: USD
+                          network: null
+                        to:
+                          account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                          amount: '1000'
+                          currency: USDC
+                          network: null
+                      actual:
+                        from:
+                          account_id: null
+                          amount: null
+                          currency: null
+                          network: null
+                        to:
+                          account_id: null
+                          amount: null
+                          currency: null
+                          network: null
+                      steps:
+                      - id: 8a4f2c1e-9b6d-4e35-b7a0-3c5d1e9f2b8a
+                        deposit_id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                        step_sequence: 1
+                        step_type: transfer
+                        estimated:
+                          from:
+                            account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                            amount: '1000'
+                            currency: USD
+                            network: null
+                          to:
+                            account_id: a81bc1f4-7e3d-4926-b04f-3d2e8a9c5f17
+                            amount: '1000'
+                            currency: USD
+                            network: null
+                        actual:
+                          from:
+                            account_id: null
+                            amount: null
+                            currency: null
+                            network: null
+                          to:
+                            account_id: null
+                            amount: null
+                            currency: null
+                            network: null
+                        transaction_hash: null
+                        fees: []
+                        provider_key: circle_mint
+                        status: created
+                        status_reasons: null
+                        created_at: '2024-03-01T10:00:00.000Z'
+                        updated_at: '2024-03-01T10:00:00.000Z'
+                        submitted_at: null
+                        confirmed_at: null
+                        completed_at: null
+                        failed_at: null
+                      - id: 3b7e9d2f-1c4a-4f68-a5b0-6e8c1d3f9a2b
+                        deposit_id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                        step_sequence: 1
+                        step_type: transfer
+                        estimated:
+                          from:
+                            account_id: a81bc1f4-7e3d-4926-b04f-3d2e8a9c5f17
+                            amount: '1000'
+                            currency: USD
+                            network: null
+                          to:
+                            account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                            amount: '1000'
+                            currency: USDC
+                            network: null
+                        actual:
+                          from:
+                            account_id: null
+                            amount: null
+                            currency: null
+                            network: null
+                          to:
+                            account_id: null
+                            amount: null
+                            currency: null
+                            network: null
+                        transaction_hash: null
+                        fees: []
+                        provider_key: circle_mint
+                        status: created
+                        status_reasons: null
+                        created_at: '2024-03-01T10:00:00.000Z'
+                        updated_at: '2024-03-01T10:00:00.000Z'
+                        submitted_at: null
+                        confirmed_at: null
+                        completed_at: null
+                        failed_at: null
+                      created_at: '2024-03-01T10:00:00.000Z'
+                      updated_at: '2024-03-01T10:00:00.000Z'
+                      expires_at: '2024-03-01T14:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get deposit by ID
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/deposits/{id}/instructions:
+    get:
+      description: 'Get deposit instructions for an existing deposit.
+
+
+        '
+      operationId: treasury_getDepositInstructions
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Deposit ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Deposit instructions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositInstructionsResponse'
+              example:
+                data:
+                  from_account:
+                    id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                    name: Acme Corp Operating Account
+                    bank_name: Chase Bank
+                    bank_account_number: '845748459212'
+                    bank_code_type: ROUTING
+                    bank_identifier_code: '021000021'
+                    bank_swift_code: CHASUS33XXX
+                  to_account:
+                    id: 7a4c2d8e-1b5f-4e69-a7d1-3f8e5c2b9a0d
+                    name: Circle USD Wire Deposit Account
+                    bank_name: STANDARD CHARTERED BANK
+                    bank_account_number: '11001259978'
+                    bank_code_type: ROUTING
+                    bank_identifier_code: '322286803'
+                    bank_swift_code: SCBLSG22XXX
+                    tracking_reference: CIR24K2SK3
+                    belongs_to:
+                      business_legal_name: CIRCLE INTERNET FINANCIAL INC
+                      business_street_address1: 99 HIGH STREET
+                      business_street_address2: LEVEL 17 SUITE 1701
+                      business_city: BOSTON
+                      business_state: MA
+                      business_postal_code: '02110'
+                      business_country: US
+                  amount: '1000'
+                  currency: USD
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get deposit instructions by id
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/deposits/{id}/simulate:
+    post:
+      description: Simulate a wire deposit by triggering Circle's mock wire API. Only available in sandbox environments.
+      operationId: treasury_simulateDeposit
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Deposit ID
+        schema:
+          type: string
+      responses:
+        '201':
+          description: Deposit simulation triggered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDepositResponse'
+              example:
+                data:
+                  id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: null
+                  direction: inbound
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USD
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: null
+                      currency: USDC
+                      network: null
+                  estimated:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USD
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: '1000'
+                      currency: USDC
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  steps:
+                  - id: 8a4f2c1e-9b6d-4e35-b7a0-3c5d1e9f2b8a
+                    deposit_id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                      to:
+                        account_id: a81bc1f4-7e3d-4926-b04f-3d2e8a9c5f17
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: null
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  - id: 3b7e9d2f-1c4a-4f68-a5b0-6e8c1d3f9a2b
+                    deposit_id: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: a81bc1f4-7e3d-4926-b04f-3d2e8a9c5f17
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                      to:
+                        account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                        amount: '1000'
+                        currency: USDC
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: null
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                  expires_at: '2024-03-01T14:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Simulate deposit in sandbox
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/rebalances:
+    get:
+      description: Retrieve a paginated list of all rebalances for the workspace.
+      operationId: treasury_getRebalances
+      parameters:
+      - name: page
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+        description: Page number for pagination (1-based)
+      - name: limit
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+        description: 'Number of items per page (default: 20)'
+      responses:
+        '200':
+          description: Rebalances retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRebalancesResponse'
+              example:
+                data:
+                - id: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: rebalance
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: BASE
+                  estimated:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                  actual:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T10:00:00.000Z'
+                  steps:
+                  - id: 7d3e1a9f-2c4b-4f85-b0a6-8e5c2d1f3b9a
+                    rebalance_id: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                      to:
+                        account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                    actual:
+                      from:
+                        account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                      to:
+                        account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                    transaction_hash: null
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: completed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:30.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: '2024-03-01T10:02:30.000Z'
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:02:30.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+                pagination:
+                  page: 1
+                  limit: 20
+                  total: 1
+                  total_pages: 1
+                  has_next: false
+                  has_prev: false
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get rebalances
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    post:
+      description: 'Create an internal rebalance between managed accounts.
+
+
+        **Validation rules:**
+
+        - `desired.from.network` / `desired.to.network` are required for wallet accounts and disallowed for ledger accounts.'
+      operationId: treasury_createRebalance
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRebalanceRequest'
+            examples:
+              default:
+                summary: Same currency/network rebalance
+                value:
+                  organization_reference_id: ref_123
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      currency: USDC
+                      network: BASE
+      responses:
+        '201':
+          description: Rebalance created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RebalanceResponse'
+              example:
+                data:
+                  id: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: rebalance
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: BASE
+                  estimated:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  balance_status: unreserved
+                  balance_reserved_at: null
+                  steps: []
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Create rebalance
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/rebalances/{id}:
+    get:
+      description: Retrieve a rebalance by its unique identifier.
+      operationId: treasury_getRebalance
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Rebalance ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Rebalance retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RebalanceResponse'
+              example:
+                data:
+                  id: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: rebalance
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: BASE
+                  estimated:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                  actual:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T10:00:00.000Z'
+                  steps:
+                  - id: 7d3e1a9f-2c4b-4f85-b0a6-8e5c2d1f3b9a
+                    rebalance_id: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                      to:
+                        account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                    actual:
+                      from:
+                        account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                      to:
+                        account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                    transaction_hash: null
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: completed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:30.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: '2024-03-01T10:02:30.000Z'
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:02:30.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get rebalance by ID
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/rebalances/{id}/steps/{stepId}/sign:
+    post:
+      description: Submit a signature for a self-custodial wallet-to-wallet rebalance step. Webhook updates will be sent as the signature is validated and submitted onchain.
+      operationId: treasury_signRebalanceStep
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Rebalance ID
+        schema:
+          type: string
+      - name: stepId
+        required: true
+        in: path
+        description: Rebalance step ID
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRebalanceStepRequest'
+      responses:
+        '200':
+          description: Signed transaction broadcast on-chain. The step is `confirmed` with its broadcast `transaction_hash`; block finality follows asynchronously.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RebalanceResponse'
+              example:
+                data:
+                  id: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: rebalance
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: BASE
+                  estimated:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T10:00:00.000Z'
+                  steps:
+                  - id: 7d3e1a9f-2c4b-4f85-b0a6-8e5c2d1f3b9a
+                    rebalance_id: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                      to:
+                        account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: '0xabc123'
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: turnkey
+                    status: confirmed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:00.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: null
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:02:00.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+              example:
+                errors:
+                - error_code: treasury-3013
+                  error_message: Rebalance step is not in a signable state
+                - error_code: treasury-3016
+                  error_message: Signed transaction does not match the rebalance details
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Sign rebalance step
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/withdrawals:
+    get:
+      description: Retrieve a paginated list of all withdrawals for the workspace.
+      operationId: treasury_getWithdrawals
+      parameters:
+      - name: page
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+        description: Page number for pagination (1-based)
+      - name: limit
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+        description: 'Number of items per page (default: 20)'
+      responses:
+        '200':
+          description: Withdrawals retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListWithdrawalsResponse'
+              example:
+                data:
+                - id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: null
+                  direction: outbound
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USDC
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: null
+                      currency: USD
+                      network: null
+                  estimated:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USDC
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: '1000'
+                      currency: USD
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T10:00:00.000Z'
+                  steps:
+                  - id: 8a4f2c1e-9b6d-4e35-b7a0-3c5d1e9f2b8a
+                    withdrawal_id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                        amount: '1000'
+                        currency: USDC
+                        network: null
+                      to:
+                        account_id: b72de3f5-8a1c-4b39-c06e-4f9d1a2e7b3c
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  - id: 3b7e9d2f-1c4a-4f68-a5b0-6e8c1d3f9a2b
+                    withdrawal_id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                    step_sequence: 2
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: b72de3f5-8a1c-4b39-c06e-4f9d1a2e7b3c
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                      to:
+                        account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                  expires_at: '2024-03-01T14:00:00.000Z'
+                pagination:
+                  page: 1
+                  limit: 20
+                  total: 1
+                  total_pages: 1
+                  has_next: false
+                  has_prev: false
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get withdrawals
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    post:
+      description: 'Create a withdrawal from a managed account or self-custodial wallet to an external bank account.
+
+
+        **Source types:**
+
+        - Circle USDC ledger (path A) — `desired.from.network` omitted.
+
+        - Self-custodial wallet (path B) — `desired.from.network` populated (e.g., `BASE`).'
+      operationId: treasury_createWithdrawal
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWithdrawalRequest'
+            examples:
+              default:
+                summary: Withdraw USDC from Circle ledger to USD bank account
+                value:
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USDC
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      currency: USD
+      responses:
+        '201':
+          description: Withdrawal created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawalResponse'
+              example:
+                data:
+                  id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: null
+                  direction: outbound
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USDC
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: null
+                      currency: USD
+                      network: null
+                  estimated:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  balance_status: unreserved
+                  balance_reserved_at: null
+                  steps: []
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                  expires_at: '2024-03-01T14:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Create withdrawal
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/withdrawals/{id}:
+    get:
+      description: Retrieve a withdrawal by its unique identifier.
+      operationId: treasury_getWithdrawal
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Withdrawal ID
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Withdrawal retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawalResponse'
+              example:
+                data:
+                  id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: null
+                  direction: outbound
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USDC
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: null
+                      currency: USD
+                      network: null
+                  estimated:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USDC
+                      network: null
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: '1000'
+                      currency: USD
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T10:00:00.000Z'
+                  steps:
+                  - id: 8a4f2c1e-9b6d-4e35-b7a0-3c5d1e9f2b8a
+                    withdrawal_id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                        amount: '1000'
+                        currency: USDC
+                        network: null
+                      to:
+                        account_id: b72de3f5-8a1c-4b39-c06e-4f9d1a2e7b3c
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  - id: 3b7e9d2f-1c4a-4f68-a5b0-6e8c1d3f9a2b
+                    withdrawal_id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                    step_sequence: 2
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: b72de3f5-8a1c-4b39-c06e-4f9d1a2e7b3c
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                      to:
+                        account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                  expires_at: '2024-03-01T14:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get withdrawal by ID
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/treasury/withdrawals/{id}/steps/{stepId}/sign:
+    post:
+      description: Submit a signature for a self-custodial wallet-source withdrawal step. Webhook updates will be sent as the signature is validated and submitted onchain.
+      operationId: treasury_signWithdrawalStep
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Withdrawal ID
+        schema:
+          type: string
+      - name: stepId
+        required: true
+        in: path
+        description: Withdrawal step ID
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignWithdrawalStepRequest'
+      responses:
+        '200':
+          description: Signed transaction broadcast on-chain. The wallet step (`step_sequence` 1) is `confirmed` with its broadcast `transaction_hash`; block finality and the payout step (`step_sequence` 2) follow asynchronously.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WithdrawalResponse'
+              example:
+                data:
+                  id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: null
+                  direction: outbound
+                  desired:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: null
+                      currency: USD
+                      network: null
+                  estimated:
+                    from:
+                      account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                      amount: '1000'
+                      currency: USDC
+                      network: BASE
+                    to:
+                      account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                      amount: '1000'
+                      currency: USD
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T10:00:00.000Z'
+                  steps:
+                  - id: 8a4f2c1e-9b6d-4e35-b7a0-3c5d1e9f2b8a
+                    withdrawal_id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 55042f8f-e527-56f1-b57c-eef23ca862db
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                      to:
+                        account_id: b72de3f5-8a1c-4b39-c06e-4f9d1a2e7b3c
+                        amount: '1000'
+                        currency: USDC
+                        network: BASE
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: '0xabc123'
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: turnkey
+                    status: confirmed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:00.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: null
+                    failed_at: null
+                  - id: 3b7e9d2f-1c4a-4f68-a5b0-6e8c1d3f9a2b
+                    withdrawal_id: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+                    step_sequence: 2
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: b72de3f5-8a1c-4b39-c06e-4f9d1a2e7b3c
+                        amount: '1000'
+                        currency: USDC
+                        network: null
+                      to:
+                        account_id: 44031e7e-d416-45f0-a46b-ded12b9751ca
+                        amount: '1000'
+                        currency: USD
+                        network: null
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: null
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: created
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+                    submitted_at: null
+                    confirmed_at: null
+                    completed_at: null
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:02:00.000Z'
+                  expires_at: '2024-03-01T14:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+              example:
+                errors:
+                - error_code: treasury-3306
+                  error_message: Withdrawal step is not in a signable state
+                - error_code: treasury-3309
+                  error_message: Signed transaction does not match the withdrawal details
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: The withdrawal does not exist in this workspace (`treasury-1200`), or the referenced step does not exist on it (`treasury-1203`).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+              example:
+                errors:
+                - error_code: treasury-1200
+                  error_message: Withdrawal with id 'wd_123' not found
+                - error_code: treasury-1203
+                  error_message: Transfer step not found for withdrawal with id 'wd_123'
+        '409':
+          description: Source wallet's live on-chain balance is below the withdrawal amount at sign time. Retry once the wallet is funded; `withdrawal.balance_updated` fires with `balance_status` `awaiting_funds`.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+              example:
+                errors:
+                - error_code: treasury-3319
+                  error_message: Source wallet has insufficient on-chain balance to sign
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Sign withdrawal step
+      tags:
+      - Treasury
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+components:
+  schemas:
+    RebalanceDesiredOverlayRequest:
+      type: object
+      properties:
+        from:
+          description: Source side of the rebalance.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceDesiredFromLeg'
+        to:
+          description: Destination side of the rebalance.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceDesiredToLeg'
+      description: Caller's stated intent for the rebalance.
+      required:
+      - from
+      - to
+    RebalanceStepEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalDesiredToLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalDesiredFromLegResponse'
+        to:
+          $ref: '#/components/schemas/WithdrawalDesiredToLegResponse'
+      description: Caller's stated intent at creation. Frozen, never overwritten.
+      required:
+      - from
+      - to
+    CreateDepositResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Deposit'
+      required:
+      - data
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
+    WireInstructionsBankAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Account ID.
+        name:
+          type: string
+          description: Account name.
+        bank_name:
+          type: string
+          description: Bank name.
+        bank_account_number:
+          type: string
+          description: Bank account number (VAN).
+        bank_code_type:
+          type: string
+          description: Bank code type (e.g., ROUTING).
+        bank_identifier_code:
+          type: string
+          description: Bank identifier code (routing number).
+        bank_swift_code:
+          type: string
+          description: Bank SWIFT code (null for non-SWIFT rails like SPEI/SEPA).
+          nullable: true
+        tracking_reference:
+          type: string
+          description: Wire transfer tracking reference.
+          nullable: true
+        belongs_to:
+          description: Beneficiary business info (legal entity receiving the wire).
+          allOf:
+          - $ref: '#/components/schemas/BeneficiaryBusinessInfo'
+      required:
+      - id
+      - name
+      - bank_name
+      - bank_account_number
+      - bank_code_type
+      - bank_identifier_code
+      - belongs_to
+    DepositDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/DepositDesiredFromLeg'
+        to:
+          $ref: '#/components/schemas/DepositDesiredToLeg'
+      description: Caller's stated intent at creation. Frozen, never overwritten.
+      required:
+      - from
+      - to
+    WithdrawalStepEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalStepEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/WithdrawalStepEstimatedToLeg'
+      description: Planned values for this step.
+      required:
+      - from
+      - to
+    BeneficiaryBusinessInfo:
+      type: object
+      properties:
+        business_legal_name:
+          type: string
+          description: Business legal name.
+        business_street_address1:
+          type: string
+          description: Street address line 1.
+          nullable: true
+        business_street_address2:
+          type: string
+          description: Street address line 2.
+          nullable: true
+        business_city:
+          type: string
+          description: City (null when address isn't structured).
+          nullable: true
+        business_state:
+          type: string
+          description: State (null when address isn't structured).
+          nullable: true
+        business_postal_code:
+          type: string
+          description: Postal code (null when address isn't structured).
+          nullable: true
+        business_country:
+          type: string
+          description: Country code (null when address isn't structured).
+          nullable: true
+      required:
+      - business_legal_name
+    WithdrawalEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/WithdrawalEstimatedToLeg'
+      description: Tesser's projection for how the withdrawal will proceed.
+      required:
+      - from
+      - to
+    WithdrawalDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source account ID.
+        amount:
+          type: string
+          description: Source amount.
+          example: '1000.00'
+        currency:
+          type: string
+          description: Source currency code.
+          example: USDC
+        network:
+          type: string
+          description: Source blockchain network. Required when source is a self-custodial wallet.
+      description: Source side of the withdrawal.
+      required:
+      - account_id
+      - amount
+      - currency
+    CreateDepositRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional client-supplied identifier.
+        desired:
+          description: Caller's stated intent for the deposit.
+          allOf:
+          - $ref: '#/components/schemas/DesiredOverlayRequest'
+      required:
+      - desired
+    DepositEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalActualFromLeg'
+        to:
+          $ref: '#/components/schemas/WithdrawalActualToLeg'
+      description: What actually settled. Populated when the withdrawal reaches a terminal state.
+      required:
+      - from
+      - to
+    WithdrawalStepActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalStepActualFromLeg'
+        to:
+          $ref: '#/components/schemas/WithdrawalStepActualToLeg'
+      description: Settled values once the step reaches a terminal state. All-null until then.
+      required:
+      - from
+      - to
+    RebalanceDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination account ID.
+        currency:
+          type: string
+          description: Destination currency code.
+          example: USDC
+        network:
+          type: string
+          description: Destination blockchain network.
+      description: Destination side of the rebalance.
+      required:
+      - account_id
+      - currency
+    RebalanceResponse:
+      type: object
+      properties:
+        data:
+          description: Rebalance data
+          allOf:
+          - $ref: '#/components/schemas/Rebalance'
+      required:
+      - data
+    ListWithdrawalsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Withdrawal'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    RebalanceEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/RebalanceEstimatedToLeg'
+      description: Tesser's projection for how the rebalance will proceed.
+      required:
+      - from
+      - to
+    StepActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    CurrencyBalanceDto:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency symbol
+          example: USDC
+        available:
+          type: string
+          description: Available balance from managed accounts (sum across all networks)
+          example: '250000000'
+        pendingReview:
+          type: string
+          description: Total payment amount pending review
+          example: '50000000'
+        rejected:
+          type: string
+          description: Total payment amount rejected
+          example: '20000000'
+      required:
+      - currency
+      - available
+      - pendingReview
+      - rejected
+    RebalanceStep:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique step identifier
+          example: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+        rebalance_id:
+          type: string
+          description: ID of the parent rebalance
+          example: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+        step_sequence:
+          type: integer
+          description: Order of this step in the rebalance flow (1-based)
+          example: 1
+        step_type:
+          type: string
+          description: Type of step
+          enum:
+          - transfer
+          - swap
+          example: transfer
+        estimated:
+          description: Planned values for this step.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceStepEstimatedOverlay'
+        actual:
+          description: Settled values once the step reaches a terminal state. All-null until then.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceStepActualOverlay'
+        transaction_hash:
+          type: string
+          description: Blockchain transaction hash
+          nullable: true
+          example: null
+        unsigned_transaction:
+          type: string
+          description: Unsigned transaction bytes for client signing. Present only for Turnkey-signed steps in signature_requested status.
+          nullable: true
+        fees:
+          description: Fees associated with this step
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/StepFee'
+        provider_key:
+          type: string
+          description: Provider used for this step
+          nullable: true
+          enum:
+          - circle_mint
+          - turnkey
+          example: circle_mint
+        status:
+          type: string
+          description: Current status of this step
+          enum:
+          - created
+          - signature_requested
+          - signed
+          - submitted
+          - confirmed
+          - completed
+          - failed
+          example: completed
+        status_reasons:
+          description: Reasons for the current status
+          nullable: true
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusReason'
+        created_at:
+          type: string
+          description: Step creation timestamp
+          format: date-time
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: Step last update timestamp
+          format: date-time
+          example: '2024-03-01T10:02:30.000Z'
+        submitted_at:
+          type: string
+          description: Timestamp when step was submitted
+          format: date-time
+          nullable: true
+          example: '2024-03-01T10:00:10.000Z'
+        confirmed_at:
+          type: string
+          description: Timestamp when step was confirmed
+          format: date-time
+          nullable: true
+          example: '2024-03-01T10:02:00.000Z'
+        completed_at:
+          type: string
+          description: Timestamp when step completed
+          format: date-time
+          nullable: true
+          example: '2024-03-01T10:02:30.000Z'
+        failed_at:
+          type: string
+          description: Timestamp when step failed
+          format: date-time
+          nullable: true
+          example: null
+      required:
+      - id
+      - rebalance_id
+      - step_sequence
+      - step_type
+      - estimated
+      - actual
+      - fees
+      - status
+      - created_at
+      - updated_at
+    RebalanceStepEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositBankAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Account ID.
+        name:
+          type: string
+          description: Account name.
+        bank_name:
+          type: string
+          description: Bank name.
+        bank_account_number:
+          type: string
+          description: Bank account number.
+        bank_code_type:
+          type: string
+          description: Bank code type (e.g., 'routing').
+        bank_identifier_code:
+          type: string
+          description: Bank identifier code (routing number, sort code, etc.).
+        bank_swift_code:
+          type: string
+          description: Bank SWIFT code.
+          nullable: true
+      required:
+      - id
+      - name
+      - bank_name
+      - bank_account_number
+      - bank_code_type
+      - bank_identifier_code
+    DepositEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/DepositEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/DepositEstimatedToLeg'
+      description: Tesser's projection for how the deposit will proceed.
+      required:
+      - from
+      - to
+    DepositInstructionsData:
+      type: object
+      properties:
+        from_account:
+          description: Source account information (for reference).
+          allOf:
+          - $ref: '#/components/schemas/DepositBankAccount'
+        to_account:
+          description: Wire instructions for completing the deposit.
+          allOf:
+          - $ref: '#/components/schemas/WireInstructionsBankAccount'
+        amount:
+          type: string
+          description: Deposit amount.
+        currency:
+          type: string
+          description: Deposit currency.
+      required:
+      - from_account
+      - to_account
+      - amount
+      - currency
+    RebalanceDesiredFromLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DesiredOverlayRequest:
+      type: object
+      properties:
+        from:
+          description: Source side of the deposit.
+          allOf:
+          - $ref: '#/components/schemas/DesiredFromLeg'
+        to:
+          description: Destination side of the deposit.
+          allOf:
+          - $ref: '#/components/schemas/DesiredToLeg'
+      description: Caller's stated intent for the deposit.
+      required:
+      - from
+      - to
+    DesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination account ID.
+        currency:
+          type: string
+          description: Destination currency code.
+          example: USDC
+        network:
+          type: string
+          description: Destination blockchain network.
+      description: Destination side of the deposit.
+      required:
+      - account_id
+      - currency
+    WithdrawalDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination bank account ID.
+        currency:
+          type: string
+          description: Destination currency code.
+          example: USD
+      description: Destination side of the withdrawal.
+      required:
+      - account_id
+      - currency
+    DepositInstructionsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DepositInstructionsData'
+      required:
+      - data
+    DepositEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalDesiredFromLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    ListDepositsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deposit'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    WithdrawalEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalStepActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceDesiredToLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source account ID.
+        amount:
+          type: string
+          description: Source amount.
+          example: '1000.00'
+        currency:
+          type: string
+          description: Source currency code.
+          example: USDC
+        network:
+          type: string
+          description: Source blockchain network.
+      description: Source side of the rebalance.
+      required:
+      - account_id
+      - amount
+      - currency
+    RebalanceStepEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceStepEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/RebalanceStepEstimatedToLeg'
+      description: Planned values for this step.
+      required:
+      - from
+      - to
+    Deposit:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the deposit.
+          example: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+        workspace_id:
+          type: string
+          description: Workspace ID the deposit belongs to.
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          description: Optional external reference ID.
+          example: null
+          nullable: true
+        direction:
+          type: string
+          description: Resource direction.
+          enum:
+          - inbound
+          example: inbound
+        desired:
+          description: Caller's stated intent at creation. Frozen, never overwritten.
+          allOf:
+          - $ref: '#/components/schemas/DepositDesiredOverlay'
+        estimated:
+          description: Tesser's projection for how the deposit will proceed.
+          allOf:
+          - $ref: '#/components/schemas/DepositEstimatedOverlay'
+        actual:
+          description: What actually settled. Populated when the deposit reaches a terminal state.
+          allOf:
+          - $ref: '#/components/schemas/DepositActualOverlay'
+        steps:
+          description: Optional list of system-generated steps that make up this deposit route.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/DepositStep'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        expires_at:
+          type: string
+          description: ISO 8601 timestamp when the deposit expires, or null for auto-created deposits.
+          example: '2024-03-01T14:00:00.000Z'
+          nullable: true
+      required:
+      - id
+      - workspace_id
+      - direction
+      - desired
+      - estimated
+      - actual
+      - created_at
+      - updated_at
+    StepEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/StepEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/StepEstimatedToLeg'
+      description: Planned values for this step.
+      required:
+      - from
+      - to
+    StepEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalStepEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Always null for deposits — see `estimated.to.amount` for the indicative target.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StatusReason:
+      type: object
+      properties:
+        error_code:
+          type: string
+          example: transfers-9201
+        error_message:
+          type: string
+          example: An upstream step failed, so this step was not executed
+      required:
+      - error_code
+      - error_message
+    Rebalance:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique rebalance identifier
+          example: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+        workspace_id:
+          type: string
+          description: Workspace ID the rebalance belongs to
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          description: External reference ID for tracking
+          nullable: true
+          example: null
+        direction:
+          type: string
+          description: Resource direction.
+          enum:
+          - rebalance
+          example: rebalance
+        desired:
+          description: Caller's stated intent at creation. Frozen, never overwritten.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceDesiredOverlay'
+        estimated:
+          description: Tesser's projection for how the rebalance will proceed.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceEstimatedOverlay'
+        actual:
+          description: What actually settled. Populated when the rebalance reaches a terminal state.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceActualOverlay'
+        balance_status:
+          type: string
+          description: Balance reservation status.
+          nullable: true
+          enum:
+          - unreserved
+          - awaiting_funds
+          - reserved
+          example: null
+        balance_reserved_at:
+          type: string
+          description: Timestamp when balance was reserved.
+          format: date-time
+          nullable: true
+          example: null
+        steps:
+          description: Rebalance execution steps.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/RebalanceStep'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        expires_at:
+          type: string
+          description: ISO 8601 timestamp when the rebalance expires.
+          example: '2024-03-04T10:00:00.000Z'
+          nullable: true
+      required:
+      - id
+      - workspace_id
+      - direction
+      - desired
+      - estimated
+      - actual
+      - balance_status
+      - balance_reserved_at
+      - steps
+      - created_at
+      - updated_at
+      - expires_at
+    TreasuryBalancesResponseDto:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/TreasuryBalancesDataDto'
+      required:
+      - message
+      - data
+    WithdrawalActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StepActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    Withdrawal:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique withdrawal identifier
+          example: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+        workspace_id:
+          type: string
+          description: Workspace ID the withdrawal belongs to
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          description: External reference ID for tracking
+          nullable: true
+          example: null
+        direction:
+          type: string
+          description: Resource direction.
+          enum:
+          - outbound
+          example: outbound
+        desired:
+          description: Caller's stated intent at creation. Frozen, never overwritten.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalDesiredOverlay'
+        estimated:
+          description: Tesser's projection for how the withdrawal will proceed.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalEstimatedOverlay'
+        actual:
+          description: What actually settled. Populated when the withdrawal reaches a terminal state.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalActualOverlay'
+        balance_status:
+          type: string
+          description: Balance reservation status.
+          nullable: true
+          enum:
+          - unreserved
+          - awaiting_funds
+          - reserved
+          example: unreserved
+        balance_reserved_at:
+          type: string
+          description: Timestamp when balance was reserved.
+          format: date-time
+          nullable: true
+          example: null
+        steps:
+          description: Withdrawal execution steps.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/WithdrawalStep'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        expires_at:
+          type: string
+          description: ISO 8601 timestamp when the withdrawal expires.
+          example: '2024-03-01T14:00:00.000Z'
+          nullable: true
+      required:
+      - id
+      - workspace_id
+      - direction
+      - desired
+      - estimated
+      - actual
+      - balance_status
+      - balance_reserved_at
+      - steps
+      - created_at
+      - updated_at
+      - expires_at
+    ListRebalancesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rebalance'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    WithdrawalResponse:
+      type: object
+      properties:
+        data:
+          description: Withdrawal data
+          allOf:
+          - $ref: '#/components/schemas/Withdrawal'
+      required:
+      - data
+    RebalanceStepActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceActualFromLeg'
+        to:
+          $ref: '#/components/schemas/RebalanceActualToLeg'
+      description: What actually settled. Populated when the rebalance reaches a terminal state.
+      required:
+      - from
+      - to
+    WithdrawalStep:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique step identifier
+          example: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+        withdrawal_id:
+          type: string
+          description: ID of the parent withdrawal
+          example: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+        step_sequence:
+          type: integer
+          description: Order of this step in the withdrawal flow (1-based)
+          example: 1
+        step_type:
+          type: string
+          description: Type of step
+          enum:
+          - transfer
+          - swap
+          example: transfer
+        estimated:
+          description: Planned values for this step.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalStepEstimatedOverlay'
+        actual:
+          description: Settled values once the step reaches a terminal state. All-null until then.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalStepActualOverlay'
+        transaction_hash:
+          type: string
+          description: Blockchain transaction hash
+          nullable: true
+          example: null
+        unsigned_transaction:
+          type: string
+          description: Unsigned transaction bytes for client signing. Present only for Turnkey-signed steps in signature_requested status.
+          nullable: true
+        fees:
+          description: Fees associated with this step
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/StepFee'
+        provider_key:
+          type: string
+          description: Provider used for this step
+          nullable: true
+          enum:
+          - circle_mint
+          - turnkey
+          - openfx
+          example: circle_mint
+        status:
+          type: string
+          description: Current status of this step
+          enum:
+          - created
+          - signature_requested
+          - signed
+          - submitted
+          - confirmed
+          - completed
+          - failed
+          example: created
+        status_reasons:
+          description: Reasons for the current status
+          nullable: true
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusReason'
+        created_at:
+          type: string
+          description: Step creation timestamp
+          format: date-time
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: Step last update timestamp
+          format: date-time
+          example: '2024-03-01T10:00:00.000Z'
+        submitted_at:
+          type: string
+          description: Timestamp when step was submitted
+          format: date-time
+          nullable: true
+          example: null
+        confirmed_at:
+          type: string
+          description: Timestamp when step was confirmed
+          format: date-time
+          nullable: true
+          example: null
+        completed_at:
+          type: string
+          description: Timestamp when step completed
+          format: date-time
+          nullable: true
+          example: null
+        failed_at:
+          type: string
+          description: Timestamp when step failed
+          format: date-time
+          nullable: true
+          example: null
+      required:
+      - id
+      - withdrawal_id
+      - step_sequence
+      - step_type
+      - estimated
+      - actual
+      - fees
+      - status
+      - created_at
+      - updated_at
+    RebalanceActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StepEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/DepositActualFromLeg'
+        to:
+          $ref: '#/components/schemas/DepositActualToLeg'
+      description: What actually settled. Populated when the deposit reaches a terminal state.
+      required:
+      - from
+      - to
+    CreateRebalanceRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional client-supplied identifier.
+        desired:
+          description: Caller's stated intent for the rebalance.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceDesiredOverlayRequest'
+      required:
+      - desired
+    RebalanceEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceStepActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    SignRebalanceStepRequest:
+      type: object
+      properties:
+        signature:
+          type: string
+          minLength: 1
+          description: Base64-encoded JSON envelope `{ body, stamp }` where `body` is the JSON-encoded Turnkey ACTIVITY_TYPE_SIGN_TRANSACTION_V2 activity and `stamp` is the X-Stamp header value produced by stamping that body. Tesser forwards the envelope to Turnkey to obtain the signed transaction.
+      required:
+      - signature
+    WithdrawalDesiredOverlayRequest:
+      type: object
+      properties:
+        from:
+          description: Source side of the withdrawal.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalDesiredFromLeg'
+        to:
+          description: Destination side of the withdrawal.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalDesiredToLeg'
+      description: Caller's stated intent for the withdrawal.
+      required:
+      - from
+      - to
+    SignWithdrawalStepRequest:
+      type: object
+      properties:
+        signature:
+          type: string
+          minLength: 1
+          description: Base64-encoded JSON envelope `{ body, stamp }` where `body` is the JSON-encoded Turnkey ACTIVITY_TYPE_SIGN_TRANSACTION_V2 activity and `stamp` is the X-Stamp header value produced by stamping that body. Tesser forwards the envelope to Turnkey to obtain the signed transaction.
+      required:
+      - signature
+    CreateWithdrawalRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional client-supplied identifier.
+        desired:
+          description: Caller's stated intent for the withdrawal.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalDesiredOverlayRequest'
+      required:
+      - desired
+    DepositStep:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the step.
+          example: 8a4f2c1e-9b6d-4e35-b7a0-3c5d1e9f2b8a
+        deposit_id:
+          type: string
+          description: ID of the parent deposit.
+          example: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+        step_sequence:
+          type: integer
+          description: Step sequence number (1-based).
+          example: 1
+        step_type:
+          type: string
+          description: 'Step type: ''transfer'', ''swap''.'
+          enum:
+          - transfer
+          - swap
+          example: transfer
+        estimated:
+          description: Planned values for this step.
+          allOf:
+          - $ref: '#/components/schemas/StepEstimatedOverlay'
+        actual:
+          description: Settled values once the step reaches a terminal state. All-null until then.
+          allOf:
+          - $ref: '#/components/schemas/StepActualOverlay'
+        transaction_hash:
+          type: string
+          description: Blockchain transaction hash (for crypto steps).
+          example: null
+          nullable: true
+        fees:
+          description: List of fees associated with this step.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/StepFee'
+        provider_key:
+          type: string
+          description: Provider key used for this step (if applicable).
+          enum:
+          - circle_mint
+          - openfx
+          - turnkey
+          example: circle_mint
+          nullable: true
+        status:
+          type: string
+          description: 'Step status: ''created'', ''signature_requested'', ''signed'', ''submitted'', ''confirmed'', ''completed'', ''failed''.'
+          enum:
+          - created
+          - signature_requested
+          - signed
+          - submitted
+          - confirmed
+          - completed
+          - failed
+          example: created
+        status_reasons:
+          description: Array of reasons explaining the current status (if any).
+          example: null
+          nullable: true
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusReason'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        submitted_at:
+          type: string
+          description: Submitted timestamp.
+          example: null
+          nullable: true
+        confirmed_at:
+          type: string
+          description: Confirmed timestamp.
+          example: null
+          nullable: true
+        completed_at:
+          type: string
+          description: Completed timestamp.
+          example: null
+          nullable: true
+        failed_at:
+          type: string
+          description: Failed timestamp.
+          example: null
+          nullable: true
+      required:
+      - id
+      - deposit_id
+      - step_sequence
+      - step_type
+      - estimated
+      - actual
+      - fees
+      - status
+      - created_at
+      - updated_at
+    WithdrawalEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source bank account ID.
+        amount:
+          type: string
+          description: Source amount.
+          example: '1000.00'
+        currency:
+          type: string
+          description: Source currency code.
+          example: USD
+      description: Source side of the deposit.
+      required:
+      - account_id
+      - amount
+      - currency
+    WithdrawalStepEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalStepActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StepFee:
+      type: object
+      properties:
+        fee_amount:
+          type: string
+          description: Fee amount.
+        fee_currency:
+          type: string
+          description: Fee currency code.
+        fee_type:
+          type: string
+          description: Fee type (e.g., 'gas', 'provider').
+        fee_metadata:
+          type: object
+          description: Additional metadata for the fee (JSON object).
+          additionalProperties: true
+      required:
+      - fee_amount
+      - fee_currency
+      - fee_type
+    TreasuryBalancesDataDto:
+      type: object
+      properties:
+        balances:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyBalanceDto'
+      required:
+      - balances
+    StepActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/StepActualFromLeg'
+        to:
+          $ref: '#/components/schemas/StepActualToLeg'
+      description: Settled values once the step reaches a terminal state. All-null until then.
+      required:
+      - from
+      - to
+    RebalanceStepActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceStepActualFromLeg'
+        to:
+          $ref: '#/components/schemas/RebalanceStepActualToLeg'
+      description: Settled values once the step reaches a terminal state. All-null until then.
+      required:
+      - from
+      - to
+    RebalanceDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceDesiredFromLegResponse'
+        to:
+          $ref: '#/components/schemas/RebalanceDesiredToLegResponse'
+      description: Caller's stated intent at creation. Frozen, never overwritten.
+      required:
+      - from
+      - to
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

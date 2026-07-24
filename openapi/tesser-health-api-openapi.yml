@@ -1,0 +1,71 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts health API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: health
+paths:
+  /v1/health:
+    get:
+      operationId: app_getHealth
+      parameters: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  gitSha:
+                    type: string
+                    example: abc123def456
+                  env:
+                    type: string
+                    example: local
+      summary: Health check endpoint
+      tags:
+      - health
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+      security: []
+  /:
+    get:
+      operationId: root_healthCheck
+      summary: Root health check
+      tags:
+      - health
+      x-internal: true
+      responses:
+        '200':
+          description: OK
+      security: []
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: rootHealthCheck
+          module: $import(./modules/health-check)
+        policies:
+          inbound: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

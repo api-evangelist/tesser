@@ -1,0 +1,2331 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts Payments API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: Payments
+paths:
+  /v1/payments:
+    get:
+      description: Retrieve all payments for the authenticated user's organization.
+      operationId: payments_getPayments
+      parameters:
+      - name: start_date
+        required: false
+        in: query
+        description: Start date for filtering payments (ISO 8601 format)
+        schema:
+          type: string
+      - name: end_date
+        required: false
+        in: query
+        description: End date for filtering payments (ISO 8601 format)
+        schema:
+          type: string
+      - name: direction
+        required: false
+        in: query
+        description: 'Payment direction filter: ''outbound'' for outgoing payments, ''inbound'' for incoming payments'
+        schema:
+          type: string
+          enum:
+          - outbound
+          - inbound
+      - name: page
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+        description: Page number for pagination (1-based)
+      - name: limit
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+        description: 'Number of items per page (default: 20)'
+      responses:
+        '200':
+          description: Successfully retrieved team payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPaymentsResponse'
+              example:
+                data:
+                - id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: outbound
+                  funding_account_id: 2113b166-5873-42fd-85fe-5b1a02940d43
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: ETHEREUM
+                  estimated:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  actual:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  risk_status: automatically_approved
+                  risk_status_reasons: []
+                  risk_reviewed_by: null
+                  risk_reviewed_at: null
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T09:59:00.000Z'
+                  steps:
+                  - id: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+                    payment_id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    actual:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    transaction_hash: '0xabc123'
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: completed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:30.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: '2024-03-01T10:02:30.000Z'
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:02:30.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+                pagination:
+                  page: 1
+                  limit: 20
+                  total: 1
+                  total_pages: 1
+                  has_next: false
+                  has_prev: false
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+      security:
+      - bearer: []
+      summary: Get payments
+      tags:
+      - Payments
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    post:
+      description: Create a payment. Returns the created payment details.
+      operationId: payments_createPayment
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+            examples:
+              default:
+                summary: Create a standard payment
+                value:
+                  organization_reference_id: ref_123
+                  funding_account_id: 2113b166-5873-42fd-85fe-5b1a02940d43
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      currency: USDC
+                      network: ETHEREUM
+      responses:
+        '201':
+          description: Payment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+              example:
+                data:
+                  id: 9f3b7e1c-4a2d-4f69-b5a8-0c6e2d9f1a3b
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: outbound
+                  funding_account_id: 2113b166-5873-42fd-85fe-5b1a02940d43
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: ETHEREUM
+                  estimated:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  risk_status: unchecked
+                  risk_status_reasons: []
+                  risk_reviewed_by: null
+                  risk_reviewed_at: null
+                  balance_status: unreserved
+                  balance_reserved_at: null
+                  steps: []
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+      security:
+      - bearer: []
+      summary: Create payment
+      tags:
+      - Payments
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/payments/internal:
+    get:
+      description: Retrieve payments optimized for table display. Returns only fields needed for the payments table UI.
+      operationId: payments_getPaymentsInternal
+      parameters:
+      - name: start_date
+        required: false
+        in: query
+        description: Start date for filtering payments (ISO 8601 format)
+        schema:
+          type: string
+      - name: end_date
+        required: false
+        in: query
+        description: End date for filtering payments (ISO 8601 format)
+        schema:
+          type: string
+      - name: direction
+        required: false
+        in: query
+        description: 'Payment direction filter: ''outbound'' for outgoing payments, ''inbound'' for incoming payments'
+        schema:
+          type: string
+          enum:
+          - outbound
+          - inbound
+      - name: status
+        required: false
+        in: query
+        description: Payment status for filtering payments
+        schema:
+          type: string
+          enum:
+          - queued
+          - processing
+          - ready-to-submit
+          - rejected
+          - sent
+          - need-review
+          - compliance-blocked
+          - insufficient-balance
+      - name: payment_type
+        required: false
+        in: query
+        description: 'Payment type filter: ''deposit'', ''withdrawal'', or ''transfer'''
+        schema:
+          type: string
+          enum:
+          - deposit
+          - withdrawal
+          - transfer
+      - name: page
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+        description: Page number for pagination (1-based)
+      - name: limit
+        required: false
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+        description: 'Number of items per page (default: 20)'
+      responses:
+        '200':
+          description: Successfully retrieved team payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalPaymentListResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+      security:
+      - bearer: []
+      summary: '[INTERNAL] Get payments for UI table'
+      tags:
+      - Payments
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/payments/internal/{paymentId}:
+    get:
+      description: Retrieve a single payment with full details including steps and entity data for UI display.
+      operationId: payments_getPaymentInternal
+      parameters:
+      - name: paymentId
+        required: true
+        in: path
+        description: Unique identifier of the payment to retrieve
+        schema:
+          type: string
+      responses:
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+      security:
+      - bearer: []
+      summary: '[INTERNAL] Get single payment for UI'
+      tags:
+      - Payments
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/payments/simulate-inbound:
+    post:
+      description: Sends a real on-chain test-USDC transfer from the platform faucet into a managed wallet and forces the risk-screening verdict to mocked_risk_status. Only available in staging. Returns 201 with the screened payment, or 202 with the tx hash if it is still being detected/screened.
+      operationId: payments_simulateInbound
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulateInboundPaymentRequest'
+      responses:
+        '201':
+          description: The simulated inbound payment, already screened to mocked_risk_status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '202':
+          description: The on-chain transfer was broadcast but the inbound was not detected and screened within the wait budget. Once payment_id is present, poll GET /v1/payments/{paymentId} for the screened payment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                    - tx_hash
+                    - network
+                    - status
+                    - payment_id
+                    properties:
+                      tx_hash:
+                        type: string
+                      network:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                        - pending
+                        example: pending
+                      payment_id:
+                        type: string
+                        format: uuid
+                        nullable: true
+      security:
+      - bearer: []
+      summary: Simulate an inbound payment with a chosen risk status (staging)
+      tags:
+      - Payments
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/payments/{paymentId}:
+    get:
+      description: Retrieve a specific payment by ID.
+      operationId: payments_getPaymentById
+      parameters:
+      - name: paymentId
+        required: true
+        in: path
+        description: Unique identifier of the payment to retrieve
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved payment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+              example:
+                data:
+                  id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: outbound
+                  funding_account_id: 2113b166-5873-42fd-85fe-5b1a02940d43
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: ETHEREUM
+                  estimated:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  actual:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  risk_status: automatically_approved
+                  risk_status_reasons: []
+                  risk_reviewed_by: null
+                  risk_reviewed_at: null
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T09:59:00.000Z'
+                  steps:
+                  - id: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+                    payment_id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    actual:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    transaction_hash: '0xabc123'
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: completed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:30.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: '2024-03-01T10:02:30.000Z'
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:02:30.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+      security:
+      - bearer: []
+      summary: Get payment by ID
+      tags:
+      - Payments
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    patch:
+      description: Update a payment with accounts.
+      operationId: payments_updatePayment
+      parameters:
+      - name: paymentId
+        required: true
+        in: path
+        description: Unique identifier of the payment to update
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentRequest'
+            examples:
+              default:
+                summary: Update payment accounts
+                value:
+                  organization_reference_id: ref_456
+                  funding_account_id: 2113b166-5873-42fd-85fe-5b1a02940d43
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+      responses:
+        '200':
+          description: Payment updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+              example:
+                data:
+                  id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_456
+                  direction: outbound
+                  funding_account_id: 2113b166-5873-42fd-85fe-5b1a02940d43
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: ETHEREUM
+                  estimated:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  actual:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  risk_status: automatically_approved
+                  risk_status_reasons: []
+                  risk_reviewed_by: null
+                  risk_reviewed_at: null
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T09:59:00.000Z'
+                  steps:
+                  - id: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+                    payment_id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    actual:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    transaction_hash: '0xabc123'
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: completed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:30.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: '2024-03-01T10:02:30.000Z'
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-05T09:00:00.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+      security:
+      - bearer: []
+      summary: Update payment
+      tags:
+      - Payments
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/payments/{paymentId}/review:
+    post:
+      description: Manually review and approve or reject a payment requiring risk review.
+      operationId: payments_reviewPayment
+      parameters:
+      - name: paymentId
+        required: true
+        in: path
+        description: Unique identifier of the payment to review
+        schema:
+          format: uuid
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewPaymentRequest'
+            examples:
+              default:
+                summary: Approve payment
+                value:
+                  is_approved: true
+      responses:
+        '200':
+          description: Payment review completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+              example:
+                data:
+                  id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: outbound
+                  funding_account_id: 2113b166-5873-42fd-85fe-5b1a02940d43
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: ETHEREUM
+                  estimated:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  actual:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  risk_status: manually_approved
+                  risk_status_reasons:
+                  - risk_status_reason_type: ownership
+                    risk_status_reason_category: Malware
+                    risk_status_reason_message: Address linked to known malware family
+                    risk_status_reason_severity: high
+                  risk_reviewed_by: 9c3e7f5a-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                  risk_reviewed_at: '2024-03-01T10:30:00.000Z'
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T09:59:00.000Z'
+                  steps:
+                  - id: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+                    payment_id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    actual:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    transaction_hash: '0xabc123'
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: circle_mint
+                    status: completed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:30.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: '2024-03-01T10:02:30.000Z'
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:35:00.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+      security:
+      - bearer: []
+      summary: Submit risk review
+      tags:
+      - Payments
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/payments/{paymentId}/steps/{stepId}/sign:
+    post:
+      description: Submit a signature for a self-custodial payment step. Webhook updates will be sent as the signature is validated and submitted onchain.
+      operationId: payments_signPaymentStep
+      parameters:
+      - name: paymentId
+        required: true
+        in: path
+        description: Unique identifier of the payment
+        schema:
+          format: uuid
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+          type: string
+      - name: stepId
+        required: true
+        in: path
+        description: Unique identifier of the payment step to sign
+        schema:
+          format: uuid
+          example: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignPaymentStepRequest'
+            examples:
+              default:
+                summary: Sign a payment step
+                value:
+                  signature: <base64({body, stamp})>
+      responses:
+        '200':
+          description: Signed transaction broadcast on-chain. The step is `confirmed` with its broadcast `transaction_hash`; block finality (`completed`) follows asynchronously.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+              example:
+                data:
+                  id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  organization_reference_id: ref_123
+                  direction: outbound
+                  funding_account_id: 2113b166-5873-42fd-85fe-5b1a02940d43
+                  desired:
+                    from:
+                      account_id: 6de8a7e9-be79-4885-9b65-b25b11d38078
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 53b7aabd-97bc-4a4f-9f9c-1c1c69474889
+                      amount: null
+                      currency: USDC
+                      network: ETHEREUM
+                  estimated:
+                    from:
+                      account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                    to:
+                      account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                      amount: '10.00'
+                      currency: USDC
+                      network: ETHEREUM
+                  actual:
+                    from:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                    to:
+                      account_id: null
+                      amount: null
+                      currency: null
+                      network: null
+                  risk_status: automatically_approved
+                  risk_status_reasons: []
+                  risk_reviewed_by: null
+                  risk_reviewed_at: null
+                  balance_status: reserved
+                  balance_reserved_at: '2024-03-01T09:59:00.000Z'
+                  steps:
+                  - id: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+                    payment_id: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+                    step_sequence: 1
+                    step_type: transfer
+                    estimated:
+                      from:
+                        account_id: 6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                      to:
+                        account_id: 8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e
+                        amount: '10.00'
+                        currency: USDC
+                        network: ETHEREUM
+                    actual:
+                      from:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                      to:
+                        account_id: null
+                        amount: null
+                        currency: null
+                        network: null
+                    transaction_hash: '0xabc123'
+                    unsigned_transaction: null
+                    fees: []
+                    provider_key: turnkey
+                    status: confirmed
+                    status_reasons: []
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:02:00.000Z'
+                    submitted_at: '2024-03-01T10:00:10.000Z'
+                    confirmed_at: '2024-03-01T10:02:00.000Z'
+                    completed_at: null
+                    failed_at: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:02:00.000Z'
+                  expires_at: '2024-03-04T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+      security:
+      - bearer: []
+      summary: Sign payment step
+      tags:
+      - Payments
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+components:
+  schemas:
+    PaymentDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source account ID. May be omitted at POST and supplied later via PATCH (two-step PATCH flow).
+        amount:
+          type: string
+          description: Source amount. Exactly one of `desired.from.amount` or `desired.to.amount` must be supplied.
+          example: '10.00'
+        currency:
+          type: string
+          description: Source currency code.
+          example: USDC
+        network:
+          type: string
+          description: Source blockchain network. Required when `desired.from.currency` is a stablecoin.
+      description: Source side of the payment.
+      required:
+      - currency
+    UpdatePaymentDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/UpdatePaymentDesiredFromLeg'
+        to:
+          $ref: '#/components/schemas/UpdatePaymentDesiredToLeg'
+      description: Account-only update to the payment's desired overlay (two-step PATCH flow).
+      required:
+      - from
+      - to
+    PaymentStepEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentStepEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/PaymentStepEstimatedToLeg'
+      description: Planned values for this step.
+      required:
+      - from
+      - to
+    SignPaymentStepRequest:
+      type: object
+      properties:
+        signature:
+          type: string
+          minLength: 1
+          description: 'Base64-encoded JSON envelope `{ body, stamp }` where `body` is the JSON-encoded Turnkey `ACTIVITY_TYPE_SIGN_TRANSACTION_V2` activity and `stamp` is the X-Stamp header value produced by stamping that body. Wire format: `base64(JSON.stringify({ body, stamp }))`.'
+          example: <base64({body, stamp})>
+      required:
+      - signature
+    UpdatePaymentDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source account ID.
+      description: Source side of the payment (account-only update).
+      required:
+      - account_id
+    PaymentDesiredFromLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    UpdatePaymentDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination account ID.
+      description: Destination side of the payment (account-only update).
+      required:
+      - account_id
+    PaymentActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    PaymentDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentDesiredFromLegResponse'
+        to:
+          $ref: '#/components/schemas/PaymentDesiredToLegResponse'
+      description: Caller's stated intent at creation. Frozen except by the two-step PATCH flow which fills account IDs.
+      required:
+      - from
+      - to
+    PaymentStep:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique step identifier
+          example: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+        payment_id:
+          type: string
+          description: ID of the parent payment
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+        step_sequence:
+          type: integer
+          description: Order of this step in the payment flow (1-based)
+          example: 1
+        step_type:
+          type: string
+          description: Type of step
+          enum:
+          - transfer
+          - swap
+          example: transfer
+        estimated:
+          description: Planned values for this step.
+          allOf:
+          - $ref: '#/components/schemas/PaymentStepEstimatedOverlay'
+        actual:
+          description: Settled values once the step reaches a terminal state. All-null until then.
+          allOf:
+          - $ref: '#/components/schemas/PaymentStepActualOverlay'
+        transaction_hash:
+          type: string
+          description: Blockchain transaction hash
+          nullable: true
+          example: null
+        unsigned_transaction:
+          type: string
+          description: Unsigned transaction bytes for client signing. Present only for Turnkey-signed steps in `signature_requested` status.
+          nullable: true
+        fees:
+          description: Fees associated with this step.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/StepFee'
+        provider_key:
+          type: string
+          description: Provider used for this step
+          nullable: true
+          enum:
+          - circle_mint
+          - openfx
+          - turnkey
+          example: null
+        status:
+          type: string
+          description: Current status of this step
+          enum:
+          - created
+          - signature_requested
+          - signed
+          - submitted
+          - confirmed
+          - completed
+          - failed
+          example: completed
+        status_reasons:
+          description: Reasons for the current status
+          nullable: true
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusReason'
+        created_at:
+          type: string
+          description: Step creation timestamp
+          format: date-time
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: Step last update timestamp
+          format: date-time
+          example: '2024-03-01T10:02:00.000Z'
+        submitted_at:
+          type: string
+          description: Timestamp when step was submitted
+          format: date-time
+          nullable: true
+          example: null
+        confirmed_at:
+          type: string
+          description: Timestamp when step was confirmed
+          format: date-time
+          nullable: true
+          example: null
+        completed_at:
+          type: string
+          description: Timestamp when step completed
+          format: date-time
+          nullable: true
+          example: null
+        failed_at:
+          type: string
+          description: Timestamp when step failed
+          format: date-time
+          nullable: true
+          example: null
+      required:
+      - id
+      - payment_id
+      - step_sequence
+      - step_type
+      - estimated
+      - actual
+      - fees
+      - status
+      - created_at
+      - updated_at
+    PaymentTableEntity:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Entity unique identifier
+        classification:
+          type: string
+          description: 'Entity classification: ''individual'' or ''business'''
+          enum:
+          - individual
+          - business
+        business_name:
+          type: string
+          nullable: true
+        first_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+          nullable: true
+        business_country:
+          type: string
+          nullable: true
+        individual_country:
+          type: string
+          nullable: true
+        wallet_address:
+          type: string
+          nullable: true
+      required:
+      - id
+      - classification
+    ReviewPaymentRequest:
+      type: object
+      properties:
+        is_approved:
+          type: boolean
+          description: Approve (true) or reject (false) the payment.
+      required:
+      - is_approved
+    SimulateInboundPaymentRequest:
+      type: object
+      properties:
+        to_account:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          description: Managed account ID that should receive the simulated inbound.
+        mocked_risk_status:
+          type: string
+          enum:
+          - automatically_approved
+          - awaiting_decision
+          - automatically_rejected
+          description: The risk_status the screening verdict should be forced to.
+        network:
+          description: EVM testnet to send on. Defaults to BASE_SEPOLIA.
+          type: string
+          enum:
+          - BASE_SEPOLIA
+          - ETHEREUM_SEPOLIA
+          - POLYGON_AMOY
+      required:
+      - to_account
+      - mocked_risk_status
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique payment identifier
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+        workspace_id:
+          type: string
+          description: Workspace ID the payment belongs to
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          description: External reference ID for tracking.
+          nullable: true
+          example: ref_123
+        direction:
+          type: string
+          description: Payment direction.
+          enum:
+          - inbound
+          - outbound
+          - rebalance
+          example: outbound
+        funding_account_id:
+          type: string
+          description: Funding account ID. Payment-only field. Top-level (not part of any overlay).
+          nullable: true
+          example: 2a8f4c1e-9b3d-4e56-b7a0-5c6d2e1f9b3a
+        desired:
+          description: Caller's stated intent at creation. Frozen except by the two-step PATCH flow which fills account IDs.
+          allOf:
+          - $ref: '#/components/schemas/PaymentDesiredOverlay'
+        estimated:
+          description: Tesser's projection for how the payment will proceed.
+          allOf:
+          - $ref: '#/components/schemas/PaymentEstimatedOverlay'
+        actual:
+          description: 'What actually settled. Populated once at least one step has `status: completed`.'
+          allOf:
+          - $ref: '#/components/schemas/PaymentActualOverlay'
+        risk_status:
+          type: string
+          description: Risk assessment status.
+          enum:
+          - unchecked
+          - awaiting_decision
+          - automatically_approved
+          - manually_approved
+          - automatically_rejected
+          - manually_rejected
+          example: unchecked
+        risk_status_reasons:
+          description: Reasons for risk status.
+          nullable: true
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskStatusReason'
+        risk_reviewed_by:
+          type: string
+          description: User ID who reviewed the risk.
+          nullable: true
+          example: null
+        risk_reviewed_at:
+          type: string
+          description: Timestamp when risk was reviewed.
+          format: date-time
+          nullable: true
+          example: null
+        balance_status:
+          type: string
+          description: Balance reservation status.
+          nullable: true
+          enum:
+          - unreserved
+          - awaiting_funds
+          - reserved
+          example: unreserved
+        balance_reserved_at:
+          type: string
+          description: Timestamp when balance was reserved.
+          format: date-time
+          nullable: true
+          example: null
+        steps:
+          description: Payment execution steps.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentStep'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        expires_at:
+          type: string
+          description: ISO 8601 timestamp when the payment expires.
+          format: date-time
+          nullable: true
+          example: '2024-03-02T10:00:00.000Z'
+      required:
+      - id
+      - workspace_id
+      - direction
+      - funding_account_id
+      - desired
+      - estimated
+      - actual
+      - risk_status
+      - balance_status
+      - balance_reserved_at
+      - steps
+      - created_at
+      - updated_at
+      - expires_at
+    PaymentStepActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    ListPaymentsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    PaymentDesiredToLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    PaymentEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/PaymentEstimatedToLeg'
+      description: Tesser's projection for how the payment will proceed.
+      required:
+      - from
+      - to
+    InternalPaymentFull:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+        workspace_id:
+          type: string
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          nullable: true
+        direction:
+          type: string
+          enum:
+          - inbound
+          - outbound
+          - rebalance
+          example: outbound
+        funding_account_id:
+          type: string
+          nullable: true
+        from_account_id:
+          type: string
+          nullable: true
+        from_amount:
+          type: string
+          example: '1000000'
+        from_network:
+          type: string
+          nullable: true
+        from_currency:
+          type: string
+          example: USDC
+        to_account_id:
+          type: string
+          nullable: true
+        to_amount:
+          type: string
+          example: '1000000'
+        to_network:
+          type: string
+          nullable: true
+        to_currency:
+          type: string
+          example: USDC
+        risk_status:
+          type: string
+          nullable: true
+          enum:
+          - unchecked
+          - awaiting_decision
+          - automatically_approved
+          - manually_approved
+          - automatically_rejected
+          - manually_rejected
+        risk_status_reasons:
+          nullable: true
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskStatusReason'
+        risk_reviewed_by:
+          type: string
+          nullable: true
+        risk_reviewed_at:
+          type: string
+          format: date-time
+          nullable: true
+        balance_status:
+          type: string
+          nullable: true
+          enum:
+          - unreserved
+          - reserved
+          - awaiting_funds
+        balance_reserved_at:
+          type: string
+          format: date-time
+          nullable: true
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegacyPaymentStep'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        originator:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/PaymentTableEntity'
+        belongsTo:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/PaymentTableEntity'
+        beneficiary:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/PaymentTableEntity'
+        funding_account:
+          nullable: true
+          allOf:
+          - $ref: '#/components/schemas/FundingAccount'
+        status:
+          type: string
+          description: Computed payment status for UI
+          enum:
+          - queued
+          - processing
+          - ready-to-submit
+          - sent
+          - need-review
+          - compliance-blocked
+          - insufficient-balance
+      required:
+      - id
+      - workspace_id
+      - direction
+      - from_amount
+      - from_currency
+      - to_amount
+      - to_currency
+      - risk_status
+      - created_at
+      - updated_at
+      - expires_at
+      - status
+    UpdatePaymentRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional external reference ID for tracking.
+        funding_account_id:
+          type: string
+          description: Funding account ID for the payment.
+        desired:
+          description: Account IDs to attach to the payment.
+          allOf:
+          - $ref: '#/components/schemas/UpdatePaymentDesiredOverlay'
+      required:
+      - funding_account_id
+      - desired
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
+    PaymentStepEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    PaymentActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentActualFromLeg'
+        to:
+          $ref: '#/components/schemas/PaymentActualToLeg'
+      description: 'What actually settled. Populated once at least one step has `status: completed`.'
+      required:
+      - from
+      - to
+    StatusReason:
+      type: object
+      properties:
+        error_code:
+          type: string
+          example: transfers-9201
+        error_message:
+          type: string
+          example: An upstream step failed, so this step was not executed
+      required:
+      - error_code
+      - error_message
+    PaymentDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination account ID. May be omitted at POST and supplied later via PATCH (two-step PATCH flow).
+        amount:
+          type: string
+          description: Destination amount. Exactly one of `desired.from.amount` or `desired.to.amount` must be supplied.
+          example: '10.00'
+        currency:
+          type: string
+          description: Destination currency code.
+          example: USDC
+        network:
+          type: string
+          description: Destination blockchain network. Required for crypto-to-crypto payments.
+      description: Destination side of the payment.
+      required:
+      - currency
+    LegacyPaymentStep:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+        payment_id:
+          type: string
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+        step_sequence:
+          type: integer
+          example: 1
+        step_type:
+          type: string
+          enum:
+          - transfer
+          - swap
+          example: transfer
+        from_account_id:
+          type: string
+          nullable: true
+        from_amount:
+          type: string
+          example: '1000000'
+        from_network:
+          type: string
+          nullable: true
+        from_currency:
+          type: string
+          example: USDC
+        to_account_id:
+          type: string
+          nullable: true
+        to_amount:
+          type: string
+          example: '999000'
+        to_network:
+          type: string
+          nullable: true
+        to_currency:
+          type: string
+          example: USDC
+        transaction_hash:
+          type: string
+          nullable: true
+        fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegacyPaymentFee'
+        provider_key:
+          type: string
+          nullable: true
+          enum:
+          - circle_mint
+          - turnkey
+        status:
+          type: string
+          enum:
+          - created
+          - signature_requested
+          - signed
+          - submitted
+          - confirmed
+          - completed
+          - failed
+        status_reasons:
+          nullable: true
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusReason'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        failed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - id
+      - payment_id
+      - step_sequence
+      - step_type
+      - from_amount
+      - from_currency
+      - to_amount
+      - to_currency
+      - status
+      - created_at
+      - updated_at
+    FundingAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Account unique identifier
+        name:
+          type: string
+          description: Account name
+        bank_name:
+          type: string
+          nullable: true
+        bank_identifier_code:
+          type: string
+          nullable: true
+        bank_swift_code:
+          type: string
+          nullable: true
+      required:
+      - id
+      - name
+    PaymentActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    PaymentStepActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    PaymentEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    CreatePaymentRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional external reference ID for tracking.
+        funding_account_id:
+          type: string
+          description: Funding account ID. Optional at POST to support the two-step PATCH creation flow; required together with `desired.from.account_id` and `desired.to.account_id` once any of the three is supplied.
+        desired:
+          description: Caller's stated intent for the payment.
+          allOf:
+          - $ref: '#/components/schemas/PaymentDesiredOverlayRequest'
+      required:
+      - desired
+    PaymentDesiredOverlayRequest:
+      type: object
+      properties:
+        from:
+          description: Source side of the payment.
+          allOf:
+          - $ref: '#/components/schemas/PaymentDesiredFromLeg'
+        to:
+          description: Destination side of the payment.
+          allOf:
+          - $ref: '#/components/schemas/PaymentDesiredToLeg'
+      description: Caller's stated intent for the payment.
+      required:
+      - from
+      - to
+    PaymentEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    PaymentStepEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StepFee:
+      type: object
+      properties:
+        fee_amount:
+          type: string
+          description: Fee amount.
+        fee_currency:
+          type: string
+          description: Fee currency code.
+        fee_type:
+          type: string
+          description: Fee type (e.g., 'gas', 'provider').
+        fee_metadata:
+          type: object
+          description: Additional metadata for the fee (JSON object).
+          additionalProperties: true
+      required:
+      - fee_amount
+      - fee_currency
+      - fee_type
+    LegacyPaymentFee:
+      type: object
+      properties:
+        fee_amount:
+          type: string
+          example: '1000'
+        fee_currency:
+          type: string
+          example: USDC
+        fee_type:
+          type: string
+          example: gas
+        fee_metadata:
+          type: object
+          nullable: true
+          additionalProperties: true
+          example: {}
+      required:
+      - fee_amount
+      - fee_currency
+      - fee_type
+    RiskStatusReason:
+      type: object
+      properties:
+        risk_status_reason_type:
+          type: string
+        risk_status_reason_category:
+          type: string
+        risk_status_reason_message:
+          type: string
+        risk_status_reason_severity:
+          type: string
+      required:
+      - risk_status_reason_type
+      - risk_status_reason_category
+      - risk_status_reason_message
+      - risk_status_reason_severity
+    InternalPaymentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InternalPaymentFull'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    PaymentResponse:
+      type: object
+      properties:
+        data:
+          description: Payment data
+          allOf:
+          - $ref: '#/components/schemas/Payment'
+      required:
+      - data
+    PaymentStepActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentStepActualFromLeg'
+        to:
+          $ref: '#/components/schemas/PaymentStepActualToLeg'
+      description: 'Settled values once the step reaches `status: completed`. All-null until then; remains all-null on failure.'
+      required:
+      - from
+      - to
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

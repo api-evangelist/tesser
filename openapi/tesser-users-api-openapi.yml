@@ -1,0 +1,323 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts Users API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: Users
+paths:
+  /v1/users/me:
+    get:
+      description: Retrieve the authenticated user's profile information including user details and team/organization information.
+      operationId: users_getCurrentUser
+      parameters: []
+      responses:
+        '200':
+          description: Successfully retrieved user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponseDto'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+      security:
+      - bearer: []
+      summary: Get current user profile
+      tags:
+      - Users
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/users/signup:
+    post:
+      operationId: users_signup
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequestDto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponseDto'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '403':
+          description: Access denied - insufficient permissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0003
+                    error_message: You do not have permission to access this resource
+      summary: Sign up a new user and create a team
+      tags:
+      - Users
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+components:
+  schemas:
+    UserProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        teamId:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+      - id
+      - email
+      - teamId
+      - createdAt
+      - updatedAt
+    SignupRequestDto:
+      type: object
+      properties:
+        entityName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+      required:
+      - entityName
+      - email
+    UserProfileResponseDto:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/UserProfileDataDto'
+      required:
+      - message
+      - data
+    SignupResponseDto:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            team:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+              required:
+              - id
+              - name
+            user:
+              type: object
+              properties:
+                id:
+                  type: string
+                email:
+                  type: string
+                teamId:
+                  type: string
+              required:
+              - id
+              - email
+              - teamId
+            isNewTeam:
+              type: boolean
+            isNewUser:
+              type: boolean
+          required:
+          - team
+          - user
+          - isNewTeam
+          - isNewUser
+      required:
+      - message
+      - data
+    TeamDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        turnkeySubOrgId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+    UserProfileDataDto:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserProfileDto'
+        team:
+          $ref: '#/components/schemas/TeamDto'
+      required:
+      - user
+      - team
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

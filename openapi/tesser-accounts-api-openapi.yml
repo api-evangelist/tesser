@@ -1,0 +1,1537 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: Accounts
+paths:
+  /v1/accounts:
+    get:
+      description: Retrieve all accounts for your workspace with optional filtering and pagination.
+      operationId: account_findAll
+      parameters:
+      - name: type
+        required: false
+        in: query
+        description: Filter by account type
+        schema:
+          enum:
+          - fiat_bank
+          - stablecoin_ethereum
+          - stablecoin_solana
+          - stablecoin_stellar
+          - ledger
+          type: string
+      - name: tenant_id
+        required: false
+        in: query
+        description: Filter by tenant ID
+        schema:
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+      - name: counterparty_id
+        required: false
+        in: query
+        description: Filter by counterparty ID
+        schema:
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+      - name: entity_type
+        required: false
+        in: query
+        description: Filter by entity type (e.g. sub_org for workspace-level)
+        schema:
+          type: string
+          enum:
+          - sub_org
+          - counterparty
+          - tenant
+      - name: search
+        required: false
+        in: query
+        description: Search by account name
+        schema:
+          type: string
+      - name: is_managed
+        required: false
+        in: query
+        description: 'Filter by managed status: ''true'' for managed wallets only, ''false'' for unmanaged wallets only, omit for all accounts'
+        schema:
+          enum:
+          - 'true'
+          - 'false'
+          type: string
+      - name: include_secure
+        required: false
+        in: query
+        description: Include masked sensitive fields (e.g., bank account number)
+        schema:
+          type: boolean
+      - name: compliance_accepted
+        required: false
+        in: query
+        description: 'Filter ledger accounts by compliance status: ''true'' returns only ledgers with ACCEPTED compliance state'
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: Page number for pagination (1-based)
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        required: false
+        in: query
+        description: 'Number of items per page (default: 20)'
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: Accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountListResponse'
+              example:
+                data:
+                - id: 8f3b1e7c-9a2d-4f58-b6c0-4e7d2a9f1b3c
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  tenant_id: null
+                  counterparty_id: 2a7e1c9f-4b3d-4a82-b6e0-8f5c2d1a9b3e
+                  type: fiat_bank
+                  name: Operating Account - EU
+                  bank_name: Chase Bank
+                  bank_code_type: SWIFT
+                  bank_identifier_code: CHASUS33
+                  created_at: '2024-03-02T14:30:00.000Z'
+                  updated_at: '2024-03-02T14:30:00.000Z'
+                  bank_account_number: •••6789
+                - id: 7a3d8f2e-6b4c-4a91-b8e5-2f9c1d7e3a0b
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  tenant_id: null
+                  counterparty_id: null
+                  type: stablecoin_ethereum
+                  name: Treasury Wallet - Ethereum
+                  crypto_wallet_address: '0x742d35CC6634C0532925a3B844BC9e7595f8fe0B'
+                  is_managed: true
+                  assets:
+                  - currency: USDC
+                    network: POLYGON
+                    available_balance: '0'
+                  - currency: USDT
+                    network: POLYGON
+                    available_balance: '0'
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+                pagination:
+                  page: 1
+                  limit: 10
+                  total: 2
+                  total_pages: 1
+                  has_next: false
+                  has_prev: false
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: List all accounts
+      tags:
+      - Accounts
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/accounts/banks:
+    post:
+      description: 'Create a new fiat bank account for your workspace, tenant, or counterparty.
+
+
+        **Security:** The `bank_account_number` field is encrypted and stored securely in a vault. It will never be returned in API responses.
+
+
+        **Ownership:** Use `tenant_id` OR `counterparty_id` to link the account. Omit both for a workspace-level account.'
+      operationId: account_createBankAccount
+      parameters: []
+      requestBody:
+        required: true
+        description: Bank account data. The bank_account_number field is SECURELY ENCRYPTED and stored in vault.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBankAccountRequestDto'
+            examples:
+              workspace:
+                summary: Create a workspace-level bank account
+                value:
+                  name: Workspace Operating Account
+                  bank_name: JPMorgan Chase Bank
+                  bank_code_type: SWIFT
+                  bank_identifier_code: CHASUS33
+                  bank_account_number: '1234567890'
+              counterparty:
+                summary: Create a bank account for a counterparty
+                value:
+                  counterparty_id: 2a7e1c9f-4b3d-4a82-b6e0-8f5c2d1a9b3e
+                  name: Supplier Payment Account - EU
+                  bank_name: Deutsche Bank
+                  bank_code_type: SWIFT
+                  bank_identifier_code: DEUTDEFF
+                  bank_account_number: DE89370400440532013000
+              tenant:
+                summary: Create a bank account for a tenant
+                value:
+                  tenant_id: 7a1f5c9e-3b2d-4e68-b0a4-6e9c1f3d8a2b
+                  name: Client Treasury Account
+                  bank_name: Bank of America
+                  bank_code_type: ROUTING
+                  bank_identifier_code: 026009593
+                  bank_account_number: '987654321'
+      responses:
+        '201':
+          description: Bank account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBankAccountResponseDto'
+              example:
+                data:
+                  id: 8f3b1e7c-9a2d-4f58-b6c0-4e7d2a9f1b3c
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  tenant_id: null
+                  counterparty_id: 2a7e1c9f-4b3d-4a82-b6e0-8f5c2d1a9b3e
+                  type: fiat_bank
+                  name: Operating Account - EU
+                  bank_name: Chase Bank
+                  bank_code_type: SWIFT
+                  bank_identifier_code: CHASUS33
+                  created_at: '2024-03-02T14:30:00.000Z'
+                  updated_at: '2024-03-02T14:30:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Create a new bank account
+      tags:
+      - Accounts
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/accounts/ledgers:
+    post:
+      description: 'Create a ledger account linked to an external liquidity provider.
+
+
+        **Supported Providers:**
+
+        - `CIRCLE_MINT`: Circle Mint USDC accounts for institutional settlement
+
+        - `KRAKEN`: Kraken exchange accounts for cryptocurrency liquidity
+
+
+        Ledger accounts are virtual accounts managed by the provider. They enable fast settlement without on-chain transactions.
+
+
+        **Ownership:** Use `tenant_id` OR `counterparty_id` to link the account. Omit both for a workspace-level ledger account.'
+      operationId: account_createLedgerAccount
+      parameters: []
+      requestBody:
+        required: true
+        description: Ledger account details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLedgerAccountRequestDto'
+            examples:
+              circle_tenant:
+                summary: Create a Circle Mint USDC ledger account for a tenant
+                value:
+                  tenant_id: 7a1f5c9e-3b2d-4e68-b0a4-6e9c1f3d8a2b
+                  name: Circle Settlement Account
+                  provider: CIRCLE_MINT
+              circle_counterparty:
+                summary: Create a Circle Mint USDC ledger account for a counterparty
+                value:
+                  counterparty_id: 6f1c4a8e-2d7b-4930-b5e2-9a3f0c7d1b6e
+                  name: Counterparty Circle Account
+                  provider: CIRCLE_MINT
+              kraken_counterparty:
+                summary: Create a Kraken ledger account for a counterparty
+                value:
+                  counterparty_id: 2a7e1c9f-4b3d-4a82-b6e0-8f5c2d1a9b3e
+                  name: Supplier Kraken Account
+                  provider: KRAKEN
+      responses:
+        '201':
+          description: Ledger account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateLedgerAccountResponseDto'
+              example:
+                data:
+                  id: 770e8400-e29b-41d4-a716-446655440006
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  tenant_id: null
+                  counterparty_id: null
+                  type: ledger
+                  name: Circle Settlement Account
+                  provider: CIRCLE_MINT
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Create a new ledger account
+      tags:
+      - Accounts
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/accounts/wallets:
+    post:
+      description: 'Create a new stablecoin wallet account.
+
+
+        **Supported Networks:**
+
+        - `stablecoin_ethereum` - Ethereum/Polygon stablecoin wallet
+
+        - `stablecoin_solana` - Solana stablecoin wallet
+
+        - `stablecoin_stellar` - Stellar stablecoin wallet
+
+
+        **Wallet Types:**
+
+        - **Managed** (`is_managed=true`) - Tesser-managed wallet, requires `signature`
+
+        - **Unmanaged** (`is_managed=false`, default) - External wallet, requires `wallet_address`
+
+
+        **Ownership:** Optionally link to a tenant or counterparty using `tenant_id` or `counterparty_id`.'
+      operationId: account_createWalletAccount
+      parameters: []
+      requestBody:
+        required: true
+        description: Wallet account details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWalletAccountRequestDto'
+            examples:
+              managed:
+                summary: Managed wallet (Tesser-managed)
+                value:
+                  name: Treasury Wallet (Omnibus)
+                  type: stablecoin_ethereum
+                  is_managed: true
+                  signature: eyJwdWJsaWNLZXkiOiJwdWJfZXhhbXBsZSIsInNpZ25hdHVyZSI6InNpZ19leGFtcGxlIiwic2NoZW1lIjoiRUQyNTUxOSJ9
+              unmanaged:
+                summary: Unmanaged wallet (external address)
+                value:
+                  name: External Partner Wallet
+                  type: stablecoin_ethereum
+                  is_managed: false
+                  wallet_address: '0x742d35CC6634C0532925a3B844BC9e7595f8fe0B'
+                  counterparty_id: 550e8400-e29b-41d4-a716-446655440002
+      responses:
+        '201':
+          description: Wallet account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWalletAccountResponseDto'
+              example:
+                data:
+                  id: 7a3d8f2e-6b4c-4a91-b8e5-2f9c1d7e3a0b
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  tenant_id: null
+                  counterparty_id: null
+                  type: stablecoin_ethereum
+                  name: Treasury Wallet - Ethereum
+                  crypto_wallet_address: '0x742d35CC6634C0532925a3B844BC9e7595f8fe0B'
+                  is_managed: true
+                  assets:
+                  - currency: USDC
+                    network: POLYGON
+                    available_balance: '0'
+                  - currency: USDT
+                    network: POLYGON
+                    available_balance: '0'
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Create a new wallet account
+      tags:
+      - Accounts
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/accounts/{id}:
+    get:
+      description: Retrieve a specific account by its unique identifier.
+      operationId: account_findOne
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Account ID (UUID)
+        schema:
+          example: 8f3b1e7c-9a2d-4f58-b6c0-4e7d2a9f1b3c
+          type: string
+      - name: include_secure
+        required: false
+        in: query
+        description: Include masked secure fields (e.g., bank account number)
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Account retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountResponseDto'
+              example:
+                data:
+                  id: 8f3b1e7c-9a2d-4f58-b6c0-4e7d2a9f1b3c
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  tenant_id: null
+                  counterparty_id: 2a7e1c9f-4b3d-4a82-b6e0-8f5c2d1a9b3e
+                  type: fiat_bank
+                  name: Operating Account - EU
+                  bank_name: Chase Bank
+                  bank_code_type: SWIFT
+                  bank_identifier_code: CHASUS33
+                  created_at: '2024-03-02T14:30:00.000Z'
+                  updated_at: '2024-03-02T14:30:00.000Z'
+                  bank_account_number: •••6789
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get an account by ID
+      tags:
+      - Accounts
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    patch:
+      description: Update an existing account's information.
+      operationId: account_update
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Account ID (UUID)
+        schema:
+          example: 8f3b1e7c-9a2d-4f58-b6c0-4e7d2a9f1b3c
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountRequestDto'
+            examples:
+              default:
+                summary: Update account name
+                value:
+                  name: Updated Operating Account
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateAccountResponseDto'
+              example:
+                data:
+                  id: 8f3b1e7c-9a2d-4f58-b6c0-4e7d2a9f1b3c
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  tenant_id: null
+                  counterparty_id: 2a7e1c9f-4b3d-4a82-b6e0-8f5c2d1a9b3e
+                  type: fiat_bank
+                  name: Updated Operating Account
+                  bank_name: Chase Bank
+                  bank_code_type: SWIFT
+                  bank_identifier_code: CHASUS33
+                  created_at: '2024-03-02T14:30:00.000Z'
+                  updated_at: '2024-03-01T12:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Update an account
+      tags:
+      - Accounts
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+components:
+  schemas:
+    AccountAssetDto:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency symbol
+          example: USDC
+        network:
+          type: string
+          description: Blockchain network (only for wallet accounts)
+          example: POLYGON
+        available_balance:
+          type: string
+          description: Available balance in smallest unit
+          example: '1000000'
+      required:
+      - currency
+      - available_balance
+    LedgerAssetDto:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency symbol
+          example: USDC
+        available_balance:
+          type: string
+          description: Available balance in smallest unit
+          example: '1000000'
+      required:
+      - currency
+      - available_balance
+    AccountListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    UpdateAccountRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: New account name
+    WalletAssetDto:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency symbol
+          example: USDC
+        network:
+          type: string
+          description: Blockchain network
+          example: POLYGON
+        available_balance:
+          type: string
+          description: Available balance in smallest unit
+          example: '1000000'
+      required:
+      - currency
+      - network
+      - available_balance
+    UpdateAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AccountData'
+      required:
+      - data
+    CreateBankAccountRequestDto:
+      type: object
+      properties:
+        tenant_id:
+          description: Tenant ID (mutually exclusive with counterparty_id). Links this account to a specific tenant.
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        counterparty_id:
+          description: Counterparty ID (mutually exclusive with tenant_id). Links this account to a specific counterparty.
+          example: 660e8400-e29b-41d4-a716-446655440003
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        name:
+          type: string
+          minLength: 1
+          description: Human-readable name for the bank account
+          example: Operating Account - EU
+          maxLength: 255
+        bank_name:
+          type: string
+          minLength: 1
+          description: Name of the financial institution
+          example: Chase Bank
+          maxLength: 255
+        bank_code_type:
+          type: string
+          minLength: 1
+          description: Type of bank code (e.g., SWIFT, BIC, IBAN, ROUTING, SORT_CODE)
+          example: SWIFT
+          maxLength: 50
+        bank_identifier_code:
+          type: string
+          minLength: 1
+          description: Bank identifier code value
+          example: CHASUS33
+          maxLength: 255
+        bank_swift_code:
+          description: SWIFT code
+          example: CHASUS33XXX
+          type: string
+          minLength: 1
+          nullable: true
+        bank_account_number:
+          type: string
+          minLength: 1
+          description: 'Bank account number. SECURE FIELD: Encrypted and stored in vault, never returned in responses. Required in API request.'
+          example: '1234567890'
+          maxLength: 255
+      required:
+      - name
+      - bank_name
+      - bank_code_type
+      - bank_identifier_code
+      - bank_account_number
+    BankAccountData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the account
+        workspace_id:
+          type: string
+          description: Workspace ID the account belongs to
+        tenant_id:
+          type: string
+          nullable: true
+          description: Tenant ID (if account belongs to a tenant)
+        counterparty_id:
+          type: string
+          nullable: true
+          description: Counterparty ID (if account belongs to a counterparty)
+        type:
+          type: string
+          description: Account type
+        name:
+          type: string
+          description: Account name
+        created_at:
+          type: string
+          description: Creation timestamp
+        updated_at:
+          type: string
+          description: Last update timestamp
+        bank_name:
+          type: string
+          description: Name of the financial institution
+        bank_code_type:
+          type: string
+          description: Type of bank code (e.g., SWIFT, BIC, IBAN, ROUTING, SORT_CODE)
+        bank_identifier_code:
+          type: string
+          description: Bank identifier code value
+        bank_swift_code:
+          type: string
+          nullable: true
+          description: SWIFT code
+        bank_account_number:
+          type: string
+          nullable: true
+          description: Bank account number (masked, only with include_secure=true)
+      required:
+      - id
+      - workspace_id
+      - type
+      - name
+      - created_at
+      - updated_at
+      - bank_name
+      - bank_code_type
+      - bank_identifier_code
+    CreateWalletAccountRequestDto:
+      type: object
+      properties:
+        tenant_id:
+          description: Tenant ID (mutually exclusive with counterparty_id). Links this wallet to a specific tenant.
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        counterparty_id:
+          description: Counterparty ID (mutually exclusive with tenant_id). Links this wallet to a specific counterparty.
+          example: 660e8400-e29b-41d4-a716-446655440003
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        name:
+          type: string
+          minLength: 1
+          description: Human-readable name for the wallet account
+          example: Treasury Wallet - Ethereum
+          maxLength: 255
+        type:
+          type: string
+          enum:
+          - stablecoin_ethereum
+          - stablecoin_solana
+          - stablecoin_stellar
+          description: Stablecoin network type. Determines which blockchain network the wallet operates on.
+          example: stablecoin_ethereum
+        signature:
+          type: string
+          description: A cryptographic stamp used to verify the integrity and authenticity of the request. This ensures the request was signed by an authorized key. Required for managed wallets (is_managed=true). See Documentation > Signing for more details.
+          example: eyJwdWJsaWNLZXkiOiJwdWJfZXhhbXBsZSIsInNpZ25hdHVyZSI6InNpZ19leGFtcGxlIiwic2NoZW1lIjoiRUQyNTUxOSJ9
+        is_managed:
+          default: false
+          type: boolean
+          description: Whether this is a managed wallet (provisioned by Tesser), or unmanaged (not provisioned by Tesser). Managed wallets (true) require a signature and automatically create USDC/USDT assets. Unmanaged wallets (false) require a wallet_address. Defaults to false.
+          example: false
+        wallet_address:
+          type: string
+          description: Blockchain wallet address. Required for unmanaged wallets (is_managed=false). Auto-generated for managed wallets.
+          example: '0x742d35CC6634C0532925a3B844BC9e7595f8fe0B'
+      required:
+      - name
+      - type
+    CreateWalletAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WalletAccountData'
+      required:
+      - data
+    CreateLedgerAccountRequestDto:
+      type: object
+      properties:
+        tenant_id:
+          description: Tenant ID (mutually exclusive with counterparty_id). Links this ledger account to a specific tenant.
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        counterparty_id:
+          description: Counterparty ID (mutually exclusive with tenant_id). Links this ledger account to a specific counterparty.
+          example: 660e8400-e29b-41d4-a716-446655440003
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        name:
+          type: string
+          minLength: 1
+          description: Human-readable name for the ledger account
+          example: Circle USDC Account
+          maxLength: 255
+        provider:
+          type: string
+          enum:
+          - CIRCLE_MINT
+          - KRAKEN
+          - OPENFX
+          description: Liquidity provider that manages this ledger account. CIRCLE_MINT for Circle Mint accounts, KRAKEN for Kraken exchange accounts.
+          example: CIRCLE_MINT
+      required:
+      - name
+      - provider
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
+    AccountData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the account
+        workspace_id:
+          type: string
+          description: Workspace ID the account belongs to
+        tenant_id:
+          type: string
+          nullable: true
+          description: Tenant ID (if account belongs to a tenant)
+        counterparty_id:
+          type: string
+          nullable: true
+          description: Counterparty ID (if account belongs to a counterparty)
+        type:
+          type: string
+          description: Account type
+        name:
+          type: string
+          description: Account name
+        bank_name:
+          type: string
+          nullable: true
+          description: Bank name (only for fiat_bank accounts)
+        bank_code_type:
+          type: string
+          nullable: true
+          description: Bank code type (only for fiat_bank accounts)
+        bank_identifier_code:
+          type: string
+          nullable: true
+          description: Bank identifier code (only for fiat_bank accounts)
+        bank_swift_code:
+          type: string
+          nullable: true
+          description: SWIFT code (only for fiat_bank accounts)
+        bank_account_number:
+          type: string
+          nullable: true
+          description: Bank account number (masked, only with include_secure=true)
+        crypto_wallet_address:
+          type: string
+          nullable: true
+          description: Crypto wallet address (only for wallet accounts)
+        is_managed:
+          type: boolean
+          nullable: true
+          description: Is managed wallet (only for wallet accounts)
+        provider:
+          type: string
+          nullable: true
+          description: Ledger provider (only for ledger accounts)
+          enum:
+          - CIRCLE_MINT
+          - KRAKEN
+          - OPENFX
+        assets:
+          description: Account assets with balances (for wallet and ledger accounts)
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountAssetDto'
+        created_at:
+          type: string
+          description: Creation timestamp
+        updated_at:
+          type: string
+          description: Last update timestamp
+      required:
+      - id
+      - workspace_id
+      - type
+      - name
+      - created_at
+      - updated_at
+    LedgerAccountData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the account
+        workspace_id:
+          type: string
+          description: Workspace ID the account belongs to
+        tenant_id:
+          type: string
+          nullable: true
+          description: Tenant ID (if account belongs to a tenant)
+        counterparty_id:
+          type: string
+          nullable: true
+          description: Counterparty ID (if account belongs to a counterparty)
+        type:
+          type: string
+          description: Account type
+        name:
+          type: string
+          description: Account name
+        created_at:
+          type: string
+          description: Creation timestamp
+        updated_at:
+          type: string
+          description: Last update timestamp
+        provider:
+          type: string
+          description: Liquidity provider that manages this ledger account
+          enum:
+          - CIRCLE_MINT
+          - KRAKEN
+          - OPENFX
+        assets:
+          description: Ledger assets with balances
+          type: array
+          items:
+            $ref: '#/components/schemas/LedgerAssetDto'
+      required:
+      - id
+      - workspace_id
+      - type
+      - name
+      - created_at
+      - updated_at
+      - provider
+    WalletAccountData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the account
+        workspace_id:
+          type: string
+          description: Workspace ID the account belongs to
+        tenant_id:
+          type: string
+          nullable: true
+          description: Tenant ID (if account belongs to a tenant)
+        counterparty_id:
+          type: string
+          nullable: true
+          description: Counterparty ID (if account belongs to a counterparty)
+        type:
+          type: string
+          description: Account type
+        name:
+          type: string
+          description: Account name
+        created_at:
+          type: string
+          description: Creation timestamp
+        updated_at:
+          type: string
+          description: Last update timestamp
+        crypto_wallet_address:
+          type: string
+          description: Blockchain wallet address
+        is_managed:
+          type: boolean
+          description: Whether this is a managed wallet (provisioned by Tesser), or unmanaged (not provisioned by Tesser)
+        assets:
+          description: Wallet assets with balances
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletAssetDto'
+      required:
+      - id
+      - workspace_id
+      - type
+      - name
+      - created_at
+      - updated_at
+      - crypto_wallet_address
+      - is_managed
+    CreateBankAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/BankAccountData'
+      required:
+      - data
+    CreateLedgerAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LedgerAccountData'
+      required:
+      - data
+    AccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AccountData'
+      required:
+      - data
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

@@ -1,0 +1,707 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts Tenants API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: Tenants
+paths:
+  /v1/entities/tenants:
+    post:
+      description: 'Create a new tenant for your workspace. Tenants are business customers that can have their own counterparties and accounts.
+
+
+        Tenants can be assigned to counterparties to organize your workspace by customer.
+
+
+        **Required fields:** business_legal_name'
+      operationId: tenant_create
+      parameters: []
+      requestBody:
+        required: true
+        description: Tenant data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTenantRequestDto'
+            examples:
+              default:
+                summary: Create a tenant
+                value:
+                  business_legal_name: Acme Corporation
+                  business_dba: Acme Co
+                  business_address_country: US
+                  business_street_address1: 456 Corp Blvd
+                  business_street_address2: Suite 200
+                  business_city: San Francisco
+                  business_state: CA
+                  business_postal_code: '94105'
+                  webhook_url: https://acme.com/webhooks/tesser
+              minimal:
+                summary: Create a tenant (minimal)
+                value:
+                  business_legal_name: TechStart Inc
+      responses:
+        '201':
+          description: Tenant created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTenantResponseDto'
+              example:
+                data:
+                  tenant:
+                    id: 0c6e3a9f-2b1d-4f84-a7e5-8d4c1b2f9a3e
+                    workspace_id: b53f6690-3242-4942-9907-885779632832
+                    name: Acme Co
+                    business_legal_name: Acme Corporation
+                    business_dba: Acme Co
+                    business_address_country: US
+                    webhook_url: https://acme.com/webhooks/tesser
+                    business_street_address1: null
+                    business_street_address2: null
+                    business_city: null
+                    business_state: null
+                    business_postal_code: null
+                    business_legal_entity_identifier: null
+                    created_at: '2024-03-01T10:00:00.000Z'
+                    updated_at: '2024-03-01T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Create a new tenant
+      tags:
+      - Tenants
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    get:
+      description: Retrieve all tenants for your workspace with optional search filtering and pagination.
+      operationId: tenant_findAll
+      parameters:
+      - name: search
+        required: false
+        in: query
+        description: Search by name (legal name or DBA)
+        schema:
+          type: string
+      - name: include_secure
+        required: false
+        in: query
+        description: Include masked vault data (address, legal entity identifier)
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: Page number for pagination (1-based)
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        required: false
+        in: query
+        description: 'Number of items per page (default: 20)'
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: Tenants retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantListResponse'
+              example:
+                data:
+                - id: 4e8c2a6f-1b9d-4f37-a5e0-7c3b8d2f1a9e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  name: Acme Co
+                  business_legal_name: Acme Corporation
+                  business_dba: Acme Co
+                  business_address_country: US
+                  webhook_url: https://acme.com/webhooks/tesser
+                  business_street_address1: 456 Corp Blvd
+                  business_street_address2: Suite 200
+                  business_city: San Francisco
+                  business_state: CA
+                  business_postal_code: '94105'
+                  business_legal_entity_identifier: null
+                  created_at: '2024-01-15T10:30:00.000Z'
+                  updated_at: '2024-01-15T10:30:00.000Z'
+                - id: 7a1f5c9e-3b2d-4e68-b0a4-6e9c1f3d8a2b
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  name: TechStart Inc
+                  business_legal_name: TechStart Inc
+                  business_dba: null
+                  business_address_country: CA
+                  webhook_url: null
+                  business_street_address1: 789 Startup Ave
+                  business_street_address2: null
+                  business_city: Toronto
+                  business_state: 'ON'
+                  business_postal_code: M5V 2T6
+                  business_legal_entity_identifier: null
+                  created_at: '2024-02-01T14:00:00.000Z'
+                  updated_at: '2024-02-01T14:00:00.000Z'
+                pagination:
+                  page: 1
+                  limit: 10
+                  total: 2
+                  total_pages: 1
+                  has_next: false
+                  has_prev: false
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: List all tenants
+      tags:
+      - Tenants
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/entities/tenants/{id}:
+    get:
+      description: Retrieve a specific tenant by its unique identifier.
+      operationId: tenant_findOne
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Tenant ID (UUID)
+        schema:
+          example: 4e8c2a6f-1b9d-4f37-a5e0-7c3b8d2f1a9e
+          type: string
+      - name: include_secure
+        required: false
+        in: query
+        description: Include masked vault data (address, legal entity identifier)
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Tenant retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantResponseDto'
+              example:
+                data:
+                  id: 4e8c2a6f-1b9d-4f37-a5e0-7c3b8d2f1a9e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  name: Acme Co
+                  business_legal_name: Acme Corporation
+                  business_dba: Acme Co
+                  business_address_country: US
+                  webhook_url: https://acme.com/webhooks/tesser
+                  business_street_address1: 456 Corp Blvd
+                  business_street_address2: Suite 200
+                  business_city: San Francisco
+                  business_state: CA
+                  business_postal_code: '94105'
+                  business_legal_entity_identifier: null
+                  created_at: '2024-01-15T10:30:00.000Z'
+                  updated_at: '2024-01-15T10:30:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get a tenant by ID
+      tags:
+      - Tenants
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+components:
+  schemas:
+    CreateTenantData:
+      type: object
+      properties:
+        tenant:
+          $ref: '#/components/schemas/TenantData'
+      required:
+      - tenant
+    CreateTenantRequestDto:
+      type: object
+      properties:
+        business_legal_name:
+          type: string
+          description: Legal business name (required)
+          example: Acme Corporation
+          minLength: 1
+          maxLength: 255
+        business_dba:
+          type: string
+          nullable: true
+          description: DBA - Doing Business As name
+          example: Acme Co
+          maxLength: 255
+        business_address_country:
+          type: string
+          nullable: true
+          description: Country code in ISO 3166-1 alpha-2 or alpha-3 format
+          example: US
+          minLength: 2
+          maxLength: 3
+          pattern: ^[A-Za-z]{2,3}$
+        webhook_url:
+          type: string
+          nullable: true
+          description: Webhook URL for payment creation notifications
+          example: https://your-api.com/webhooks/tesser
+          format: uri
+        business_street_address1:
+          type: string
+          nullable: true
+          description: Street address line 1
+          maxLength: 255
+          example: 456 Corp Blvd
+        business_street_address2:
+          type: string
+          nullable: true
+          description: Street address line 2
+          maxLength: 255
+          example: Suite 200
+        business_city:
+          type: string
+          nullable: true
+          description: City
+          maxLength: 255
+          example: San Francisco
+        business_state:
+          type: string
+          nullable: true
+          description: State/region
+          maxLength: 255
+          example: CA
+        business_postal_code:
+          type: string
+          nullable: true
+          description: Postal code
+          maxLength: 50
+          example: '94105'
+        business_legal_entity_identifier:
+          type: string
+          nullable: true
+          description: Legal Entity Identifier
+          maxLength: 255
+          example: '1234567890'
+      required:
+      - business_legal_name
+    TenantData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the tenant
+          example: 550e8400-e29b-41d4-a716-446655440000
+        workspace_id:
+          type: string
+          description: Workspace ID the tenant belongs to
+          example: 550e8400-e29b-41d4-a716-446655440001
+        name:
+          type: string
+          description: Display name derived from business fields
+          example: Acme Corporation
+        business_legal_name:
+          type: string
+          nullable: true
+          description: Legal business name
+          example: Acme Corporation
+        business_dba:
+          type: string
+          nullable: true
+          description: DBA - Doing Business As
+          example: Acme Co
+        business_address_country:
+          type: string
+          nullable: true
+          description: Country code in ISO 3166-1 format
+          example: US
+        webhook_url:
+          type: string
+          nullable: true
+          description: Webhook URL for payment creation notifications
+          example: https://your-api.com/webhooks/tesser
+        business_street_address1:
+          type: string
+          nullable: true
+          description: Street address line 1
+          example: 456 Corp Blvd
+        business_street_address2:
+          type: string
+          nullable: true
+          description: Street address line 2
+          example: Suite 200
+        business_city:
+          type: string
+          nullable: true
+          description: City
+          example: San Francisco
+        business_state:
+          type: string
+          nullable: true
+          description: State/region
+          example: CA
+        business_postal_code:
+          type: string
+          nullable: true
+          description: Postal code
+          example: '94105'
+        business_legal_entity_identifier:
+          type: string
+          nullable: true
+          description: Legal Entity Identifier
+          example: '1234567890'
+        created_at:
+          type: string
+          description: Creation timestamp in ISO 8601 format
+          example: '2024-01-15T10:30:00.000Z'
+        updated_at:
+          type: string
+          description: Last update timestamp in ISO 8601 format
+          example: '2024-01-15T10:30:00.000Z'
+      required:
+      - id
+      - workspace_id
+      - name
+      - created_at
+      - updated_at
+    CreateTenantResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateTenantData'
+      required:
+      - data
+    TenantResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TenantData'
+      required:
+      - data
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
+    TenantListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

@@ -1,0 +1,112 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts MCP API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: MCP
+paths:
+  /v1/mcp:
+    post:
+      operationId: mcp_server
+      summary: MCP Server
+      description: Model Context Protocol endpoint for AI agent tool discovery and invocation
+      tags:
+      - MCP
+      x-internal: true
+      responses:
+        '200':
+          description: MCP JSON-RPC response
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: mcpServerHandler
+          module: $import(@zuplo/runtime)
+          options:
+            name: tesser-payments
+            version: 1.0.0
+            operations:
+            - file: ./config/routes.oas.json
+              id: account_findAll
+            - file: ./config/routes.oas.json
+              id: account_createBankAccount
+            - file: ./config/routes.oas.json
+              id: account_createLedgerAccount
+            - file: ./config/routes.oas.json
+              id: account_createWalletAccount
+            - file: ./config/routes.oas.json
+              id: account_findOne
+            - file: ./config/routes.oas.json
+              id: account_update
+            - file: ./config/routes.oas.json
+              id: currency_getCurrencies
+            - file: ./config/routes.oas.json
+              id: counterparty_findAll
+            - file: ./config/routes.oas.json
+              id: counterparty_create
+            - file: ./config/routes.oas.json
+              id: counterparty_findOne
+            - file: ./config/routes.oas.json
+              id: tenant_findAll
+            - file: ./config/routes.oas.json
+              id: tenant_create
+            - file: ./config/routes.oas.json
+              id: tenant_findOne
+            - file: ./config/routes.oas.json
+              id: networks_getNetworks
+            - file: ./config/routes.oas.json
+              id: payments_getPayments
+            - file: ./config/routes.oas.json
+              id: payments_createPayment
+            - file: ./config/routes.oas.json
+              id: payments_simulateInbound
+            - file: ./config/routes.oas.json
+              id: payments_getPaymentById
+            - file: ./config/routes.oas.json
+              id: payments_updatePayment
+            - file: ./config/routes.oas.json
+              id: payments_reviewPayment
+            - file: ./config/routes.oas.json
+              id: payments_signPaymentStep
+            - file: ./config/routes.oas.json
+              id: treasury_getDeposits
+            - file: ./config/routes.oas.json
+              id: treasury_createDeposit
+            - file: ./config/routes.oas.json
+              id: treasury_getDeposit
+            - file: ./config/routes.oas.json
+              id: treasury_getDepositInstructions
+            - file: ./config/routes.oas.json
+              id: treasury_simulateDeposit
+            - file: ./config/routes.oas.json
+              id: treasury_getRebalances
+            - file: ./config/routes.oas.json
+              id: treasury_createRebalance
+            - file: ./config/routes.oas.json
+              id: treasury_getRebalance
+            - file: ./config/routes.oas.json
+              id: treasury_signRebalanceStep
+            - file: ./config/routes.oas.json
+              id: treasury_getWithdrawals
+            - file: ./config/routes.oas.json
+              id: treasury_createWithdrawal
+            - file: ./config/routes.oas.json
+              id: treasury_getWithdrawal
+            - file: ./config/routes.oas.json
+              id: treasury_signWithdrawalStep
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - detect-auth-type-inbound
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

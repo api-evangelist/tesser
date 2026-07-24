@@ -1,0 +1,721 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts webhooks API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: webhooks
+paths:
+  /v1/webhooks/circle:
+    post:
+      operationId: webhook_receiveCircleWebhook
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Webhook processed successfully
+      summary: Receive webhook notifications from Circle
+      tags:
+      - webhooks
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+      security: []
+    head:
+      operationId: webhook_receiveCircleWebhook_head
+      summary: Webhook endpoint reachability probe
+      tags:
+      - webhooks
+      parameters: []
+      x-internal: true
+      security: []
+      responses:
+        '200':
+          description: Endpoint reachable
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+  /v1/webhooks/circle/{organizationId}:
+    post:
+      operationId: webhook_receiveCircleWebhookForOrg
+      parameters:
+      - name: organizationId
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Webhook processed successfully
+      summary: Receive webhook notifications from Circle for a specific organization
+      tags:
+      - webhooks
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+      security: []
+    head:
+      operationId: webhook_receiveCircleWebhookForOrg_head
+      summary: Webhook endpoint reachability probe
+      tags:
+      - webhooks
+      parameters:
+      - name: organizationId
+        required: true
+        in: path
+        schema:
+          type: string
+      x-internal: true
+      security: []
+      responses:
+        '200':
+          description: Endpoint reachable
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+  /v1/webhooks/cpn/{organizationId}:
+    post:
+      operationId: webhook_receiveCpnWebhook
+      parameters:
+      - name: organizationId
+        required: true
+        in: path
+        description: Organization ID the CPN subscription was registered for
+        schema:
+          format: uuid
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+          type: string
+      - name: x-circle-signature
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: x-circle-key-id
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: bypass-sig-verification
+        required: false
+        in: header
+        description: Development-only flag to skip signature verification.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Webhook processed successfully
+        '400':
+          description: Invalid organizationId
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: webhooks-0004
+                    error_message: Invalid webhook signature
+      summary: Receive CPN (Circle Payments Network) webhook notifications for an organization
+      tags:
+      - webhooks
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+      security: []
+    head:
+      operationId: webhook_receiveCpnWebhook_head
+      summary: Webhook endpoint reachability probe
+      tags:
+      - webhooks
+      parameters:
+      - name: organizationId
+        required: true
+        in: path
+        description: Organization ID the CPN subscription was registered for
+        schema:
+          format: uuid
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+          type: string
+      - name: x-circle-signature
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: x-circle-key-id
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: bypass-sig-verification
+        required: false
+        in: header
+        description: Development-only flag to skip signature verification.
+        schema:
+          type: string
+      x-internal: true
+      security: []
+      responses:
+        '200':
+          description: Endpoint reachable
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+  /v1/webhooks/notabene:
+    post:
+      operationId: notabeneWebhook_receive
+      parameters:
+      - name: svix-id
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: svix-timestamp
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: svix-signature
+        required: true
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Webhook processed successfully
+        '401':
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: webhooks-0004
+                    error_message: Invalid webhook signature
+      summary: Receive Notabene Travel Rule webhook notifications
+      tags:
+      - webhooks
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+      security: []
+    head:
+      operationId: notabeneWebhook_receive_head
+      summary: Webhook endpoint reachability probe
+      tags:
+      - webhooks
+      parameters:
+      - name: svix-id
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: svix-timestamp
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: svix-signature
+        required: true
+        in: header
+        schema:
+          type: string
+      x-internal: true
+      security: []
+      responses:
+        '200':
+          description: Endpoint reachable
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+  /v1/webhooks/openfx/{workspaceId}:
+    post:
+      operationId: webhook_receiveOpenFxWebhook
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: Workspace ID receiving the OpenFX webhook
+        schema:
+          format: uuid
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+          type: string
+      - name: x-openfx-signature
+        required: true
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Webhook processed successfully
+        '400':
+          description: Invalid workspaceId or webhook payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+      summary: Receive workspace-scoped OpenFX webhook notifications
+      tags:
+      - webhooks
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+      security: []
+    head:
+      operationId: webhook_receiveOpenFxWebhook_head
+      summary: Webhook endpoint reachability probe
+      tags:
+      - webhooks
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: Workspace ID receiving the OpenFX webhook
+        schema:
+          format: uuid
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+          type: string
+      - name: x-openfx-signature
+        required: true
+        in: header
+        schema:
+          type: string
+      x-internal: true
+      security: []
+      responses:
+        '200':
+          description: Endpoint reachable
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+  /v1/webhooks/quicknode/{network}:
+    post:
+      operationId: webhook_receiveQuicknodeWebhookForNetwork
+      parameters:
+      - name: network
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: x-qn-signature
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: x-qn-nonce
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: x-qn-timestamp
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: bypass-sig-verification
+        required: false
+        in: header
+        description: Development-only flag to skip signature verification.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuicknodeWebhookPayloadDto'
+      responses:
+        '200':
+          description: Webhook processed successfully
+        '400':
+          description: Invalid webhook payload
+        '401':
+          description: Invalid webhook signature
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: webhooks-0004
+                    error_message: Invalid webhook signature
+      summary: Receive webhook updates from Quicknode
+      tags:
+      - webhooks
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+      security: []
+    head:
+      operationId: webhook_receiveQuicknodeWebhookForNetwork_head
+      summary: Webhook endpoint reachability probe
+      tags:
+      - webhooks
+      parameters:
+      - name: network
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: x-qn-signature
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: x-qn-nonce
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: x-qn-timestamp
+        required: true
+        in: header
+        schema:
+          type: string
+      - name: bypass-sig-verification
+        required: false
+        in: header
+        description: Development-only flag to skip signature verification.
+        schema:
+          type: string
+      x-internal: true
+      security: []
+      responses:
+        '200':
+          description: Endpoint reachable
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+components:
+  schemas:
+    QuicknodeWebhookPayloadDto:
+      anyOf:
+      - type: object
+        properties:
+          matchingReceipts:
+            type: array
+            items:
+              type: object
+              properties:
+                transactionHash:
+                  type: string
+                status:
+                  type: string
+                logs:
+                  anyOf:
+                  - type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        blockHash:
+                          type: string
+                        blockNumber:
+                          type: string
+                        data:
+                          type: string
+                        logIndex:
+                          type: string
+                        removed:
+                          type: boolean
+                        topics:
+                          type: array
+                          items:
+                            type: string
+                        transactionHash:
+                          type: string
+                        transactionIndex:
+                          type: string
+                      required:
+                      - address
+                      - blockHash
+                      - blockNumber
+                      - data
+                      - logIndex
+                      - removed
+                      - topics
+                      - transactionHash
+                      - transactionIndex
+                  - type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        topics:
+                          type: array
+                          items:
+                            type: string
+                        data:
+                          type: string
+                        blockHash:
+                          type: string
+                          nullable: true
+                        blockNumber:
+                          type: string
+                          nullable: true
+                        transactionHash:
+                          type: string
+                        transactionIndex:
+                          type: string
+                        logIndex:
+                          type: number
+                        removed:
+                          type: boolean
+                      required:
+                      - address
+                      - topics
+                      - data
+                blockHash:
+                  type: string
+                blockNumber:
+                  type: string
+                contractAddress:
+                  type: string
+                  nullable: true
+                cumulativeGasUsed:
+                  type: string
+                  nullable: true
+                effectiveGasPrice:
+                  type: string
+                from:
+                  type: string
+                gasUsed:
+                  type: string
+                logsBloom:
+                  type: string
+                  nullable: true
+                to:
+                  type: string
+                  nullable: true
+                transactionIndex:
+                  type: string
+                  nullable: true
+                type:
+                  type: string
+                  nullable: true
+              required:
+              - transactionHash
+              - status
+              - logs
+          currentBlockNumber:
+            type: number
+            nullable: true
+        required:
+        - matchingReceipts
+      - type: object
+        properties:
+          heartbeat:
+            type: boolean
+            const: true
+          currentBlockNumber:
+            type: number
+            nullable: true
+        required:
+        - heartbeat
+        - currentBlockNumber
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

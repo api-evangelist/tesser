@@ -1,0 +1,382 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts Organizations API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: Organizations
+paths:
+  /v1/organizations/risk-profile:
+    patch:
+      description: 'Update the compliance risk profile for the authenticated user''s organization. Available profiles:
+
+
+        - **conservative**: Strictest screening, lowest risk tolerance
+
+        - **balanced**: Moderate screening (default)
+
+        - **aggressive**: Lenient screening, highest risk tolerance
+
+
+        Note: Changing the risk profile will affect future compliance screenings but will not retroactively change past screenings.'
+      operationId: organizations_updateRiskProfile
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRiskProfileRequest'
+      responses:
+        '200':
+          description: Risk profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateRiskProfileResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+      security:
+      - bearer: []
+      summary: Update organization risk profile
+      tags:
+      - Organizations
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    get:
+      description: Retrieve the current compliance risk profile for the authenticated user's organization.
+      operationId: organizations_getRiskProfile
+      parameters: []
+      responses:
+        '200':
+          description: Risk profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskProfileResponse'
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+      security:
+      - bearer: []
+      summary: Get organization risk profile
+      tags:
+      - Organizations
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/organizations/secrets:
+    post:
+      description: 'Store a secret (e.g., API key) securely in the vault for the authenticated user''s organization.
+
+
+        Secrets are stored at the organization level and shared across all workspaces within the organization.
+
+
+        Currently supported providers:
+
+        - **CIRCLE_MINT**: Circle Mint API key for payment processing
+
+        - **OPENFX**: OpenFX credentials bundle (orgId, apiKey, privateKey, webhookSecret)
+
+        - **CIRCLE_PAYMENTS_NETWORK**: Circle Payments Network (CPN) API key, validated by creating a CPN webhook subscription
+
+
+        The secret is encrypted and stored in Basis Theory vault. Only a masked version is returned.'
+      operationId: organizations_createSecret
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSecretRequest'
+      responses:
+        '200':
+          description: Secret stored successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSecretResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+      security:
+      - bearer: []
+      summary: Create or update an organization secret
+      tags:
+      - Organizations
+      x-internal: true
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+components:
+  schemas:
+    CreateSecretResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether the secret was stored successfully
+        masked_value:
+          type: string
+          description: Masked version of the stored secret (e.g., '****abc123')
+      required:
+      - success
+      - masked_value
+    RiskProfileResponse:
+      type: object
+      properties:
+        risk_profile:
+          type: string
+          enum:
+          - conservative
+          - balanced
+          - aggressive
+          description: Current risk profile
+      required:
+      - risk_profile
+    UpdateRiskProfileRequest:
+      type: object
+      properties:
+        risk_profile:
+          type: string
+          enum:
+          - conservative
+          - balanced
+          - aggressive
+          description: The risk profile for compliance screening
+      required:
+      - risk_profile
+    UpdateRiskProfileResponse:
+      type: object
+      properties:
+        risk_profile:
+          type: string
+          enum:
+          - conservative
+          - balanced
+          - aggressive
+          description: New risk profile
+        old_risk_profile:
+          type: string
+          enum:
+          - conservative
+          - balanced
+          - aggressive
+          description: Previous risk profile
+        updated_at:
+          type: string
+          format: date-time
+          pattern: ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+          description: Timestamp of the update
+      required:
+      - risk_profile
+      - old_risk_profile
+      - updated_at
+    CreateSecretRequest:
+      type: object
+      properties:
+        provider:
+          type: string
+          enum:
+          - CIRCLE_MINT
+          - OPENFX
+          - CIRCLE_PAYMENTS_NETWORK
+          description: The secret provider (CIRCLE_MINT, OPENFX, or CIRCLE_PAYMENTS_NETWORK)
+        key:
+          type: string
+          enum:
+          - CIRCLE_MINT_API_KEY
+          - OPENFX_CREDENTIALS
+          - CIRCLE_PAYMENTS_NETWORK_API_KEY
+          description: The secret key name (must be a known organization secret key)
+        value:
+          anyOf:
+          - type: string
+            minLength: 1
+            description: Single-string secret value (used by CIRCLE_MINT_API_KEY and CIRCLE_PAYMENTS_NETWORK_API_KEY)
+          - type: object
+            properties:
+              orgId:
+                type: string
+                minLength: 1
+                description: OpenFX organization UUID
+              apiKey:
+                type: string
+                minLength: 1
+                description: OpenFX API key identifier (used in JWT subject and x-api-key header)
+              privateKey:
+                type: string
+                minLength: 1
+                description: ES256 PEM private key used to sign short-lived OpenFX JWTs. Literal `\n` escapes are normalized to real newlines.
+              webhookSecret:
+                type: string
+                minLength: 1
+                description: HMAC-SHA256 signing key used to verify OpenFX webhook signatures
+            required:
+            - orgId
+            - apiKey
+            - privateKey
+            - webhookSecret
+            description: OpenFX brokerage credentials bundle
+          description: Secret payload. A string for single-value secrets, or an object for bundled credentials (e.g., OPENFX_CREDENTIALS).
+      required:
+      - provider
+      - key
+      - value
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

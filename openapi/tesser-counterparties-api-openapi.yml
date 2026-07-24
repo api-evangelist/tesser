@@ -1,0 +1,874 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts Counterparties API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: Counterparties
+paths:
+  /v1/entities/counterparties:
+    post:
+      description: Create a new counterparty for your workspace or a specific tenant.
+      operationId: counterparty_create
+      parameters: []
+      requestBody:
+        required: true
+        description: Counterparty data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCounterpartyRequestDto'
+            examples:
+              individual:
+                summary: Create an individual counterparty
+                value:
+                  classification: individual
+                  individual_first_name: John
+                  individual_last_name: Doe
+                  individual_address_country: US
+                  individual_date_of_birth: '1980-01-01'
+                  individual_national_identification_number: '123456789'
+                  individual_street_address1: 123 Main St
+                  individual_street_address2: Apt 4B
+                  individual_city: New York
+                  individual_state: NY
+                  individual_postal_code: '10001'
+              business:
+                summary: Create a business counterparty
+                value:
+                  classification: business
+                  business_legal_name: Acme Corporation
+                  business_dba: Acme Co
+                  business_address_country: US
+                  business_street_address1: 456 Corp Blvd
+                  business_street_address2: Suite 200
+                  business_city: San Francisco
+                  business_state: CA
+                  business_legal_entity_identifier: '1234567890'
+              business_with_tenant:
+                summary: Create a counterparty assigned to a tenant
+                description: Use tenant_id to assign the counterparty to a specific tenant. Only workspace-level API keys can specify tenant_id. Tenant API keys automatically assign counterparties to their tenant.
+                value:
+                  classification: business
+                  tenant_id: 4e8c2a6f-1b9d-4f37-a5e0-7c3b8d2f1a9e
+                  business_legal_name: Tenant Customer Corp
+                  business_dba: TenantCust
+                  business_address_country: US
+                  business_street_address1: 789 Partner Lane
+                  business_city: Chicago
+                  business_state: IL
+                  business_postal_code: '60601'
+      responses:
+        '201':
+          description: Counterparty created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateCounterpartyResponseDto'
+              example:
+                data:
+                  id: c7d8e9f0-1a2b-3c4d-5e6f-789012345678
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  classification: individual
+                  tenant_id: null
+                  individual_first_name: John
+                  individual_last_name: Doe
+                  individual_address_country: US
+                  individual_date_of_birth: '1980-01-01'
+                  individual_national_identification_number: '123456789'
+                  individual_street_address1: 123 Main St
+                  individual_street_address2: Apt 4B
+                  individual_city: New York
+                  individual_state: NY
+                  individual_postal_code: '10001'
+                  business_legal_name: null
+                  business_dba: null
+                  business_address_country: null
+                  business_street_address1: null
+                  business_street_address2: null
+                  business_city: null
+                  business_state: null
+                  business_legal_entity_identifier: null
+                  created_at: '2024-03-01T10:00:00.000Z'
+                  updated_at: '2024-03-01T10:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Create a new counterparty
+      tags:
+      - Counterparties
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+    get:
+      description: Retrieve all counterparties for your workspace or a specific tenant.
+      operationId: counterparty_findAll
+      parameters:
+      - name: classification
+        required: false
+        in: query
+        description: Filter by classification
+        schema:
+          enum:
+          - individual
+          - business
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: Search by name
+        schema:
+          type: string
+      - name: include_secure
+        required: false
+        in: query
+        description: Include masked vault data (address, DOB, national ID, legal entity identifier)
+        schema:
+          default: false
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: Page number for pagination (1-based)
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        required: false
+        in: query
+        description: 'Number of items per page (default: 20)'
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: Counterparties retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CounterpartyListResponse'
+              example:
+                data:
+                - id: 6f1c4a8e-2d7b-4930-b5e2-9a3f0c7d1b6e
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  classification: business
+                  tenant_id: null
+                  individual_first_name: null
+                  individual_last_name: null
+                  individual_address_country: null
+                  individual_date_of_birth: null
+                  individual_national_identification_number: null
+                  individual_street_address1: null
+                  individual_street_address2: null
+                  individual_city: null
+                  individual_state: null
+                  individual_postal_code: null
+                  business_legal_name: Acme Corporation
+                  business_dba: Acme Co
+                  business_address_country: US
+                  business_street_address1: 456 Corp Blvd
+                  business_street_address2: Suite 200
+                  business_city: San Francisco
+                  business_state: CA
+                  business_legal_entity_identifier: '1234567890'
+                  created_at: '2024-02-01T14:00:00.000Z'
+                  updated_at: '2024-02-01T14:00:00.000Z'
+                - id: 3e9a7c2f-1b8d-4e56-a0f3-5c2d8b1e9a7f
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  classification: individual
+                  tenant_id: null
+                  individual_first_name: John
+                  individual_last_name: Doe
+                  individual_address_country: US
+                  individual_date_of_birth: '1980-01-01'
+                  individual_national_identification_number: '123456789'
+                  individual_street_address1: 123 Main St
+                  individual_street_address2: Apt 4B
+                  individual_city: New York
+                  individual_state: NY
+                  individual_postal_code: '10001'
+                  business_legal_name: null
+                  business_dba: null
+                  business_address_country: null
+                  business_street_address1: null
+                  business_street_address2: null
+                  business_city: null
+                  business_state: null
+                  business_legal_entity_identifier: null
+                  created_at: '2024-01-15T10:30:00.000Z'
+                  updated_at: '2024-01-15T10:30:00.000Z'
+                pagination:
+                  page: 1
+                  limit: 10
+                  total: 2
+                  total_pages: 1
+                  has_next: false
+                  has_prev: false
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: List all counterparties
+      tags:
+      - Counterparties
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+  /v1/entities/counterparties/{id}:
+    get:
+      description: Retrieve a specific counterparty by its unique identifier.
+      operationId: counterparty_findOne
+      parameters:
+      - name: id
+        required: true
+        in: path
+        description: Counterparty ID (UUID)
+        schema:
+          example: d8e9f0a1-2b3c-4d5e-6f78-901234567890
+          type: string
+      - name: include_secure
+        required: false
+        in: query
+        description: Include masked vault data (address, DOB, national ID, legal entity identifier)
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Counterparty retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CounterpartyResponseDto'
+              example:
+                data:
+                  id: d8e9f0a1-2b3c-4d5e-6f78-901234567890
+                  workspace_id: b53f6690-3242-4942-9907-885779632832
+                  classification: business
+                  tenant_id: null
+                  individual_first_name: null
+                  individual_last_name: null
+                  individual_address_country: null
+                  individual_date_of_birth: null
+                  individual_national_identification_number: null
+                  individual_street_address1: null
+                  individual_street_address2: null
+                  individual_city: null
+                  individual_state: null
+                  individual_postal_code: null
+                  business_legal_name: Acme Corporation
+                  business_dba: Acme Co
+                  business_address_country: US
+                  business_street_address1: 456 Corp Blvd
+                  business_street_address2: Suite 200
+                  business_city: San Francisco
+                  business_state: CA
+                  business_legal_entity_identifier: '1234567890'
+                  created_at: '2024-02-01T14:00:00.000Z'
+                  updated_at: '2024-02-01T14:00:00.000Z'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: counterparties-3001
+                    error_message: 'classification must be one of: individual, business'
+                  - error_code: counterparties-3002
+                    error_message: business_legal_name is required when classification is business
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0001
+                    error_message: Resource not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0006
+                    error_message: An unexpected error occurred
+      security:
+      - bearer: []
+      summary: Get a counterparty by ID
+      tags:
+      - Counterparties
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+components:
+  schemas:
+    CounterpartyListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CounterpartyData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    CreateCounterpartyResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CounterpartyData'
+      required:
+      - data
+    CounterpartyResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CounterpartyData'
+      required:
+      - data
+    CounterpartyData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the counterparty
+          example: 550e8400-e29b-41d4-a716-446655440000
+        workspace_id:
+          type: string
+          description: Workspace ID the counterparty belongs to
+          example: 550e8400-e29b-41d4-a716-446655440001
+        classification:
+          type: string
+          description: 'Classification: individual (person) or business (company)'
+          enum:
+          - individual
+          - business
+          example: business
+        tenant_id:
+          type: string
+          nullable: true
+          description: Optional reference to a tenant entity this counterparty belongs to
+          example: 550e8400-e29b-41d4-a716-446655440002
+        individual_first_name:
+          type: string
+          nullable: true
+          description: First name (for individuals)
+          example: John
+        individual_last_name:
+          type: string
+          nullable: true
+          description: Last name (for individuals)
+          example: Doe
+        individual_address_country:
+          type: string
+          nullable: true
+          description: Country code in ISO 3166-1 format (for individuals)
+          example: US
+        individual_date_of_birth:
+          type: string
+          nullable: true
+          description: Date of birth (for individuals)
+          example: '1980-01-01'
+        individual_national_identification_number:
+          type: string
+          nullable: true
+          description: National identification number (for individuals)
+          example: '123456789'
+        individual_street_address1:
+          type: string
+          nullable: true
+          description: Street address line 1 (for individuals)
+          example: 123 Main St
+        individual_street_address2:
+          type: string
+          nullable: true
+          description: Street address line 2 (for individuals)
+          example: Apt 4B
+        individual_city:
+          type: string
+          nullable: true
+          description: City (for individuals)
+          example: New York
+        individual_state:
+          type: string
+          nullable: true
+          description: State/region (for individuals)
+          example: NY
+        individual_postal_code:
+          type: string
+          nullable: true
+          description: Postal code (for individuals)
+          example: '10001'
+        business_legal_name:
+          type: string
+          nullable: true
+          description: Legal business name (for businesses)
+          example: Acme Corporation
+        business_dba:
+          type: string
+          nullable: true
+          description: DBA - Doing Business As (for businesses)
+          example: Acme Co
+        business_address_country:
+          type: string
+          nullable: true
+          description: Country code in ISO 3166-1 format (for businesses)
+          example: US
+        business_street_address1:
+          type: string
+          nullable: true
+          description: Street address line 1 (for businesses)
+          example: 456 Corp Blvd
+        business_street_address2:
+          type: string
+          nullable: true
+          description: Street address line 2 (for businesses)
+          example: Suite 200
+        business_city:
+          type: string
+          nullable: true
+          description: City (for businesses)
+          example: San Francisco
+        business_state:
+          type: string
+          nullable: true
+          description: State/region (for businesses)
+          example: CA
+        business_legal_entity_identifier:
+          type: string
+          nullable: true
+          description: Legal Entity Identifier (for businesses)
+          example: '1234567890'
+        created_at:
+          type: string
+          description: Creation timestamp in ISO 8601 format
+          example: '2024-01-15T10:30:00.000Z'
+        updated_at:
+          type: string
+          description: Last update timestamp in ISO 8601 format
+          example: '2024-01-15T10:30:00.000Z'
+      required:
+      - id
+      - workspace_id
+      - classification
+      - created_at
+      - updated_at
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
+    CreateCounterpartyRequestDto:
+      type: object
+      properties:
+        classification:
+          type: string
+          description: 'Classification: ''individual'' or ''business''.'
+          enum:
+          - individual
+          - business
+          example: individual
+        tenant_id:
+          type: string
+          description: ID of the tenant entity (optional).
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$
+        individual_first_name:
+          type: string
+          description: First name (required if classification is 'individual'). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: John
+          nullable: true
+        individual_last_name:
+          type: string
+          description: Last name (required if classification is 'individual'). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: Doe
+          nullable: true
+        individual_address_country:
+          type: string
+          description: ISO 3166-1 alpha-2 or alpha-3 country code.
+          minLength: 2
+          maxLength: 3
+          pattern: ^[A-Za-z]{2,3}$
+          example: US
+          nullable: true
+        individual_date_of_birth:
+          type: string
+          description: Date of birth (for individuals).
+          maxLength: 255
+          example: '1980-01-01'
+          nullable: true
+        individual_national_identification_number:
+          type: string
+          description: National identification number (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: '123456789'
+          nullable: true
+        individual_street_address1:
+          type: string
+          description: Street address line 1 (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: 123 Main St
+          nullable: true
+        individual_street_address2:
+          type: string
+          description: Street address line 2 (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: Apt 4B
+          nullable: true
+        individual_city:
+          type: string
+          description: City (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: New York
+          nullable: true
+        individual_state:
+          type: string
+          description: State/region (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: NY
+          nullable: true
+        individual_postal_code:
+          type: string
+          description: Postal code (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: '10001'
+          nullable: true
+        business_legal_name:
+          type: string
+          description: Legal business name (required if classification is 'business').
+          maxLength: 255
+          example: Acme Corporation
+          nullable: true
+        business_dba:
+          type: string
+          description: Doing Business As name (optional).
+          maxLength: 255
+          example: Acme Co
+          nullable: true
+        business_address_country:
+          type: string
+          description: ISO 3166-1 alpha-2 or alpha-3 country code.
+          minLength: 2
+          maxLength: 3
+          pattern: ^[A-Za-z]{2,3}$
+          example: US
+          nullable: true
+        business_street_address1:
+          type: string
+          description: Street address line 1 (for businesses).
+          maxLength: 255
+          example: 456 Corp Blvd
+          nullable: true
+        business_street_address2:
+          type: string
+          description: Street address line 2 (for businesses).
+          maxLength: 255
+          example: Suite 200
+          nullable: true
+        business_city:
+          type: string
+          description: City (for businesses).
+          maxLength: 255
+          example: San Francisco
+          nullable: true
+        business_state:
+          type: string
+          description: State/region (for businesses).
+          maxLength: 255
+          example: CA
+          nullable: true
+        business_legal_entity_identifier:
+          type: string
+          description: Legal Entity Identifier (for businesses). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: '1234567890'
+          nullable: true
+      required:
+      - classification
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."

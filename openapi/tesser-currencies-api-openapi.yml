@@ -1,0 +1,135 @@
+openapi: 3.1.0
+info:
+  title: Tesser Accounts Currencies API
+  description: The Tesser Payments Platform API documentation.
+  version: v1
+  contact: {}
+servers: []
+security:
+- bearer: []
+tags:
+- name: Currencies
+paths:
+  /v1/currencies:
+    get:
+      description: Retrieve list of all supported currencies (crypto and fiat). Returns an array with currency name, key, decimals, and network information.
+      operationId: currency_getCurrencies
+      parameters: []
+      responses:
+        '200':
+          description: Successfully retrieved available currencies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrenciesResponse'
+              example:
+                data:
+                - name: Circle USD
+                  key: USDC
+                  decimals: 6
+                  network: BASE
+                - name: Tether USD
+                  key: USDT
+                  decimals: 6
+                  network: BASE
+                - name: Circle USD
+                  key: USDC
+                  decimals: 6
+                  network: ETHEREUM
+                - name: Tether USD
+                  key: USDT
+                  decimals: 6
+                  network: ETHEREUM
+                - name: Circle USD
+                  key: USDC
+                  decimals: 6
+                  network: POLYGON
+                - name: Tether USD
+                  key: USDT
+                  decimals: 6
+                  network: POLYGON
+                - name: Circle USD
+                  key: USDC
+                  decimals: 6
+                  network: STELLAR
+                - name: USD
+                  key: USD
+                  decimals: 2
+                  network: null
+        '401':
+          description: Authentication required or invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        error_code:
+                          type: string
+                        error_message:
+                          type: string
+                      required:
+                      - error_code
+                      - error_message
+                required:
+                - errors
+                example:
+                  errors:
+                  - error_code: api-0004
+                    error_message: Unauthorized
+      security:
+      - bearer: []
+      summary: Get available currencies
+      tags:
+      - Currencies
+      x-zuplo-route:
+        corsPolicy: anything-goes
+        handler:
+          export: forwardToBackend
+          module: $import(./modules/forward-to-backend)
+        policies:
+          inbound:
+          - set-backend-secret-inbound
+          - auth0-jwt-auth-inbound
+          - forward-user-info-inbound
+components:
+  schemas:
+    CurrenciesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Display name for the currency (e.g., 'Circle USD')
+              key:
+                type: string
+                description: Currency code/key (e.g., 'USDC', 'USD')
+              decimals:
+                type: number
+                description: Number of decimal places for the currency
+              network:
+                description: Blockchain network (e.g., 'POLYGON') or null for fiat currencies. See GET /networks for supported values.
+                type: string
+                nullable: true
+            required:
+            - name
+            - key
+            - decimals
+            - network
+          description: List of all supported currencies
+      required:
+      - data
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      description: "Enter your JWT token.\n\nTo obtain a token, make a request to Auth0:\n\n```bash\ncurl --request POST \\\n  --url https://dev-awqy75wdabpsnsvu.us.auth0.com/oauth/token \\\n  --header 'content-type: application/json' \\\n  --data '{\n    \"client_id\":\"YOUR_CLIENT_ID\",\n    \"client_secret\":\"YOUR_CLIENT_SECRET\",\n    \"audience\":\"https://sandbox.tesserx.co\",\n    \"grant_type\":\"client_credentials\"\n  }'\n```\n\nThe response will contain an `access_token` field which should be used as the Bearer token."
