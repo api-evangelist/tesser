@@ -1,0 +1,49 @@
+generated: '2026-07-21'
+method: searched
+source:
+  - https://docs.tesser.xyz/overviews/authentication
+  - https://docs.tesser.xyz/overviews/errors
+  - https://docs.tesser.xyz/webhooks/general
+  - openapi/tesser-openapi-original.json
+authentication:
+  style: oauth2-client-credentials -> bearer JWT
+  header: 'Authorization: Bearer <jwt>'
+  see: authentication/tesser-authentication.yml
+versioning:
+  scheme: uri-path
+  current: v1
+  base_path: /v1
+  hosts:
+    production: https://api.tesser.xyz
+    sandbox: https://sandbox.tesserx.co
+pagination:
+  style: page-number
+  params: [page, limit]
+  applies_to: collection GET endpoints (accounts, counterparties, tenants, payments, treasury.*, keys)
+idempotency:
+  documented_header: null
+  note: >-
+    No public Idempotency-Key request header is documented in the OpenAPI. The
+    error reference does list an internal "Idempotency" error domain (legacy
+    numbering), indicating server-side idempotency handling on some flows, but
+    there is no client-facing idempotency-key contract to advertise.
+error_envelope:
+  format: custom-array
+  shape: '{ "errors": [ { "error_code": "domain-YZZZ", "error_message": "..." } ] }'
+  problem_json: false
+  code_convention: '{domain}-{YZZZ} where Y = HTTP status category, ZZZ = number'
+  step_failures: 'failed steps carry status_reasons[] reusing {error_code, error_message}'
+  see: errors/tesser-error-codes.yml
+webhooks:
+  direction: outbound (Tesser -> your server)
+  signing: Ed25519, header X-Tesser-Signature (base64), verify over raw UTF-8 body
+  envelope: '{ id, type ("scope.action"), created_at (ISO 8601), data.object }'
+  scopes: [payment, deposit, withdrawal, rebalance, step]
+  see: asyncapi/tesser-webhooks.yml
+data_model:
+  funds_movement: 'payments, deposits, withdrawals, rebalances share a common lifecycle/data shape (desired / estimated / actual overlays + steps)'
+  see: data-model/tesser-data-model.yml
+agentic:
+  mcp_server: https://sandbox.tesserx.co/v1/mcp (Streamable HTTP)
+  oauth_discovery: /.well-known/oauth-protected-resource (RFC 9728)
+  published_skill: skills/tesser-setup-openfx.md

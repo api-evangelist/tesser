@@ -1,22 +1,373 @@
 aid: tesser
 name: Tesser
-description: Tesser is a company surfaced as a portfolio company of anthemis and added to the API Evangelist
-  network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+description: >-
+  Tesser is a New York-based stablecoin payments infrastructure company that lets
+  licensed financial institutions, banks, fintechs, and payment service providers
+  move money across borders instantly and compliantly on modern stablecoin rails.
+  Its full-stack platform handles wallet provisioning, treasury management,
+  compliance orchestration, and reconciliation, letting institutions integrate
+  stablecoin payments in under a month. The Tesser API (OpenAPI 3.1, v1) exposes
+  accounts, counterparties, tenants, payments, and treasury operations (deposits,
+  withdrawals, rebalances) secured with Auth0 client-credentials JWTs, plus
+  Ed25519-signed webhooks, first-party TypeScript and Kotlin signer SDKs, a
+  published Model Context Protocol server, and an open-source agentic onboarding
+  skill. Founded by Geetha Panchapakesan (ex-MoneyGram, Visa Direct, Circle);
+  raised a $4.5M seed in October 2025 led by Castle Island Ventures with Anthemis,
+  Strobe Ventures, and Digital Currency Group.
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://raw.githubusercontent.com/tesser-payments/public/8ec11667adbdf3ba7ea626044483a24ba1a504f1/tesser-logo-Blue.svg
 url: https://raw.githubusercontent.com/api-evangelist/tesser/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - anthemis
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: profiled
+x-tier-reason: has-public-api
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-21'
 tags:
 - Company
-apis: []
+- Payments
+- Stablecoins
+- Cross-Border Payments
+- Fintech
+- Treasury
+- Banking
+- Blockchain
+- Compliance
+- MCP
+- Developer Platform
+apis:
+- aid: tesser:tesser-accounts-api
+  name: Tesser Accounts API
+  description: The Accounts API from Tesser — 5 operation(s) for accounts.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-accounts-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-admin-api
+  name: Tesser Admin API
+  description: The Admin API from Tesser — 1 operation(s) for admin.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Admin
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-admin-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-api-keys-api
+  name: Tesser API Keys API
+  description: The API Keys API from Tesser — 3 operation(s) for api keys.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - API Keys
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-api-keys-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-counterparties-api
+  name: Tesser Counterparties API
+  description: The Counterparties API from Tesser — 2 operation(s) for counterparties.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Counterparties
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-counterparties-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-currencies-api
+  name: Tesser Currencies API
+  description: The Currencies API from Tesser — 1 operation(s) for currencies.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Currencies
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-currencies-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-health-api
+  name: Tesser health API
+  description: The health API from Tesser — 2 operation(s) for health.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - health
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-health-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-mcp-api
+  name: Tesser MCP API
+  description: The MCP API from Tesser — 1 operation(s) for mcp.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - MCP
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-mcp-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-networks-api
+  name: Tesser Networks API
+  description: The Networks API from Tesser — 1 operation(s) for networks.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Networks
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-networks-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-organizations-api
+  name: Tesser Organizations API
+  description: The Organizations API from Tesser — 2 operation(s) for organizations.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Organizations
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-organizations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-payments-api
+  name: Tesser Payments API
+  description: The Payments API from Tesser — 7 operation(s) for payments.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Payments
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-payments-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-tenants-api
+  name: Tesser Tenants API
+  description: The Tenants API from Tesser — 2 operation(s) for tenants.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Tenants
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-tenants-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-treasury-api
+  name: Tesser Treasury API
+  description: The Treasury API from Tesser — 12 operation(s) for treasury.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Treasury
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-treasury-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-users-api
+  name: Tesser Users API
+  description: The Users API from Tesser — 2 operation(s) for users.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-users-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+- aid: tesser:tesser-webhooks-api
+  name: Tesser webhooks API
+  description: The webhooks API from Tesser — 6 operation(s) for webhooks.
+  humanURL: https://docs.tesser.xyz
+  baseURL: https://api.tesser.xyz
+  tags:
+  - webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/tesser-webhooks-api-openapi.yml
+  - type: Documentation
+    url: https://docs.tesser.xyz
+  - type: APIReference
+    url: https://docs.tesser.xyz/api/v1/schema.json
+  - type: GettingStarted
+    url: https://docs.tesser.xyz/overviews/authentication
+  - type: Authentication
+    url: authentication/tesser-authentication.yml
+common:
+- type: DomainSecurity
+  url: security/tesser-domain-security.yml
+- type: DeveloperPortal
+  url: https://docs.tesser.xyz
+- type: Documentation
+  url: https://docs.tesser.xyz
+- type: APIReference
+  url: https://docs.tesser.xyz/api/v1/schema.json
+- type: GettingStarted
+  url: https://docs.tesser.xyz/overviews/authentication
+- type: Website
+  url: https://tesser.xyz
+- type: SignUp
+  url: https://app.tesser.xyz
+- type: Login
+  url: https://app.tesser.xyz
+- type: Support
+  url: https://tesser.xyz/#contact
+- type: TermsOfService
+  url: https://tesser.xyz/legal/terms-of-service
+- type: PrivacyPolicy
+  url: https://tesser.xyz/legal/privacy-policy
+- type: GitHubOrganization
+  url: https://github.com/tesser-payments
+- type: LinkedIn
+  url: https://www.linkedin.com/company/tesserpayments/
+- type: OpenAPI
+  url: openapi/tesser-openapi-original.json
+- type: LLMsTxt
+  url: llms/tesser-llms.txt
+- type: Authentication
+  url: authentication/tesser-authentication.yml
+- type: MCPServer
+  url: mcp/tesser-mcp.yml
+- type: WellKnown
+  url: well-known/tesser-well-known.yml
+- type: Packages
+  url: packages/tesser-packages.yml
+- type: SDKs
+  url: packages/tesser-packages.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Conventions
+  url: conventions/tesser-conventions.yml
+- type: ErrorCatalog
+  url: errors/tesser-error-codes.yml
+- type: Webhooks
+  url: asyncapi/tesser-webhooks.yml
+- type: Sandbox
+  url: sandbox/tesser-sandbox.yml
+- type: Lifecycle
+  url: lifecycle/tesser-lifecycle.yml
+- type: Conformance
+  url: conformance/tesser-conformance.yml
+- type: DataModel
+  url: data-model/tesser-data-model.yml
+- type: Overlay
+  url: overlays/tesser-openapi-overlay.yaml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+x-enrichment:
+  date: '2026-07-21'
+  status: enriched
+  artifacts_added: 22
+  pass: local-v1

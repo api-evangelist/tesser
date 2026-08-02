@@ -1,0 +1,24 @@
+generated: '2026-07-21'
+method: searched
+source:
+  - openapi/tesser-openapi-original.json
+  - https://docs.tesser.xyz
+versioning:
+  scheme: uri-path
+  current: v1
+  docs: https://docs.tesser.xyz/overviews/resources-overview
+deprecation:
+  policy_url: null
+  sunset_header: null
+  note: No published deprecation/sunset policy found (early-stage, single v1).
+sla:
+  url: null
+status_page: null   # no status.tesser.xyz / public status page found (probe returned no host)
+deprecated_operations: []   # none flagged deprecated in the OpenAPI
+health_endpoints:
+  - openapi/tesser-openapi-original.json#app_getHealth   # GET /v1/health (live, 200)
+  - openapi/tesser-openapi-original.json#root_healthCheck # GET /
+notes: >-
+  Tesser is an early-stage (seed, Oct 2025) platform on a single versioned API
+  (v1). No public status page, SLA, or deprecation policy is published yet; a live
+  health endpoint is exposed at api.tesser.xyz/v1/health.

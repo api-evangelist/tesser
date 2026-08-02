@@ -1,0 +1,39 @@
+generated: '2026-07-21'
+method: searched
+source:
+  - https://docs.tesser.xyz/agentic/mcp-integration
+  - https://github.com/tesser-payments/skills
+  - openapi/tesser-openapi-original.json
+environments:
+  - name: production
+    api_host: https://api.tesser.xyz
+    token_audience: https://api.tesser.xyz
+    auth_server: https://tesser-payments.us.auth0.com
+    webhook_public_key_constant: WEBHOOK_PUBLIC_KEY
+  - name: sandbox
+    aka: sandbox / staging
+    api_host: https://sandbox.tesserx.co
+    token_audience: https://sandbox.tesserx.co
+    auth_server: https://dev-awqy75wdabpsnsvu.us.auth0.com
+    mcp_endpoint: https://sandbox.tesserx.co/v1/mcp
+    webhook_public_key_constant: WEBHOOK_SANDBOX_PUBLIC_KEY
+separation:
+  model: separate hosts + separate Auth0 audiences and webhook signing keys per environment
+simulation_endpoints:
+  - operation: openapi/tesser-openapi-original.json#payments_simulateInbound
+    path: POST /v1/payments/simulate-inbound
+    purpose: Simulate an inbound payment (test the receive/reconcile flow).
+  - operation: openapi/tesser-openapi-original.json#treasury_simulateDeposit
+    path: POST /v1/treasury/deposits/{id}/simulate
+    purpose: Simulate inbound funds for a deposit so the full lifecycle runs without real money.
+test_fixtures:
+  bank_accounts: >-
+    The provider-published setup-openfx skill ships sandbox bank-account fixtures
+    (references/sandbox-bank-accounts.md in github.com/tesser-payments/skills) for
+    exercising OpenFX onboarding in sandbox.
+notes: >-
+  In sandbox/staging an agent may run state-changing calls (with confirmation); in
+  production, sensitive credential writes stay generate-only. No published card
+  numbers (this is a bank/PSP stablecoin platform, not a card acquirer); test data
+  is magic simulation endpoints + provider-shipped sandbox account fixtures. Never
+  invent test values.

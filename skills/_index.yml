@@ -1,0 +1,25 @@
+generated: '2026-07-21'
+method: searched
+source: https://github.com/tesser-payments/skills (provider-published) + generated from openapi/tesser-openapi-original.json
+skills:
+  - file: tesser-setup-openfx.md
+    name: Onboard an OpenFX liquidity-provider account onto Tesser
+    method: searched
+    source: https://github.com/tesser-payments/skills/blob/main/skills/setup-openfx/SKILL.md
+    api: openapi/tesser-openapi-original.json
+    operations: [organizations_createSecret, account_createBankAccount, account_createWalletAccount, treasury_createDeposit]
+    note: Provider-published, cross-harness (Claude Code + Codex) skill saved verbatim. Also distributed via the Claude Code plugin marketplace tesser-payments/skills.
+  - file: tesser-send-stablecoin-payout.md
+    name: Send a stablecoin payout to a counterparty
+    method: generated
+    api: openapi/tesser-openapi-original.json
+    operations: [counterparty_create, account_createWalletAccount, payments_createPayment, payments_signPaymentStep, payments_getPaymentById]
+  - file: tesser-deposit-via-liquidity-provider.md
+    name: Deposit fiat funds via a liquidity provider
+    method: generated
+    api: openapi/tesser-openapi-original.json
+    operations: [account_createBankAccount, treasury_createDeposit, treasury_getDepositInstructions, treasury_getDeposit]
+provider_distribution:
+  claude_code_marketplace: tesser-payments/skills
+  agents_md: https://github.com/tesser-payments/skills/blob/main/AGENTS.md
+  saved_verbatim: [tesser-setup-openfx.md, tesser-AGENTS.md]

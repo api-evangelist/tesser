@@ -1,0 +1,25 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Tesser API
+  version: 1.0.0
+extends: openapi/tesser-openapi-original.json
+actions:
+  - target: $.info
+    update:
+      x-apievangelist-provider: tesser
+      x-apievangelist-category: stablecoin-payments
+      x-apievangelist-review-date: '2026-07-21'
+  - target: $.servers
+    update:
+      - url: https://api.tesser.xyz
+        description: Production (added by API Evangelist; upstream servers[] is empty)
+      - url: https://sandbox.tesserx.co
+        description: Sandbox / staging
+  - target: $.info
+    update:
+      x-authentication: authentication/tesser-authentication.yml
+      x-conventions: conventions/tesser-conventions.yml
+      x-error-catalog: errors/tesser-error-codes.yml
+      x-webhooks: asyncapi/tesser-webhooks.yml
+      x-mcp-server: mcp/tesser-mcp.yml
+      x-data-model: data-model/tesser-data-model.yml

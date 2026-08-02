@@ -1,0 +1,50 @@
+generated: '2026-07-21'
+method: searched
+source: registry probe (npmjs.org) + github.com/tesser-payments
+packages:
+  - language: javascript
+    registry: npm
+    name: "@tesser-payments/sdk-ts"
+    version: 0.0.4
+    url: https://www.npmjs.com/package/@tesser-payments/sdk-ts
+    repo: https://github.com/tesser-payments/sdk-ts
+    install: bun add @tesser-payments/sdk-ts @tesser-payments/types
+    official: true
+    description: >-
+      Signer-only TypeScript SDK for the Tesser API: locally stamp
+      signCreateWallet and signStep activities using Turnkey API keys. The SDK
+      does not own HTTP or OAuth (bring your own client). Apache-2.0.
+  - language: typescript
+    registry: npm
+    name: "@tesser-payments/types"
+    version: 0.0.4
+    url: https://www.npmjs.com/package/@tesser-payments/types
+    install: bun add @tesser-payments/types
+    official: true
+    description: Shared TypeScript types and Zod schemas for the Tesser Payments platform (peer dependency of sdk-ts).
+  - language: kotlin
+    registry: maven-central
+    name: "xyz.tesser:sdk"
+    version: 0.0.2
+    group_id: xyz.tesser
+    artifact_id: sdk
+    url: https://github.com/tesser-payments/sdk-kotlin
+    install: 'implementation("xyz.tesser:sdk:0.0.2")'
+    official: true
+    targets: JVM 17+, Kotlin 2.0+
+    description: >-
+      Kotlin SDK for the Tesser API; produces locally-signed payloads (wallet
+      creation, rebalance step signing) ready to submit to the Tesser API.
+      README states Maven Central publication is pending the first release tag;
+      GitHub source is public.
+related_repos:
+  - name: api-demo
+    url: https://github.com/tesser-payments/api-demo
+    description: Sample integration with the Tesser API (TypeScript/Bun).
+  - name: skills
+    url: https://github.com/tesser-payments/skills
+    description: Cross-harness agentic skills plugin for the Tesser Payments platform.
+notes: >-
+  Both SDKs are "signer-only" — they locally sign wallet/step activities and
+  leave HTTP + OAuth to the caller. The full REST surface is reached directly
+  (or via the MCP server), not through a generated HTTP client.

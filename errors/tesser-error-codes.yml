@@ -1,0 +1,38 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.tesser.xyz/overviews/errors
+format: custom-array
+envelope:
+  shape: '{ "errors": [ { "error_code": "domain-YZZZ", "error_message": "Human-readable error description" } ] }'
+  problem_json: false
+code_convention:
+  pattern: '{domain}-{YZZZ}'
+  domain: identifies the resource area (e.g. accounts, payments, treasury, transfers)
+  y: HTTP status category digit
+  zzz: specific error number within that category
+  ranges:
+    - {range: '1000-1999', http_status: 404, meaning: Not Found}
+    - {range: '2000-2999', http_status: '401/403', meaning: Unauthorized / Forbidden}
+    - {range: '3000-3999', http_status: 400, meaning: Bad Request}
+    - {range: '4000-4999', http_status: 429, meaning: Too Many Requests}
+    - {range: '5000-5999', http_status: '502/503', meaning: Bad Gateway / Service Unavailable}
+  legacy_domains: [Circle, Idempotency]  # use legacy numbering that does not follow the range convention
+step_failures:
+  field: status_reasons
+  note: >-
+    When a step of a payment, deposit, withdrawal, or rebalance transitions to
+    "failed", the step carries a status_reasons[] array; each entry reuses the
+    error vocabulary (error_code + error_message), e.g. transfers-9201 "An
+    upstream step failed, so this step was not executed".
+examples:
+  - {error_code: transfers-9201, error_message: 'An upstream step failed, so this step was not executed'}
+derived_from_openapi:
+  source: openapi/tesser-openapi-original.json
+  response_status_distribution:
+    '400': 42
+    '401': 43
+    '403': 1
+    '404': 15
+    '409': 1
+    '500': 25
+  note: 'Full error-code registry is auto-generated on the Tesser docs (Errors overview); this captures the convention + envelope + observed status spread across 58 operations.'

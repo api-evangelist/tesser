@@ -1,0 +1,42 @@
+generated: '2026-07-21'
+method: derived
+source:
+  - openapi/tesser-openapi-original.json
+  - https://docs.tesser.xyz/overviews/authentication
+  - https://docs.tesser.xyz/agentic/mcp-integration
+  - https://docs.tesser.xyz/webhooks/authentication
+standards:
+  - id: oauth2
+    conforms: true
+    evidence: OAuth 2.0 client-credentials grant via Auth0; bearer JWT security scheme applied globally.
+  - id: oauth2-client-credentials
+    conforms: true
+    evidence: Token endpoint uses grant_type=client_credentials with per-environment audience.
+  - id: rfc9728-oauth-protected-resource
+    conforms: true
+    evidence: /.well-known/oauth-protected-resource served (200) on api.tesser.xyz and sandbox.tesserx.co.
+  - id: rfc8414-oauth-authorization-server
+    conforms: false
+    evidence: /.well-known/oauth-authorization-server returns 404 on Tesser hosts (served by Auth0 tenant instead).
+  - id: mcp
+    conforms: true
+    evidence: Published Model Context Protocol server (Streamable HTTP) at sandbox.tesserx.co/v1/mcp; native POST /v1/mcp operation.
+  - id: ed25519-webhook-signing
+    conforms: true
+    evidence: Outbound webhooks signed with Ed25519 (X-Tesser-Signature); public keys published for prod + sandbox.
+  - id: openapi-3.1
+    conforms: true
+    evidence: Machine-readable OpenAPI 3.1.0 published at docs.tesser.xyz/api/v1/schema.json (58 operations, 170 schemas).
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: 'Errors use a custom { errors: [ { error_code, error_message } ] } envelope, not application/problem+json.'
+  - id: openid-connect
+    conforms: false
+    evidence: No OIDC discovery document published on Tesser hosts.
+compliance_program:
+  published: false
+  note: >-
+    Tesser exposes compliance/risk-management features (risk-profile endpoints,
+    Notabene travel-rule webhook, KYC/counterparty flows) but does not publish a
+    formal certification program (SOC 2 / ISO 27001 / PCI) page. Do not assert a
+    Compliance pointer without a published certification.

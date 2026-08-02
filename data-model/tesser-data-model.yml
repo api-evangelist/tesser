@@ -1,0 +1,61 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/tesser-openapi-original.json
+docs: https://docs.tesser.xyz/overviews/funds-movement-lifecycle-and-data-model
+description: >-
+  Entity-relationship graph derived from the Tesser OpenAPI (47 paths, 58
+  operations, 170 schemas). Payments, deposits, withdrawals and rebalances share a
+  common funds-movement shape (desired / estimated / actual overlays + steps).
+entities:
+  - name: Organization
+    resource: /v1/organizations
+    fields: [risk-profile, secrets]
+  - name: Tenant
+    resource: /v1/entities/tenants
+    description: Business customers of a platform (multi-tenant).
+  - name: Counterparty
+    resource: /v1/entities/counterparties
+    description: External individuals/businesses you pay or receive from.
+  - name: Account
+    resource: /v1/accounts
+    subtypes: [bank, wallet, ledger]
+    description: Fiat bank accounts, self-custodial crypto wallets, and internal ledger accounts.
+  - name: ApiKey
+    resource: /v1/keys
+  - name: Payment
+    resource: /v1/payments
+    children: [PaymentStep]
+    overlays: [desired, estimated, actual]
+  - name: PaymentStep
+    resource: /v1/payments/{paymentId}/steps/{stepId}
+  - name: Deposit
+    resource: /v1/treasury/deposits
+    children: [DepositStep]
+  - name: Withdrawal
+    resource: /v1/treasury/withdrawals
+    children: [WithdrawalStep]
+  - name: Rebalance
+    resource: /v1/treasury/rebalances
+    children: [RebalanceStep]
+  - name: Currency
+    resource: /v1/currencies
+  - name: Network
+    resource: /v1/networks
+    description: Supported blockchain networks (e.g. ETHEREUM).
+  - name: User
+    resource: /v1/users
+relationships:
+  - {from: Tenant, type: belongs_to, to: Organization, via: organization_id}
+  - {from: Account, type: belongs_to, to: Organization, via: workspace_id}
+  - {from: Payment, type: has_many, to: PaymentStep, via: steps}
+  - {from: Payment, type: belongs_to, to: Account, via: funding_account_id}
+  - {from: Payment, type: references, to: Counterparty, via: to.account_id}
+  - {from: Deposit, type: has_many, to: DepositStep, via: steps}
+  - {from: Deposit, type: belongs_to, to: Account, via: account_id}
+  - {from: Withdrawal, type: has_many, to: WithdrawalStep, via: steps}
+  - {from: Rebalance, type: has_many, to: RebalanceStep, via: steps}
+  - {from: Payment, type: references, to: Currency, via: currency}
+  - {from: Payment, type: references, to: Network, via: network}
+lifecycle:
+  shared_statuses: 'desired -> estimated -> actual overlays; steps progress through statuses; failed steps carry status_reasons[]'
+  docs: https://docs.tesser.xyz/overviews/funds-movement-lifecycle-and-data-model

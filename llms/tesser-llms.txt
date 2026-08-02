@@ -1,0 +1,48 @@
+# Tesser Documentation
+
+> Documentation files for Large Language Models
+
+## Documentation
+
+- [Treasury Updates](/webhooks/treasury-updates.md): Webhook events fired during the deposit, withdrawal, and rebalance lifecycle
+- [Payment Updates](/webhooks/payment-updates.md): Webhook events fired during the payment lifecycle
+- [General](/webhooks/general.md): Common envelope structure shared by all Tesser webhook events
+- [Webhook Authentication](/webhooks/authentication.md): Verify that webhooks originate from Tesser using Ed25519 signatures
+- [Treasury Management](/overviews/treasury-management.md): Stablecoin balance and yield management
+- [Transfers](/overviews/transfers.md): Internal movement of funds
+- [Supported Tokens and Networks](/overviews/tokens-and-networks.md): Supported blockchain networks and stablecoins
+- [Tenants](/overviews/tenants.md): Manage business customers and their integrations
+- [Stablecoin Custody](/overviews/stablecoin-custody.md): Secure non-custodial wallet architecture
+- [Resources Overview](/overviews/resources-overview.md): Overview of the Platform API Resources
+- [Payments](/overviews/payments.md): Movement of funds to/from counterparties
+- [Payment Planning](/overviews/payment-planning.md): Quotes, costs, and routing for payments
+- [Networks](/overviews/networks.md): Supported blockchain networks
+- [Liquidity Providers](/overviews/liquidity-providers.md): Integration with global fiat on/off ramps
+- [Funds Movement Lifecycle and Data Model](/overviews/funds-movement-lifecycle-and-data-model.md): How Tesser models payments, deposits, withdrawals, and rebalances — the shared data shape, lifecycle phases, and statuses.
+- [Errors](/overviews/errors.md): Complete reference of all API error codes and their meanings
+- [Deposits and Withdrawals](/overviews/deposits-and-withdrawals.md): On-ramping and off-ramping operations
+- [Currencies](/overviews/currencies.md): Supported fiat and crypto currencies
+- [Counterparties](/overviews/counterparties.md): Manage external individuals and businesses
+- [Compliance and Risk Management](/overviews/compliance-and-risk.md): Comprehensive compliance management to meet regulatory requirements
+- [Authentication](/overviews/authentication.md): How to authenticate with the Tesser API
+- [Accounts](/overviews/accounts.md): Manage fiat bank accounts and crypto wallets
+- [Withdraw Funds via a Liquidity Provider](/how-tos/withdraw-funds-via-a-liquidity-provider.md): Move funds out of your managed accounts at a liquidity provider to your external bank account.
+- [Sign a Wallet Step](/how-tos/sign-a-wallet-step.md): Submit signatures for self-custodial wallet-originated steps across payments, rebalances, and withdrawals.
+- [Receive an Inbound Payment to a Wallet](/how-tos/receive-an-inbound-payment-to-a-wallet.md): Observe and reconcile inbound stablecoin payments sent on-chain to one of your managed wallets — what events fire, what the resource looks like, and how the sending wallet is identified.
+- [Rebalance Funds](/how-tos/rebalance-funds.md): Move funds between your managed accounts, including across currencies and networks.
+- [Deposit Funds via a Liquidity Provider](/how-tos/deposit-funds-via-a-liquidity-provider.md): Deposit fiat funds via a liquidity provider, with or without on-ramping to stablecoin.
+- [Create an Account](/how-tos/create-an-account.md): Pre-register accounts for payouts on the Tesser platform
+- [Create a Tenant](/how-tos/create-a-tenant.md): How to create and manage tenants for platform customers
+- [Create a Counterparty](/how-tos/create-a-counterparty.md): Pre-register counterparties for payouts on the Tesser platform
+- [Combine a Deposit and a Payout](/how-tos/combine-a-deposit-and-a-payout.md): Combine a deposit and an outbound payment into a single orchestrated API call that leverages a "stablecoin sandwich" (fiat --> stablecoin --> fiat).
+- [Resources](/agentic/resources.md): AI-friendly resources and authentication for the Tesser API
+- [Provider Onboarding](/agentic/provider-onboarding.md): Connect a liquidity provider to Tesser with the open-source Tesser agent skill.
+- [MCP Integration](/agentic/mcp-integration.md): Connect AI coding assistants to Tesser via Model Context Protocol
+- [Manual MCP Setup](/agentic/manual-mcp.md): Connect to the Tesser MCP server using a manually fetched token
+- [AI Context File](/agentic/ai-context.md): A ready-to-paste context file that gives AI assistants Tesser API knowledge
+- [Request Supported Currencies and Networks](/how-tos/send-a-stablecoin-payout/supported-currencies-and-networks.md): Learn which currencies and payment networks are available
+- [Payments Workflow](/how-tos/send-a-stablecoin-payout/payout-workflow.md): End-to-end payment execution flow
+- [Create a Payout (via Custodian)](/how-tos/send-a-stablecoin-payout/create-a-stablecoin-payout.md): Create and execute payouts using third-party custodian accounts
+- [Create a Payout (from a Wallet)](/how-tos/send-a-stablecoin-payout/create-a-payout-from-a-wallet.md): Create and execute payouts using self-custodial wallets
+- [Payment Planning](/overviews/payment-planning.md): Quotes, costs, and routing for payments
+- [Payments Workflow](/how-tos/send-a-stablecoin-payout/payout-workflow.md): End-to-end payment execution flow

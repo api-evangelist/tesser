@@ -1,0 +1,40 @@
+{
+  "provider": "tesser",
+  "sources": [
+    "tesser-accounts-api-openapi.yml",
+    "tesser-admin-api-openapi.yml",
+    "tesser-api-keys-api-openapi.yml",
+    "tesser-counterparties-api-openapi.yml",
+    "tesser-currencies-api-openapi.yml",
+    "tesser-health-api-openapi.yml",
+    "tesser-mcp-api-openapi.yml",
+    "tesser-networks-api-openapi.yml",
+    "tesser-organizations-api-openapi.yml",
+    "tesser-payments-api-openapi.yml",
+    "tesser-tenants-api-openapi.yml",
+    "tesser-treasury-api-openapi.yml",
+    "tesser-users-api-openapi.yml",
+    "tesser-webhooks-api-openapi.yml"
+  ],
+  "outputs": [
+    "tesser-accounts-api-openapi.yml",
+    "tesser-admin-api-openapi.yml",
+    "tesser-api-keys-api-openapi.yml",
+    "tesser-counterparties-api-openapi.yml",
+    "tesser-currencies-api-openapi.yml",
+    "tesser-health-api-openapi.yml",
+    "tesser-mcp-api-openapi.yml",
+    "tesser-networks-api-openapi.yml",
+    "tesser-organizations-api-openapi.yml",
+    "tesser-payments-api-openapi.yml",
+    "tesser-tenants-api-openapi.yml",
+    "tesser-treasury-api-openapi.yml",
+    "tesser-users-api-openapi.yml",
+    "tesser-webhooks-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

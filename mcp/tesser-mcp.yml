@@ -1,0 +1,39 @@
+generated: '2026-07-21'
+method: searched
+status: published
+source: https://docs.tesser.xyz/agentic/mcp-integration
+docs:
+  - https://docs.tesser.xyz/agentic/mcp-integration
+  - https://docs.tesser.xyz/agentic/manual-mcp
+server:
+  name: tesser-payments
+  transport: http
+  transport_detail: Streamable HTTP
+  url: https://sandbox.tesserx.co/v1/mcp
+  native_operation: openapi/tesser-openapi-original.json#mcp_server
+description: >-
+  The Tesser MCP server exposes every public Tesser API endpoint as a tool that
+  AI agents can discover and invoke over Streamable HTTP. It is also modeled in
+  the OpenAPI as the POST /v1/mcp operation (operationId mcp_server). Tools map
+  1:1 to the REST operations (Accounts, Counterparties, Tenants, API Keys,
+  Payments, Treasury, Currencies, Networks, Organizations, Users).
+authentication:
+  model: oauth2-client-credentials (Auth0), same credentials as the REST API
+  methods:
+    - name: oauth-discovery
+      recommended: true
+      detail: >-
+        Serves RFC 9728 protected-resource metadata at
+        /.well-known/oauth-protected-resource; a 401 returns a
+        `WWW-Authenticate: resource_metadata` hint. MCP-authorization-spec
+        clients (e.g. Cursor) run the OAuth flow and refresh tokens
+        automatically.
+    - name: manual-bearer
+      detail: >-
+        Fallback for clients without OAuth discovery (e.g. Claude Code today):
+        fetch a token via scripts/mcp-token.sh and pass it as a header.
+clients_documented: [Cursor, Claude Code]
+tools_note: >-
+  Published server advertises tools dynamically from the API surface; the
+  provider does not publish a static tool manifest. See the OpenAPI operations
+  (58) as the canonical tool set.

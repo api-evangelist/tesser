@@ -1,0 +1,43 @@
+generated: '2026-07-21'
+method: searched
+source: live probe of /.well-known/* on Tesser hosts
+hosts:
+  - host: https://api.tesser.xyz
+    documents:
+      - path: /.well-known/oauth-protected-resource   # RFC 9728
+        status: 200
+        file: tesser-oauth-protected-resource.json
+        note: 'resource=https://api.tesser.xyz; auth server=https://tesser-payments.us.auth0.com'
+      - path: /.well-known/oauth-authorization-server  # RFC 8414
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+  - host: https://sandbox.tesserx.co
+    documents:
+      - path: /.well-known/oauth-protected-resource   # RFC 9728
+        status: 200
+        file: tesser-oauth-protected-resource-sandbox.json
+        note: 'resource=https://sandbox.tesserx.co; auth server=https://dev-awqy75wdabpsnsvu.us.auth0.com'
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+  - host: https://tesser.xyz
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /llms.txt
+        status: 404
+notes: >-
+  Both API hosts publish RFC 9728 OAuth Protected Resource metadata (used for
+  MCP/OAuth auto-discovery). No security.txt, OIDC discovery, or api-catalog is
+  published. Note llms.txt is served from the docs host (docs.tesser.xyz/llms.txt),
+  not the apex.
