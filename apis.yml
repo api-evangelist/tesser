@@ -330,7 +330,7 @@ common:
 - type: LinkedIn
   url: https://www.linkedin.com/company/tesserpayments/
 - type: OpenAPI
-  url: openapi/tesser-openapi-original.json
+  url: openapi/_original/tesser-openapi-original.json
 - type: LLMsTxt
   url: llms/tesser-llms.txt
 - type: Authentication
