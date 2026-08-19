@@ -1,0 +1,1007 @@
+{
+  "item": [
+    {
+      "id": "59ab8fb7-119c-4cfa-b127-7eade341abd6",
+      "name": "Counterparties",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "b315fb37-636c-4467-b8fb-d058546b3839",
+          "name": "Create a new counterparty",
+          "request": {
+            "name": "Create a new counterparty",
+            "description": {
+              "content": "Create a new counterparty for your workspace or a specific tenant.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "entities",
+                "counterparties"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classification\": \"<string>\",\n  \"tenant_id\": \"<uuid>\",\n  \"individual_first_name\": \"<string>\",\n  \"individual_last_name\": \"<string>\",\n  \"individual_address_country\": \"<string>\",\n  \"individual_date_of_birth\": \"<string>\",\n  \"individual_national_identification_number\": \"<string>\",\n  \"individual_street_address1\": \"<string>\",\n  \"individual_street_address2\": \"<string>\",\n  \"individual_city\": \"<string>\",\n  \"individual_state\": \"<string>\",\n  \"individual_postal_code\": \"<string>\",\n  \"business_legal_name\": \"<string>\",\n  \"business_dba\": \"<string>\",\n  \"business_address_country\": \"<string>\",\n  \"business_street_address1\": \"<string>\",\n  \"business_street_address2\": \"<string>\",\n  \"business_city\": \"<string>\",\n  \"business_state\": \"<string>\",\n  \"business_legal_entity_identifier\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "d3539dfa-df3f-4440-a446-5eebeea7b0ce",
+              "name": "Counterparty created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"classification\": \"individual\",\n  \"individual_first_name\": \"John\",\n  \"individual_last_name\": \"Doe\",\n  \"individual_address_country\": \"US\",\n  \"individual_date_of_birth\": \"1980-01-01\",\n  \"individual_national_identification_number\": \"123456789\",\n  \"individual_street_address1\": \"123 Main St\",\n  \"individual_street_address2\": \"Apt 4B\",\n  \"individual_city\": \"New York\",\n  \"individual_state\": \"NY\",\n  \"individual_postal_code\": \"10001\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"c7d8e9f0-1a2b-3c4d-5e6f-789012345678\",\n    \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n    \"classification\": \"individual\",\n    \"tenant_id\": null,\n    \"individual_first_name\": \"John\",\n    \"individual_last_name\": \"Doe\",\n    \"individual_address_country\": \"US\",\n    \"individual_date_of_birth\": \"1980-01-01\",\n    \"individual_national_identification_number\": \"123456789\",\n    \"individual_street_address1\": \"123 Main St\",\n    \"individual_street_address2\": \"Apt 4B\",\n    \"individual_city\": \"New York\",\n    \"individual_state\": \"NY\",\n    \"individual_postal_code\": \"10001\",\n    \"business_legal_name\": null,\n    \"business_dba\": null,\n    \"business_address_country\": null,\n    \"business_street_address1\": null,\n    \"business_street_address2\": null,\n    \"business_city\": null,\n    \"business_state\": null,\n    \"business_legal_entity_identifier\": null,\n    \"created_at\": \"2024-03-01T10:00:00.000Z\",\n    \"updated_at\": \"2024-03-01T10:00:00.000Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "92bd1ba9-cfea-4b6b-a63d-fd7da68c9888",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"classification\": \"individual\",\n  \"individual_first_name\": \"John\",\n  \"individual_last_name\": \"Doe\",\n  \"individual_address_country\": \"US\",\n  \"individual_date_of_birth\": \"1980-01-01\",\n  \"individual_national_identification_number\": \"123456789\",\n  \"individual_street_address1\": \"123 Main St\",\n  \"individual_street_address2\": \"Apt 4B\",\n  \"individual_city\": \"New York\",\n  \"individual_state\": \"NY\",\n  \"individual_postal_code\": \"10001\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "3448ae4a-6c0f-4718-8d51-3004ade68dae",
+              "name": "Authentication required or invalid credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"classification\": \"individual\",\n  \"individual_first_name\": \"John\",\n  \"individual_last_name\": \"Doe\",\n  \"individual_address_country\": \"US\",\n  \"individual_date_of_birth\": \"1980-01-01\",\n  \"individual_national_identification_number\": \"123456789\",\n  \"individual_street_address1\": \"123 Main St\",\n  \"individual_street_address2\": \"Apt 4B\",\n  \"individual_city\": \"New York\",\n  \"individual_state\": \"NY\",\n  \"individual_postal_code\": \"10001\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"api-0004\",\n      \"error_message\": \"Unauthorized\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "541046cd-676a-4df8-833a-3fe814927c4e",
+              "name": "Internal server error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"classification\": \"individual\",\n  \"individual_first_name\": \"John\",\n  \"individual_last_name\": \"Doe\",\n  \"individual_address_country\": \"US\",\n  \"individual_date_of_birth\": \"1980-01-01\",\n  \"individual_national_identification_number\": \"123456789\",\n  \"individual_street_address1\": \"123 Main St\",\n  \"individual_street_address2\": \"Apt 4B\",\n  \"individual_city\": \"New York\",\n  \"individual_state\": \"NY\",\n  \"individual_postal_code\": \"10001\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"api-0006\",\n      \"error_message\": \"An unexpected error occurred\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "659f2328-c23c-45fe-90db-3d3e3f6738ef",
+          "name": "List all counterparties",
+          "request": {
+            "name": "List all counterparties",
+            "description": {
+              "content": "Retrieve all counterparties for your workspace or a specific tenant.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "entities",
+                "counterparties"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "classification",
+                  "value": "<string>",
+                  "description": "Filter by classification"
+                },
+                {
+                  "disabled": false,
+                  "key": "search",
+                  "value": "<string>",
+                  "description": "Search by name"
+                },
+                {
+                  "disabled": false,
+                  "key": "include_secure",
+                  "value": "false",
+                  "description": "Include masked vault data (address, DOB, national ID, legal entity identifier)"
+                },
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "<integer>",
+                  "description": "Page number for pagination (1-based)"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "<integer>",
+                  "description": "Number of items per page (default: 20)"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "b6d8d384-0c4a-4752-bc09-499134eaf5ad",
+              "name": "Counterparties retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "classification",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_secure",
+                      "value": "false"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"6f1c4a8e-2d7b-4930-b5e2-9a3f0c7d1b6e\",\n      \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n      \"classification\": \"business\",\n      \"tenant_id\": null,\n      \"individual_first_name\": null,\n      \"individual_last_name\": null,\n      \"individual_address_country\": null,\n      \"individual_date_of_birth\": null,\n      \"individual_national_identification_number\": null,\n      \"individual_street_address1\": null,\n      \"individual_street_address2\": null,\n      \"individual_city\": null,\n      \"individual_state\": null,\n      \"individual_postal_code\": null,\n      \"business_legal_name\": \"Acme Corporation\",\n      \"business_dba\": \"Acme Co\",\n      \"business_address_country\": \"US\",\n      \"business_street_address1\": \"456 Corp Blvd\",\n      \"business_street_address2\": \"Suite 200\",\n      \"business_city\": \"San Francisco\",\n      \"business_state\": \"CA\",\n      \"business_legal_entity_identifier\": \"1234567890\",\n      \"created_at\": \"2024-02-01T14:00:00.000Z\",\n      \"updated_at\": \"2024-02-01T14:00:00.000Z\"\n    },\n    {\n      \"id\": \"3e9a7c2f-1b8d-4e56-a0f3-5c2d8b1e9a7f\",\n      \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n      \"classification\": \"individual\",\n      \"tenant_id\": null,\n      \"individual_first_name\": \"John\",\n      \"individual_last_name\": \"Doe\",\n      \"individual_address_country\": \"US\",\n      \"individual_date_of_birth\": \"1980-01-01\",\n      \"individual_national_identification_number\": \"123456789\",\n      \"individual_street_address1\": \"123 Main St\",\n      \"individual_street_address2\": \"Apt 4B\",\n      \"individual_city\": \"New York\",\n      \"individual_state\": \"NY\",\n      \"individual_postal_code\": \"10001\",\n      \"business_legal_name\": null,\n      \"business_dba\": null,\n      \"business_address_country\": null,\n      \"business_street_address1\": null,\n      \"business_street_address2\": null,\n      \"business_city\": null,\n      \"business_state\": null,\n      \"business_legal_entity_identifier\": null,\n      \"created_at\": \"2024-01-15T10:30:00.000Z\",\n      \"updated_at\": \"2024-01-15T10:30:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 2,\n    \"total_pages\": 1,\n    \"has_next\": false,\n    \"has_prev\": false\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "aaf83f3e-6d43-4f9e-90ed-f94394f74ef1",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "classification",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_secure",
+                      "value": "false"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "94e638a1-adca-4289-94f1-a45ee15d744a",
+              "name": "Authentication required or invalid credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "classification",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_secure",
+                      "value": "false"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"api-0004\",\n      \"error_message\": \"Unauthorized\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "54f74e14-f03c-46f8-855a-8dad19567d79",
+              "name": "Internal server error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "classification",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_secure",
+                      "value": "false"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"api-0006\",\n      \"error_message\": \"An unexpected error occurred\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "bcb9f0eb-ecfe-4197-a871-2e88fbff65ae",
+          "name": "Get a counterparty by ID",
+          "request": {
+            "name": "Get a counterparty by ID",
+            "description": {
+              "content": "Retrieve a specific counterparty by its unique identifier.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "entities",
+                "counterparties",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "include_secure",
+                  "value": "<boolean>",
+                  "description": "Include masked vault data (address, DOB, national ID, legal entity identifier)"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "id",
+                  "description": "(Required) Counterparty ID (UUID)"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "4171d910-a92a-4135-a2f1-dc93969cc319",
+              "name": "Counterparty retrieved successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "include_secure",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Counterparty ID (UUID)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"d8e9f0a1-2b3c-4d5e-6f78-901234567890\",\n    \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n    \"classification\": \"business\",\n    \"tenant_id\": null,\n    \"individual_first_name\": null,\n    \"individual_last_name\": null,\n    \"individual_address_country\": null,\n    \"individual_date_of_birth\": null,\n    \"individual_national_identification_number\": null,\n    \"individual_street_address1\": null,\n    \"individual_street_address2\": null,\n    \"individual_city\": null,\n    \"individual_state\": null,\n    \"individual_postal_code\": null,\n    \"business_legal_name\": \"Acme Corporation\",\n    \"business_dba\": \"Acme Co\",\n    \"business_address_country\": \"US\",\n    \"business_street_address1\": \"456 Corp Blvd\",\n    \"business_street_address2\": \"Suite 200\",\n    \"business_city\": \"San Francisco\",\n    \"business_state\": \"CA\",\n    \"business_legal_entity_identifier\": \"1234567890\",\n    \"created_at\": \"2024-02-01T14:00:00.000Z\",\n    \"updated_at\": \"2024-02-01T14:00:00.000Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b2f32078-80a7-4830-83f2-d001bccd48a8",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "include_secure",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Counterparty ID (UUID)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1e3209e2-cb7b-4df3-8333-0d5ed59b5470",
+              "name": "Authentication required or invalid credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "include_secure",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Counterparty ID (UUID)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"api-0004\",\n      \"error_message\": \"Unauthorized\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4ccb79f8-254f-4f1c-88fb-8d54a163c376",
+              "name": "Resource not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "include_secure",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Counterparty ID (UUID)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"api-0001\",\n      \"error_message\": \"Resource not found\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "419318a4-57e3-4d99-b2d7-36d1eaf6fa13",
+              "name": "Internal server error",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "entities",
+                    "counterparties",
+                    ":id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "include_secure",
+                      "value": "<boolean>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "id",
+                      "description": "(Required) Counterparty ID (UUID)"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"api-0006\",\n      \"error_message\": \"An unexpected error occurred\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "d046d7b5-e620-4c16-9645-724a82cc9c5f",
+    "name": "Tesser Accounts Counterparties API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Tesser Payments Platform API documentation.",
+      "type": "text/plain"
+    }
+  }
+}

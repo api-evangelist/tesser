@@ -1,0 +1,113 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tesser Accounts Tenants API",
+    "version": "v1"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Tenants",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all tenants",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/entities/tenants",
+            "params": [
+              {
+                "name": "search",
+                "value": "",
+                "type": "query",
+                "description": "Search by name (legal name or DBA)"
+              },
+              {
+                "name": "include_secure",
+                "value": "",
+                "type": "query",
+                "description": "Include masked vault data (address, legal entity identifier)"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number for pagination (1-based)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Number of items per page (default: 20)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve all tenants for your workspace with optional search filtering and pagination."
+        },
+        {
+          "info": {
+            "name": "Create a new tenant",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/entities/tenants",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create a new tenant for your workspace. Tenants are business customers that can have their own counterparties and accounts.\n\nTenants can be assigned to counterparties to organize your workspace by customer.\n\n**Required fields:** business_legal_name"
+        },
+        {
+          "info": {
+            "name": "Get a tenant by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/entities/tenants/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tenant ID (UUID)"
+              },
+              {
+                "name": "include_secure",
+                "value": "",
+                "type": "query",
+                "description": "Include masked vault data (address, legal entity identifier)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a specific tenant by its unique identifier."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

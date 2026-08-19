@@ -1,0 +1,433 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tesser Accounts Treasury API",
+    "version": "v1"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Treasury",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get treasury activity feed (deposits, withdrawals + rebalances)",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/activity",
+            "params": [
+              {
+                "name": "page",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "account_id",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "completed_only",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "types",
+                "value": "",
+                "type": "query",
+                "description": "Filter by activity type"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Get treasury activity feed (deposits, withdrawals + rebalances)"
+        },
+        {
+          "info": {
+            "name": "Get treasury balances",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/balances",
+            "params": [
+              {
+                "name": "currency",
+                "value": "",
+                "type": "query",
+                "description": "Filter by currency. Comma-separated for multiple values. Example: USDC,USDT"
+              },
+              {
+                "name": "managed",
+                "value": "",
+                "type": "query",
+                "description": "Filter by managed status. 'true' for managed accounts only, 'false' for non-managed only, omit for all accounts."
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Get treasury balances grouped by currency. Each currency includes: available balance from managed accounts, pending review payment amounts, and rejected payment amounts. Optionally filter by specific currencies."
+        },
+        {
+          "info": {
+            "name": "Get deposits",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/deposits",
+            "params": [
+              {
+                "name": "ids",
+                "value": "",
+                "type": "query",
+                "description": "Filter by deposit IDs (comma-separated UUIDs)"
+              },
+              {
+                "name": "to_account_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by destination account ID (desired.to.account_id)."
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number for pagination (1-based)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Number of items per page (default: 20)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a paginated list of all deposits for the workspace."
+        },
+        {
+          "info": {
+            "name": "Create deposit",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/treasury/deposits",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create a deposit payment and get deposit instructions."
+        },
+        {
+          "info": {
+            "name": "Get deposit by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/deposits/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Deposit ID"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a deposit payment by its unique identifier."
+        },
+        {
+          "info": {
+            "name": "Get deposit instructions by id",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/deposits/:id/instructions",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Deposit ID"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Get deposit instructions for an existing deposit.\n\n"
+        },
+        {
+          "info": {
+            "name": "Simulate deposit in sandbox",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/treasury/deposits/:id/simulate",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Deposit ID"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Simulate a wire deposit by triggering Circle's mock wire API. Only available in sandbox environments."
+        },
+        {
+          "info": {
+            "name": "Get rebalances",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/rebalances",
+            "params": [
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number for pagination (1-based)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Number of items per page (default: 20)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a paginated list of all rebalances for the workspace."
+        },
+        {
+          "info": {
+            "name": "Create rebalance",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/treasury/rebalances",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create an internal rebalance between managed accounts.\n\n**Validation rules:**\n- `desired.from.network` / `desired.to.network` are required for wallet accounts and disallowed for ledger accounts."
+        },
+        {
+          "info": {
+            "name": "Get rebalance by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/rebalances/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Rebalance ID"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a rebalance by its unique identifier."
+        },
+        {
+          "info": {
+            "name": "Sign rebalance step",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/treasury/rebalances/:id/steps/:stepId/sign",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Rebalance ID"
+              },
+              {
+                "name": "stepId",
+                "value": "",
+                "type": "path",
+                "description": "Rebalance step ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Submit a signature for a self-custodial wallet-to-wallet rebalance step. Webhook updates will be sent as the signature is validated and submitted onchain."
+        },
+        {
+          "info": {
+            "name": "Get withdrawals",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/withdrawals",
+            "params": [
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number for pagination (1-based)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Number of items per page (default: 20)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a paginated list of all withdrawals for the workspace."
+        },
+        {
+          "info": {
+            "name": "Create withdrawal",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/treasury/withdrawals",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create a withdrawal from a managed account or self-custodial wallet to an external bank account.\n\n**Source types:**\n- Circle USDC ledger (path A) — `desired.from.network` omitted.\n- Self-custodial wallet (path B) — `desired.from.network` populated (e.g., `BASE`)."
+        },
+        {
+          "info": {
+            "name": "Get withdrawal by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/treasury/withdrawals/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Withdrawal ID"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a withdrawal by its unique identifier."
+        },
+        {
+          "info": {
+            "name": "Sign withdrawal step",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/treasury/withdrawals/:id/steps/:stepId/sign",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Withdrawal ID"
+              },
+              {
+                "name": "stepId",
+                "value": "",
+                "type": "path",
+                "description": "Withdrawal step ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Submit a signature for a self-custodial wallet-source withdrawal step. Webhook updates will be sent as the signature is validated and submitted onchain."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

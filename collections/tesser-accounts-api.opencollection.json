@@ -1,0 +1,214 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tesser Accounts API",
+    "version": "v1"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Accounts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/accounts",
+            "params": [
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "Filter by account type"
+              },
+              {
+                "name": "tenant_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by tenant ID"
+              },
+              {
+                "name": "counterparty_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by counterparty ID"
+              },
+              {
+                "name": "entity_type",
+                "value": "",
+                "type": "query",
+                "description": "Filter by entity type (e.g. sub_org for workspace-level)"
+              },
+              {
+                "name": "search",
+                "value": "",
+                "type": "query",
+                "description": "Search by account name"
+              },
+              {
+                "name": "is_managed",
+                "value": "",
+                "type": "query",
+                "description": "Filter by managed status: 'true' for managed wallets only, 'false' for unmanaged wallets only, omit for all accounts"
+              },
+              {
+                "name": "include_secure",
+                "value": "",
+                "type": "query",
+                "description": "Include masked sensitive fields (e.g., bank account number)"
+              },
+              {
+                "name": "compliance_accepted",
+                "value": "",
+                "type": "query",
+                "description": "Filter ledger accounts by compliance status: 'true' returns only ledgers with ACCEPTED compliance state"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number for pagination (1-based)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Number of items per page (default: 20)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve all accounts for your workspace with optional filtering and pagination."
+        },
+        {
+          "info": {
+            "name": "Create a new bank account",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/accounts/banks",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create a new fiat bank account for your workspace, tenant, or counterparty.\n\n**Security:** The `bank_account_number` field is encrypted and stored securely in a vault. It will never be returned in API responses.\n\n**Ownership:** Use `tenant_id` OR `counterparty_id` to link the account. Omit both for a workspace-level account."
+        },
+        {
+          "info": {
+            "name": "Create a new ledger account",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/accounts/ledgers",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create a ledger account linked to an external liquidity provider.\n\n**Supported Providers:**\n- `CIRCLE_MINT`: Circle Mint USDC accounts for institutional settlement\n- `KRAKEN`: Kraken exchange accounts for cryptocurrency liquidity\n\nLedger accounts are virtual accounts managed by the provider. They enable fast settlement without on-chain transactions.\n\n**Ownership:** Use `tenant_id` OR `counterparty_id` to link the account. Omit both for a workspace-level ledger account."
+        },
+        {
+          "info": {
+            "name": "Create a new wallet account",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/accounts/wallets",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create a new stablecoin wallet account.\n\n**Supported Networks:**\n- `stablecoin_ethereum` - Ethereum/Polygon stablecoin wallet\n- `stablecoin_solana` - Solana stablecoin wallet\n- `stablecoin_stellar` - Stellar stablecoin wallet\n\n**Wallet Types:**\n- **Managed** (`is_managed=true`) - Tesser-managed wallet, requires `signature`\n- **Unmanaged** (`is_managed=false`, default) - External wallet, requires `wallet_address`\n\n**Ownership:** Optionally link to a tenant or counterparty using `tenant_id` or `co"
+        },
+        {
+          "info": {
+            "name": "Get an account by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/accounts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Account ID (UUID)"
+              },
+              {
+                "name": "include_secure",
+                "value": "",
+                "type": "query",
+                "description": "Include masked secure fields (e.g., bank account number)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a specific account by its unique identifier."
+        },
+        {
+          "info": {
+            "name": "Update an account",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/v1/accounts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Account ID (UUID)"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Update an existing account's information."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

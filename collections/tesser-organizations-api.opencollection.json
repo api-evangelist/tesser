@@ -1,0 +1,77 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tesser Accounts Organizations API",
+    "version": "v1"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Organizations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get organization risk profile",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/organizations/risk-profile",
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve the current compliance risk profile for the authenticated user's organization."
+        },
+        {
+          "info": {
+            "name": "Update organization risk profile",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/v1/organizations/risk-profile",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Update the compliance risk profile for the authenticated user's organization. Available profiles:\n\n- **conservative**: Strictest screening, lowest risk tolerance\n- **balanced**: Moderate screening (default)\n- **aggressive**: Lenient screening, highest risk tolerance\n\nNote: Changing the risk profile will affect future compliance screenings but will not retroactively change past screenings."
+        },
+        {
+          "info": {
+            "name": "Create or update an organization secret",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/organizations/secrets",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Store a secret (e.g., API key) securely in the vault for the authenticated user's organization.\n\nSecrets are stored at the organization level and shared across all workspaces within the organization.\n\nCurrently supported providers:\n- **CIRCLE_MINT**: Circle Mint API key for payment processing\n- **OPENFX**: OpenFX credentials bundle (orgId, apiKey, privateKey, webhookSecret)\n- **CIRCLE_PAYMENTS_NETWORK**: Circle Payments Network (CPN) API key, validated by creating a CPN webhook subscription\n\nThe"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

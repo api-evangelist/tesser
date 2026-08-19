@@ -1,0 +1,332 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tesser Accounts webhooks API",
+    "version": "v1"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Receive webhook notifications from Circle",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/webhooks/circle",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Receive webhook notifications from Circle"
+        },
+        {
+          "info": {
+            "name": "Webhook endpoint reachability probe",
+            "type": "http"
+          },
+          "http": {
+            "method": "HEAD",
+            "url": "{{baseUrl}}/v1/webhooks/circle"
+          },
+          "docs": "Webhook endpoint reachability probe"
+        },
+        {
+          "info": {
+            "name": "Receive webhook notifications from Circle for a specific organization",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/webhooks/circle/:organizationId",
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Receive webhook notifications from Circle for a specific organization"
+        },
+        {
+          "info": {
+            "name": "Webhook endpoint reachability probe",
+            "type": "http"
+          },
+          "http": {
+            "method": "HEAD",
+            "url": "{{baseUrl}}/v1/webhooks/circle/:organizationId",
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Webhook endpoint reachability probe"
+        },
+        {
+          "info": {
+            "name": "Receive CPN (Circle Payments Network) webhook notifications for an organization",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/webhooks/cpn/:organizationId",
+            "headers": [
+              {
+                "name": "x-circle-signature",
+                "value": ""
+              },
+              {
+                "name": "x-circle-key-id",
+                "value": ""
+              },
+              {
+                "name": "bypass-sig-verification",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "",
+                "type": "path",
+                "description": "Organization ID the CPN subscription was registered for"
+              }
+            ]
+          },
+          "docs": "Receive CPN (Circle Payments Network) webhook notifications for an organization"
+        },
+        {
+          "info": {
+            "name": "Webhook endpoint reachability probe",
+            "type": "http"
+          },
+          "http": {
+            "method": "HEAD",
+            "url": "{{baseUrl}}/v1/webhooks/cpn/:organizationId",
+            "headers": [
+              {
+                "name": "x-circle-signature",
+                "value": ""
+              },
+              {
+                "name": "x-circle-key-id",
+                "value": ""
+              },
+              {
+                "name": "bypass-sig-verification",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "organizationId",
+                "value": "",
+                "type": "path",
+                "description": "Organization ID the CPN subscription was registered for"
+              }
+            ]
+          },
+          "docs": "Webhook endpoint reachability probe"
+        },
+        {
+          "info": {
+            "name": "Receive Notabene Travel Rule webhook notifications",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/webhooks/notabene",
+            "headers": [
+              {
+                "name": "svix-id",
+                "value": ""
+              },
+              {
+                "name": "svix-timestamp",
+                "value": ""
+              },
+              {
+                "name": "svix-signature",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Receive Notabene Travel Rule webhook notifications"
+        },
+        {
+          "info": {
+            "name": "Webhook endpoint reachability probe",
+            "type": "http"
+          },
+          "http": {
+            "method": "HEAD",
+            "url": "{{baseUrl}}/v1/webhooks/notabene",
+            "headers": [
+              {
+                "name": "svix-id",
+                "value": ""
+              },
+              {
+                "name": "svix-timestamp",
+                "value": ""
+              },
+              {
+                "name": "svix-signature",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Webhook endpoint reachability probe"
+        },
+        {
+          "info": {
+            "name": "Receive workspace-scoped OpenFX webhook notifications",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/webhooks/openfx/:workspaceId",
+            "headers": [
+              {
+                "name": "x-openfx-signature",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "workspaceId",
+                "value": "",
+                "type": "path",
+                "description": "Workspace ID receiving the OpenFX webhook"
+              }
+            ]
+          },
+          "docs": "Receive workspace-scoped OpenFX webhook notifications"
+        },
+        {
+          "info": {
+            "name": "Webhook endpoint reachability probe",
+            "type": "http"
+          },
+          "http": {
+            "method": "HEAD",
+            "url": "{{baseUrl}}/v1/webhooks/openfx/:workspaceId",
+            "headers": [
+              {
+                "name": "x-openfx-signature",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "workspaceId",
+                "value": "",
+                "type": "path",
+                "description": "Workspace ID receiving the OpenFX webhook"
+              }
+            ]
+          },
+          "docs": "Webhook endpoint reachability probe"
+        },
+        {
+          "info": {
+            "name": "Receive webhook updates from Quicknode",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/webhooks/quicknode/:network",
+            "headers": [
+              {
+                "name": "x-qn-signature",
+                "value": ""
+              },
+              {
+                "name": "x-qn-nonce",
+                "value": ""
+              },
+              {
+                "name": "x-qn-timestamp",
+                "value": ""
+              },
+              {
+                "name": "bypass-sig-verification",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "network",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Receive webhook updates from Quicknode"
+        },
+        {
+          "info": {
+            "name": "Webhook endpoint reachability probe",
+            "type": "http"
+          },
+          "http": {
+            "method": "HEAD",
+            "url": "{{baseUrl}}/v1/webhooks/quicknode/:network",
+            "headers": [
+              {
+                "name": "x-qn-signature",
+                "value": ""
+              },
+              {
+                "name": "x-qn-nonce",
+                "value": ""
+              },
+              {
+                "name": "x-qn-timestamp",
+                "value": ""
+              },
+              {
+                "name": "bypass-sig-verification",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "network",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Webhook endpoint reachability probe"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

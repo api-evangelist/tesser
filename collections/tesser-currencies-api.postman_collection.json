@@ -1,0 +1,173 @@
+{
+  "item": [
+    {
+      "id": "867012e1-12cf-4be7-afdc-39e2a281f63c",
+      "name": "Currencies",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "62f7ad8f-24ad-483a-89be-8e94920bb205",
+          "name": "Get available currencies",
+          "request": {
+            "name": "Get available currencies",
+            "description": {
+              "content": "Retrieve list of all supported currencies (crypto and fiat). Returns an array with currency name, key, decimals, and network information.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "currencies"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "626f7c47-73e2-4510-98c2-caa7a3a0fe04",
+              "name": "Successfully retrieved available currencies",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"name\": \"Circle USD\",\n      \"key\": \"USDC\",\n      \"decimals\": 6,\n      \"network\": \"BASE\"\n    },\n    {\n      \"name\": \"Tether USD\",\n      \"key\": \"USDT\",\n      \"decimals\": 6,\n      \"network\": \"BASE\"\n    },\n    {\n      \"name\": \"Circle USD\",\n      \"key\": \"USDC\",\n      \"decimals\": 6,\n      \"network\": \"ETHEREUM\"\n    },\n    {\n      \"name\": \"Tether USD\",\n      \"key\": \"USDT\",\n      \"decimals\": 6,\n      \"network\": \"ETHEREUM\"\n    },\n    {\n      \"name\": \"Circle USD\",\n      \"key\": \"USDC\",\n      \"decimals\": 6,\n      \"network\": \"POLYGON\"\n    },\n    {\n      \"name\": \"Tether USD\",\n      \"key\": \"USDT\",\n      \"decimals\": 6,\n      \"network\": \"POLYGON\"\n    },\n    {\n      \"name\": \"Circle USD\",\n      \"key\": \"USDC\",\n      \"decimals\": 6,\n      \"network\": \"STELLAR\"\n    },\n    {\n      \"name\": \"USD\",\n      \"key\": \"USD\",\n      \"decimals\": 2,\n      \"network\": null\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d908278c-54d9-481d-a51f-babf555c31a4",
+              "name": "Authentication required or invalid credentials",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "currencies"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"api-0004\",\n      \"error_message\": \"Unauthorized\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "3c231fff-015d-488d-8091-dd14d07d9d28",
+    "name": "Tesser Accounts Currencies API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Tesser Payments Platform API documentation.",
+      "type": "text/plain"
+    }
+  }
+}

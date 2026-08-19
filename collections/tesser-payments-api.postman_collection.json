@@ -1,0 +1,1671 @@
+{
+  "item": [
+    {
+      "id": "b4c81bc7-138b-4329-bb5d-e89a86b4778f",
+      "name": "Payments",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "aef3aeaf-af9d-4702-bd7d-1971b586d450",
+          "name": "Get payments",
+          "request": {
+            "name": "Get payments",
+            "description": {
+              "content": "Retrieve all payments for the authenticated user's organization.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "start_date",
+                  "value": "<string>",
+                  "description": "Start date for filtering payments (ISO 8601 format)"
+                },
+                {
+                  "disabled": false,
+                  "key": "end_date",
+                  "value": "<string>",
+                  "description": "End date for filtering payments (ISO 8601 format)"
+                },
+                {
+                  "disabled": false,
+                  "key": "direction",
+                  "value": "<string>",
+                  "description": "Payment direction filter: 'outbound' for outgoing payments, 'inbound' for incoming payments"
+                },
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "<integer>",
+                  "description": "Page number for pagination (1-based)"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "<integer>",
+                  "description": "Number of items per page (default: 20)"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "7091dcbc-8a51-45ff-8f90-b4cd13bc1ddf",
+              "name": "Successfully retrieved team payments",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "start_date",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "end_date",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n      \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n      \"organization_reference_id\": \"ref_123\",\n      \"direction\": \"outbound\",\n      \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n      \"desired\": {\n        \"from\": {\n          \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\",\n          \"amount\": \"10.00\",\n          \"currency\": \"USDC\",\n          \"network\": \"ETHEREUM\"\n        },\n        \"to\": {\n          \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\",\n          \"amount\": null,\n          \"currency\": \"USDC\",\n          \"network\": \"ETHEREUM\"\n        }\n      },\n      \"estimated\": {\n        \"from\": {\n          \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n          \"amount\": \"10.00\",\n          \"currency\": \"USDC\",\n          \"network\": \"ETHEREUM\"\n        },\n        \"to\": {\n          \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n          \"amount\": \"10.00\",\n          \"currency\": \"USDC\",\n          \"network\": \"ETHEREUM\"\n        }\n      },\n      \"actual\": {\n        \"from\": {\n          \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n          \"amount\": \"10.00\",\n          \"currency\": \"USDC\",\n          \"network\": \"ETHEREUM\"\n        },\n        \"to\": {\n          \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n          \"amount\": \"10.00\",\n          \"currency\": \"USDC\",\n          \"network\": \"ETHEREUM\"\n        }\n      },\n      \"risk_status\": \"automatically_approved\",\n      \"risk_status_reasons\": [],\n      \"risk_reviewed_by\": null,\n      \"risk_reviewed_at\": null,\n      \"balance_status\": \"reserved\",\n      \"balance_reserved_at\": \"2024-03-01T09:59:00.000Z\",\n      \"steps\": [\n        {\n          \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n          \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n          \"step_sequence\": 1,\n          \"step_type\": \"transfer\",\n          \"estimated\": {\n            \"from\": {\n              \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n              \"amount\": \"10.00\",\n              \"currency\": \"USDC\",\n              \"network\": \"ETHEREUM\"\n            },\n            \"to\": {\n              \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n              \"amount\": \"10.00\",\n              \"currency\": \"USDC\",\n              \"network\": \"ETHEREUM\"\n            }\n          },\n          \"actual\": {\n            \"from\": {\n              \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n              \"amount\": \"10.00\",\n              \"currency\": \"USDC\",\n              \"network\": \"ETHEREUM\"\n            },\n            \"to\": {\n              \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n              \"amount\": \"10.00\",\n              \"currency\": \"USDC\",\n              \"network\": \"ETHEREUM\"\n            }\n          },\n          \"transaction_hash\": \"0xabc123\",\n          \"unsigned_transaction\": null,\n          \"fees\": [],\n          \"provider_key\": \"circle_mint\",\n          \"status\": \"completed\",\n          \"status_reasons\": [],\n          \"created_at\": \"2024-03-01T10:00:00.000Z\",\n          \"updated_at\": \"2024-03-01T10:02:30.000Z\",\n          \"submitted_at\": \"2024-03-01T10:00:10.000Z\",\n          \"confirmed_at\": \"2024-03-01T10:02:00.000Z\",\n          \"completed_at\": \"2024-03-01T10:02:30.000Z\",\n          \"failed_at\": null\n        }\n      ],\n      \"created_at\": \"2024-03-01T10:00:00.000Z\",\n      \"updated_at\": \"2024-03-01T10:02:30.000Z\",\n      \"expires_at\": \"2024-03-04T10:00:00.000Z\"\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 20,\n    \"total\": 1,\n    \"total_pages\": 1,\n    \"has_next\": false,\n    \"has_prev\": false\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d2bcf6d2-01ec-4f32-b624-49f13941b245",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "start_date",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "end_date",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e6396610-1b89-4262-ae44-0393689acd1b",
+          "name": "Create payment",
+          "request": {
+            "name": "Create payment",
+            "description": {
+              "content": "Create a payment. Returns the created payment details.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"desired\": {\n    \"from\": {\n      \"currency\": \"<string>\",\n      \"account_id\": \"<string>\",\n      \"amount\": \"<string>\",\n      \"network\": \"<string>\"\n    },\n    \"to\": {\n      \"currency\": \"<string>\",\n      \"account_id\": \"<string>\",\n      \"amount\": \"<string>\",\n      \"network\": \"<string>\"\n    }\n  },\n  \"organization_reference_id\": \"<string>\",\n  \"funding_account_id\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "8ace50d0-7473-4a8c-afe0-0a7ae48e6365",
+              "name": "Payment created successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"organization_reference_id\": \"ref_123\",\n  \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n  \"desired\": {\n    \"from\": {\n      \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\",\n      \"amount\": \"10.00\",\n      \"currency\": \"USDC\",\n      \"network\": \"ETHEREUM\"\n    },\n    \"to\": {\n      \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\",\n      \"currency\": \"USDC\",\n      \"network\": \"ETHEREUM\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"9f3b7e1c-4a2d-4f69-b5a8-0c6e2d9f1a3b\",\n    \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n    \"organization_reference_id\": \"ref_123\",\n    \"direction\": \"outbound\",\n    \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n    \"desired\": {\n      \"from\": {\n        \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\",\n        \"amount\": null,\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"estimated\": {\n      \"from\": {\n        \"account_id\": null,\n        \"amount\": null,\n        \"currency\": null,\n        \"network\": null\n      },\n      \"to\": {\n        \"account_id\": null,\n        \"amount\": null,\n        \"currency\": null,\n        \"network\": null\n      }\n    },\n    \"actual\": {\n      \"from\": {\n        \"account_id\": null,\n        \"amount\": null,\n        \"currency\": null,\n        \"network\": null\n      },\n      \"to\": {\n        \"account_id\": null,\n        \"amount\": null,\n        \"currency\": null,\n        \"network\": null\n      }\n    },\n    \"risk_status\": \"unchecked\",\n    \"risk_status_reasons\": [],\n    \"risk_reviewed_by\": null,\n    \"risk_reviewed_at\": null,\n    \"balance_status\": \"unreserved\",\n    \"balance_reserved_at\": null,\n    \"steps\": [],\n    \"created_at\": \"2024-03-01T10:00:00.000Z\",\n    \"updated_at\": \"2024-03-01T10:00:00.000Z\",\n    \"expires_at\": \"2024-03-04T10:00:00.000Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b76766af-3263-4187-9ca8-e341969469cc",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"organization_reference_id\": \"ref_123\",\n  \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n  \"desired\": {\n    \"from\": {\n      \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\",\n      \"amount\": \"10.00\",\n      \"currency\": \"USDC\",\n      \"network\": \"ETHEREUM\"\n    },\n    \"to\": {\n      \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\",\n      \"currency\": \"USDC\",\n      \"network\": \"ETHEREUM\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "89f9f2c0-4e3f-43ea-9c47-4ef1716fd126",
+          "name": "[INTERNAL] Get payments for UI table",
+          "request": {
+            "name": "[INTERNAL] Get payments for UI table",
+            "description": {
+              "content": "Retrieve payments optimized for table display. Returns only fields needed for the payments table UI.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments",
+                "internal"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "start_date",
+                  "value": "<string>",
+                  "description": "Start date for filtering payments (ISO 8601 format)"
+                },
+                {
+                  "disabled": false,
+                  "key": "end_date",
+                  "value": "<string>",
+                  "description": "End date for filtering payments (ISO 8601 format)"
+                },
+                {
+                  "disabled": false,
+                  "key": "direction",
+                  "value": "<string>",
+                  "description": "Payment direction filter: 'outbound' for outgoing payments, 'inbound' for incoming payments"
+                },
+                {
+                  "disabled": false,
+                  "key": "status",
+                  "value": "<string>",
+                  "description": "Payment status for filtering payments"
+                },
+                {
+                  "disabled": false,
+                  "key": "payment_type",
+                  "value": "<string>",
+                  "description": "Payment type filter: 'deposit', 'withdrawal', or 'transfer'"
+                },
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "<integer>",
+                  "description": "Page number for pagination (1-based)"
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "<integer>",
+                  "description": "Number of items per page (default: 20)"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "fe6d2af7-4ccc-4f90-bd2f-8bef1c3ce5d3",
+              "name": "Successfully retrieved team payments",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    "internal"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "start_date",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "end_date",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "payment_type",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": [\n    {\n      \"id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n      \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n      \"direction\": \"outbound\",\n      \"from_amount\": \"1000000\",\n      \"from_currency\": \"USDC\",\n      \"to_amount\": \"1000000\",\n      \"to_currency\": \"USDC\",\n      \"risk_status\": \"automatically_rejected\",\n      \"created_at\": \"1959-12-05T23:27:30.718Z\",\n      \"updated_at\": \"1991-10-06T19:40:40.389Z\",\n      \"expires_at\": \"1983-06-09T21:54:28.262Z\",\n      \"status\": \"need-review\",\n      \"organization_reference_id\": \"string\",\n      \"funding_account_id\": \"string\",\n      \"from_account_id\": \"string\",\n      \"from_network\": \"string\",\n      \"to_account_id\": \"string\",\n      \"to_network\": \"string\",\n      \"risk_status_reasons\": [\n        {\n          \"risk_status_reason_type\": \"string\",\n          \"risk_status_reason_category\": \"string\",\n          \"risk_status_reason_message\": \"string\",\n          \"risk_status_reason_severity\": \"string\"\n        },\n        {\n          \"risk_status_reason_type\": \"string\",\n          \"risk_status_reason_category\": \"string\",\n          \"risk_status_reason_message\": \"string\",\n          \"risk_status_reason_severity\": \"string\"\n        }\n      ],\n      \"risk_reviewed_by\": \"string\",\n      \"risk_reviewed_at\": \"1978-06-22T00:45:07.677Z\",\n      \"balance_status\": \"awaiting_funds\",\n      \"balance_reserved_at\": \"1988-11-18T16:49:59.149Z\",\n      \"steps\": [\n        {\n          \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n          \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n          \"step_sequence\": 1,\n          \"step_type\": \"transfer\",\n          \"from_amount\": \"1000000\",\n          \"from_currency\": \"USDC\",\n          \"to_amount\": \"999000\",\n          \"to_currency\": \"USDC\",\n          \"status\": \"signature_requested\",\n          \"created_at\": \"1993-10-23T15:27:06.420Z\",\n          \"updated_at\": \"1971-07-15T21:47:14.884Z\",\n          \"from_account_id\": \"string\",\n          \"from_network\": \"string\",\n          \"to_account_id\": \"string\",\n          \"to_network\": \"string\",\n          \"transaction_hash\": \"string\",\n          \"fees\": [\n            {\n              \"fee_amount\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_currency\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_type\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_metadata\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"fee_amount\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_currency\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_type\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_metadata\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ],\n          \"provider_key\": \"turnkey\",\n          \"status_reasons\": [\n            {\n              \"error_code\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"error_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"error_code\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"error_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ],\n          \"submitted_at\": \"1997-05-06T07:44:07.544Z\",\n          \"confirmed_at\": \"1983-10-13T02:02:06.763Z\",\n          \"completed_at\": \"2004-11-24T10:12:00.089Z\",\n          \"failed_at\": \"2019-02-09T09:03:25.796Z\"\n        },\n        {\n          \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n          \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n          \"step_sequence\": 1,\n          \"step_type\": \"transfer\",\n          \"from_amount\": \"1000000\",\n          \"from_currency\": \"USDC\",\n          \"to_amount\": \"999000\",\n          \"to_currency\": \"USDC\",\n          \"status\": \"signature_requested\",\n          \"created_at\": \"2004-12-06T21:51:44.079Z\",\n          \"updated_at\": \"1981-01-28T04:13:14.293Z\",\n          \"from_account_id\": \"string\",\n          \"from_network\": \"string\",\n          \"to_account_id\": \"string\",\n          \"to_network\": \"string\",\n          \"transaction_hash\": \"string\",\n          \"fees\": [\n            {\n              \"fee_amount\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_currency\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_type\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_metadata\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"fee_amount\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_currency\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_type\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_metadata\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ],\n          \"provider_key\": \"turnkey\",\n          \"status_reasons\": [\n            {\n              \"error_code\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"error_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"error_code\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"error_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ],\n          \"submitted_at\": \"2011-12-04T20:20:48.880Z\",\n          \"confirmed_at\": \"2008-04-20T11:55:58.226Z\",\n          \"completed_at\": \"1968-10-01T09:06:44.138Z\",\n          \"failed_at\": \"2013-02-03T06:49:30.417Z\"\n        }\n      ],\n      \"originator\": {\n        \"id\": \"string\",\n        \"classification\": \"individual\",\n        \"business_name\": \"string\",\n        \"first_name\": \"string\",\n        \"last_name\": \"string\",\n        \"business_country\": \"string\",\n        \"individual_country\": \"string\",\n        \"wallet_address\": \"string\"\n      },\n      \"belongsTo\": {\n        \"id\": \"string\",\n        \"classification\": \"individual\",\n        \"business_name\": \"string\",\n        \"first_name\": \"string\",\n        \"last_name\": \"string\",\n        \"business_country\": \"string\",\n        \"individual_country\": \"string\",\n        \"wallet_address\": \"string\"\n      },\n      \"beneficiary\": {\n        \"id\": \"string\",\n        \"classification\": \"business\",\n        \"business_name\": \"string\",\n        \"first_name\": \"string\",\n        \"last_name\": \"string\",\n        \"business_country\": \"string\",\n        \"individual_country\": \"string\",\n        \"wallet_address\": \"string\"\n      },\n      \"funding_account\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"bank_name\": \"string\",\n        \"bank_identifier_code\": \"string\",\n        \"bank_swift_code\": \"string\"\n      }\n    },\n    {\n      \"id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n      \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n      \"direction\": \"outbound\",\n      \"from_amount\": \"1000000\",\n      \"from_currency\": \"USDC\",\n      \"to_amount\": \"1000000\",\n      \"to_currency\": \"USDC\",\n      \"risk_status\": \"manually_approved\",\n      \"created_at\": \"2025-08-30T05:16:15.539Z\",\n      \"updated_at\": \"1993-01-30T13:15:38.510Z\",\n      \"expires_at\": \"1981-04-25T01:02:58.120Z\",\n      \"status\": \"need-review\",\n      \"organization_reference_id\": \"string\",\n      \"funding_account_id\": \"string\",\n      \"from_account_id\": \"string\",\n      \"from_network\": \"string\",\n      \"to_account_id\": \"string\",\n      \"to_network\": \"string\",\n      \"risk_status_reasons\": [\n        {\n          \"risk_status_reason_type\": \"string\",\n          \"risk_status_reason_category\": \"string\",\n          \"risk_status_reason_message\": \"string\",\n          \"risk_status_reason_severity\": \"string\"\n        },\n        {\n          \"risk_status_reason_type\": \"string\",\n          \"risk_status_reason_category\": \"string\",\n          \"risk_status_reason_message\": \"string\",\n          \"risk_status_reason_severity\": \"string\"\n        }\n      ],\n      \"risk_reviewed_by\": \"string\",\n      \"risk_reviewed_at\": \"2008-03-19T21:25:38.499Z\",\n      \"balance_status\": \"reserved\",\n      \"balance_reserved_at\": \"2020-01-03T04:49:32.787Z\",\n      \"steps\": [\n        {\n          \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n          \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n          \"step_sequence\": 1,\n          \"step_type\": \"transfer\",\n          \"from_amount\": \"1000000\",\n          \"from_currency\": \"USDC\",\n          \"to_amount\": \"999000\",\n          \"to_currency\": \"USDC\",\n          \"status\": \"submitted\",\n          \"created_at\": \"1966-05-06T16:48:22.771Z\",\n          \"updated_at\": \"2013-12-12T14:25:33.337Z\",\n          \"from_account_id\": \"string\",\n          \"from_network\": \"string\",\n          \"to_account_id\": \"string\",\n          \"to_network\": \"string\",\n          \"transaction_hash\": \"string\",\n          \"fees\": [\n            {\n              \"fee_amount\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_currency\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_type\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_metadata\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"fee_amount\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_currency\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_type\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_metadata\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ],\n          \"provider_key\": \"circle_mint\",\n          \"status_reasons\": [\n            {\n              \"error_code\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"error_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"error_code\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"error_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ],\n          \"submitted_at\": \"2022-03-17T06:10:04.179Z\",\n          \"confirmed_at\": \"1991-12-11T10:38:08.793Z\",\n          \"completed_at\": \"1954-11-09T20:31:35.040Z\",\n          \"failed_at\": \"1970-08-24T13:47:02.132Z\"\n        },\n        {\n          \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n          \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n          \"step_sequence\": 1,\n          \"step_type\": \"transfer\",\n          \"from_amount\": \"1000000\",\n          \"from_currency\": \"USDC\",\n          \"to_amount\": \"999000\",\n          \"to_currency\": \"USDC\",\n          \"status\": \"created\",\n          \"created_at\": \"1974-04-19T23:00:42.421Z\",\n          \"updated_at\": \"2017-12-05T16:05:42.162Z\",\n          \"from_account_id\": \"string\",\n          \"from_network\": \"string\",\n          \"to_account_id\": \"string\",\n          \"to_network\": \"string\",\n          \"transaction_hash\": \"string\",\n          \"fees\": [\n            {\n              \"fee_amount\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_currency\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_type\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_metadata\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"fee_amount\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_currency\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_type\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"fee_metadata\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ],\n          \"provider_key\": \"turnkey\",\n          \"status_reasons\": [\n            {\n              \"error_code\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"error_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"error_code\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"error_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ],\n          \"submitted_at\": \"1948-06-23T07:28:08.114Z\",\n          \"confirmed_at\": \"1989-10-07T08:06:01.267Z\",\n          \"completed_at\": \"1970-03-01T14:56:50.064Z\",\n          \"failed_at\": \"1965-10-09T05:39:46.577Z\"\n        }\n      ],\n      \"originator\": {\n        \"id\": \"string\",\n        \"classification\": \"business\",\n        \"business_name\": \"string\",\n        \"first_name\": \"string\",\n        \"last_name\": \"string\",\n        \"business_country\": \"string\",\n        \"individual_country\": \"string\",\n        \"wallet_address\": \"string\"\n      },\n      \"belongsTo\": {\n        \"id\": \"string\",\n        \"classification\": \"individual\",\n        \"business_name\": \"string\",\n        \"first_name\": \"string\",\n        \"last_name\": \"string\",\n        \"business_country\": \"string\",\n        \"individual_country\": \"string\",\n        \"wallet_address\": \"string\"\n      },\n      \"beneficiary\": {\n        \"id\": \"string\",\n        \"classification\": \"business\",\n        \"business_name\": \"string\",\n        \"first_name\": \"string\",\n        \"last_name\": \"string\",\n        \"business_country\": \"string\",\n        \"individual_country\": \"string\",\n        \"wallet_address\": \"string\"\n      },\n      \"funding_account\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"bank_name\": \"string\",\n        \"bank_identifier_code\": \"string\",\n        \"bank_swift_code\": \"string\"\n      }\n    }\n  ],\n  \"pagination\": {\n    \"page\": 8441.700987321707,\n    \"limit\": 4576.854355198505,\n    \"total\": 1332.269231622646,\n    \"total_pages\": 4926.570067842879,\n    \"has_next\": true,\n    \"has_prev\": false\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8dda9286-27b5-4bab-8c47-a62840f2f57e",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    "internal"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "start_date",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "end_date",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "direction",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "payment_type",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "page",
+                      "value": "<integer>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "<integer>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "875398e4-d07e-4bb8-8f8e-42c374b99bd9",
+          "name": "[INTERNAL] Get single payment for UI",
+          "request": {
+            "name": "[INTERNAL] Get single payment for UI",
+            "description": {
+              "content": "Retrieve a single payment with full details including steps and entity data for UI display.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments",
+                "internal",
+                ":paymentId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "paymentId",
+                  "description": "(Required) Unique identifier of the payment to retrieve"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "0cd71304-f6d2-4861-89c7-6aef107739d4",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    "internal",
+                    ":paymentId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment to retrieve"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "473ccf73-808b-409c-817d-48045a3dad32",
+          "name": "Simulate an inbound payment with a chosen risk status (staging)",
+          "request": {
+            "name": "Simulate an inbound payment with a chosen risk status (staging)",
+            "description": {
+              "content": "Sends a real on-chain test-USDC transfer from the platform faucet into a managed wallet and forces the risk-screening verdict to mocked_risk_status. Only available in staging. Returns 201 with the screened payment, or 202 with the tx hash if it is still being detected/screened.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments",
+                "simulate-inbound"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to_account\": \"<uuid>\",\n  \"mocked_risk_status\": \"<string>\",\n  \"network\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "c9c7856d-9db5-47a7-8b19-d17baa484c65",
+              "name": "The simulated inbound payment, already screened to mocked_risk_status.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    "simulate-inbound"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"to_account\": \"<uuid>\",\n  \"mocked_risk_status\": \"<string>\",\n  \"network\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n    \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n    \"direction\": \"outbound\",\n    \"funding_account_id\": \"2a8f4c1e-9b3d-4e56-b7a0-5c6d2e1f9b3a\",\n    \"desired\": {\n      \"from\": {\n        \"account_id\": \"string\",\n        \"amount\": \"string\",\n        \"currency\": \"string\",\n        \"network\": \"string\"\n      },\n      \"to\": {\n        \"account_id\": \"string\",\n        \"amount\": \"string\",\n        \"currency\": \"string\",\n        \"network\": \"string\"\n      }\n    },\n    \"estimated\": {\n      \"from\": {\n        \"account_id\": \"string\",\n        \"amount\": \"string\",\n        \"currency\": \"string\",\n        \"network\": \"string\"\n      },\n      \"to\": {\n        \"account_id\": \"string\",\n        \"amount\": \"string\",\n        \"currency\": \"string\",\n        \"network\": \"string\"\n      }\n    },\n    \"actual\": {\n      \"from\": {\n        \"account_id\": \"string\",\n        \"amount\": \"string\",\n        \"currency\": \"string\",\n        \"network\": \"string\"\n      },\n      \"to\": {\n        \"account_id\": \"string\",\n        \"amount\": \"string\",\n        \"currency\": \"string\",\n        \"network\": \"string\"\n      }\n    },\n    \"risk_status\": \"unchecked\",\n    \"balance_status\": \"unreserved\",\n    \"balance_reserved_at\": null,\n    \"created_at\": \"2024-03-01T10:00:00.000Z\",\n    \"updated_at\": \"2024-03-01T10:00:00.000Z\",\n    \"expires_at\": \"2024-03-02T10:00:00.000Z\",\n    \"organization_reference_id\": \"ref_123\",\n    \"risk_reviewed_by\": null,\n    \"risk_reviewed_at\": null\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f61e475c-d808-4312-8951-f4ce228a1ef9",
+              "name": "The on-chain transfer was broadcast but the inbound was not detected and screened within the wait budget. Once payment_id is present, poll GET /v1/payments/{paymentId} for the screened payment.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    "simulate-inbound"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"to_account\": \"<uuid>\",\n  \"mocked_risk_status\": \"<string>\",\n  \"network\": \"<string>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"tx_hash\": \"string\",\n    \"network\": \"string\",\n    \"status\": \"pending\",\n    \"payment_id\": \"27e57d99-70c4-4284-043a-52a140d3b73d\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "6ffae849-8eef-4ed8-a455-2097aa683a13",
+          "name": "Get payment by ID",
+          "request": {
+            "name": "Get payment by ID",
+            "description": {
+              "content": "Retrieve a specific payment by ID.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments",
+                ":paymentId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "paymentId",
+                  "description": "(Required) Unique identifier of the payment to retrieve"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "2192b44e-88bd-46d9-974f-ad36942f2fcb",
+              "name": "Successfully retrieved payment",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    ":paymentId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment to retrieve"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n    \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n    \"organization_reference_id\": \"ref_123\",\n    \"direction\": \"outbound\",\n    \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n    \"desired\": {\n      \"from\": {\n        \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\",\n        \"amount\": null,\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"estimated\": {\n      \"from\": {\n        \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"actual\": {\n      \"from\": {\n        \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"risk_status\": \"automatically_approved\",\n    \"risk_status_reasons\": [],\n    \"risk_reviewed_by\": null,\n    \"risk_reviewed_at\": null,\n    \"balance_status\": \"reserved\",\n    \"balance_reserved_at\": \"2024-03-01T09:59:00.000Z\",\n    \"steps\": [\n      {\n        \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n        \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n        \"step_sequence\": 1,\n        \"step_type\": \"transfer\",\n        \"estimated\": {\n          \"from\": {\n            \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          },\n          \"to\": {\n            \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          }\n        },\n        \"actual\": {\n          \"from\": {\n            \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          },\n          \"to\": {\n            \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          }\n        },\n        \"transaction_hash\": \"0xabc123\",\n        \"unsigned_transaction\": null,\n        \"fees\": [],\n        \"provider_key\": \"circle_mint\",\n        \"status\": \"completed\",\n        \"status_reasons\": [],\n        \"created_at\": \"2024-03-01T10:00:00.000Z\",\n        \"updated_at\": \"2024-03-01T10:02:30.000Z\",\n        \"submitted_at\": \"2024-03-01T10:00:10.000Z\",\n        \"confirmed_at\": \"2024-03-01T10:02:00.000Z\",\n        \"completed_at\": \"2024-03-01T10:02:30.000Z\",\n        \"failed_at\": null\n      }\n    ],\n    \"created_at\": \"2024-03-01T10:00:00.000Z\",\n    \"updated_at\": \"2024-03-01T10:02:30.000Z\",\n    \"expires_at\": \"2024-03-04T10:00:00.000Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5aa2263e-cfc7-4dfc-b0e2-fe9ebc45203e",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    ":paymentId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment to retrieve"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "28607eda-d6cc-446d-9682-8a307ae76f9e",
+          "name": "Update payment",
+          "request": {
+            "name": "Update payment",
+            "description": {
+              "content": "Update a payment with accounts.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments",
+                ":paymentId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "paymentId",
+                  "description": "(Required) Unique identifier of the payment to update"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "PATCH",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"funding_account_id\": \"<string>\",\n  \"desired\": {\n    \"from\": {\n      \"account_id\": \"<string>\"\n    },\n    \"to\": {\n      \"account_id\": \"<string>\"\n    }\n  },\n  \"organization_reference_id\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "4272fcda-c087-447d-b2e8-3775d245eae3",
+              "name": "Payment updated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    ":paymentId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment to update"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"organization_reference_id\": \"ref_456\",\n  \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n  \"desired\": {\n    \"from\": {\n      \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\"\n    },\n    \"to\": {\n      \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n    \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n    \"organization_reference_id\": \"ref_456\",\n    \"direction\": \"outbound\",\n    \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n    \"desired\": {\n      \"from\": {\n        \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\",\n        \"amount\": null,\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"estimated\": {\n      \"from\": {\n        \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"actual\": {\n      \"from\": {\n        \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"risk_status\": \"automatically_approved\",\n    \"risk_status_reasons\": [],\n    \"risk_reviewed_by\": null,\n    \"risk_reviewed_at\": null,\n    \"balance_status\": \"reserved\",\n    \"balance_reserved_at\": \"2024-03-01T09:59:00.000Z\",\n    \"steps\": [\n      {\n        \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n        \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n        \"step_sequence\": 1,\n        \"step_type\": \"transfer\",\n        \"estimated\": {\n          \"from\": {\n            \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          },\n          \"to\": {\n            \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          }\n        },\n        \"actual\": {\n          \"from\": {\n            \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          },\n          \"to\": {\n            \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          }\n        },\n        \"transaction_hash\": \"0xabc123\",\n        \"unsigned_transaction\": null,\n        \"fees\": [],\n        \"provider_key\": \"circle_mint\",\n        \"status\": \"completed\",\n        \"status_reasons\": [],\n        \"created_at\": \"2024-03-01T10:00:00.000Z\",\n        \"updated_at\": \"2024-03-01T10:02:30.000Z\",\n        \"submitted_at\": \"2024-03-01T10:00:10.000Z\",\n        \"confirmed_at\": \"2024-03-01T10:02:00.000Z\",\n        \"completed_at\": \"2024-03-01T10:02:30.000Z\",\n        \"failed_at\": null\n      }\n    ],\n    \"created_at\": \"2024-03-01T10:00:00.000Z\",\n    \"updated_at\": \"2024-03-05T09:00:00.000Z\",\n    \"expires_at\": \"2024-03-04T10:00:00.000Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0b400802-00ec-4b93-8fcb-7b41a37e09b9",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    ":paymentId"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment to update"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "PATCH",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"organization_reference_id\": \"ref_456\",\n  \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n  \"desired\": {\n    \"from\": {\n      \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\"\n    },\n    \"to\": {\n      \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\"\n    }\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e15702b1-dfd5-4949-9219-22b68a200a54",
+          "name": "Submit risk review",
+          "request": {
+            "name": "Submit risk review",
+            "description": {
+              "content": "Manually review and approve or reject a payment requiring risk review.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments",
+                ":paymentId",
+                "review"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "paymentId",
+                  "description": "(Required) Unique identifier of the payment to review"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_approved\": \"<boolean>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "480e9fc5-a296-4c53-b478-dda6226e6230",
+              "name": "Payment review completed successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    ":paymentId",
+                    "review"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment to review"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"is_approved\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n    \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n    \"organization_reference_id\": \"ref_123\",\n    \"direction\": \"outbound\",\n    \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n    \"desired\": {\n      \"from\": {\n        \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\",\n        \"amount\": null,\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"estimated\": {\n      \"from\": {\n        \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"actual\": {\n      \"from\": {\n        \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"risk_status\": \"manually_approved\",\n    \"risk_status_reasons\": [\n      {\n        \"risk_status_reason_type\": \"ownership\",\n        \"risk_status_reason_category\": \"Malware\",\n        \"risk_status_reason_message\": \"Address linked to known malware family\",\n        \"risk_status_reason_severity\": \"high\"\n      }\n    ],\n    \"risk_reviewed_by\": \"9c3e7f5a-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n    \"risk_reviewed_at\": \"2024-03-01T10:30:00.000Z\",\n    \"balance_status\": \"reserved\",\n    \"balance_reserved_at\": \"2024-03-01T09:59:00.000Z\",\n    \"steps\": [\n      {\n        \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n        \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n        \"step_sequence\": 1,\n        \"step_type\": \"transfer\",\n        \"estimated\": {\n          \"from\": {\n            \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          },\n          \"to\": {\n            \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          }\n        },\n        \"actual\": {\n          \"from\": {\n            \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          },\n          \"to\": {\n            \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          }\n        },\n        \"transaction_hash\": \"0xabc123\",\n        \"unsigned_transaction\": null,\n        \"fees\": [],\n        \"provider_key\": \"circle_mint\",\n        \"status\": \"completed\",\n        \"status_reasons\": [],\n        \"created_at\": \"2024-03-01T10:00:00.000Z\",\n        \"updated_at\": \"2024-03-01T10:02:30.000Z\",\n        \"submitted_at\": \"2024-03-01T10:00:10.000Z\",\n        \"confirmed_at\": \"2024-03-01T10:02:00.000Z\",\n        \"completed_at\": \"2024-03-01T10:02:30.000Z\",\n        \"failed_at\": null\n      }\n    ],\n    \"created_at\": \"2024-03-01T10:00:00.000Z\",\n    \"updated_at\": \"2024-03-01T10:35:00.000Z\",\n    \"expires_at\": \"2024-03-04T10:00:00.000Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "7451d44d-6bbc-48df-8685-921b9103a9da",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    ":paymentId",
+                    "review"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment to review"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"is_approved\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "9a426963-2dc5-4317-acac-adb44d8966b0",
+          "name": "Sign payment step",
+          "request": {
+            "name": "Sign payment step",
+            "description": {
+              "content": "Submit a signature for a self-custodial payment step. Webhook updates will be sent as the signature is validated and submitted onchain.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "payments",
+                ":paymentId",
+                "steps",
+                ":stepId",
+                "sign"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "paymentId",
+                  "description": "(Required) Unique identifier of the payment"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<uuid>",
+                  "key": "stepId",
+                  "description": "(Required) Unique identifier of the payment step to sign"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"signature\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "cdf091be-e8f0-4139-85a5-b23409293652",
+              "name": "Signed transaction broadcast on-chain. The step is `confirmed` with its broadcast `transaction_hash`; block finality (`completed`) follows asynchronously.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    ":paymentId",
+                    "steps",
+                    ":stepId",
+                    "sign"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "stepId",
+                      "description": "(Required) Unique identifier of the payment step to sign"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"signature\": \"<base64({body, stamp})>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"data\": {\n    \"id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n    \"workspace_id\": \"b53f6690-3242-4942-9907-885779632832\",\n    \"organization_reference_id\": \"ref_123\",\n    \"direction\": \"outbound\",\n    \"funding_account_id\": \"2113b166-5873-42fd-85fe-5b1a02940d43\",\n    \"desired\": {\n      \"from\": {\n        \"account_id\": \"6de8a7e9-be79-4885-9b65-b25b11d38078\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"53b7aabd-97bc-4a4f-9f9c-1c1c69474889\",\n        \"amount\": null,\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"estimated\": {\n      \"from\": {\n        \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      },\n      \"to\": {\n        \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n        \"amount\": \"10.00\",\n        \"currency\": \"USDC\",\n        \"network\": \"ETHEREUM\"\n      }\n    },\n    \"actual\": {\n      \"from\": {\n        \"account_id\": null,\n        \"amount\": null,\n        \"currency\": null,\n        \"network\": null\n      },\n      \"to\": {\n        \"account_id\": null,\n        \"amount\": null,\n        \"currency\": null,\n        \"network\": null\n      }\n    },\n    \"risk_status\": \"automatically_approved\",\n    \"risk_status_reasons\": [],\n    \"risk_reviewed_by\": null,\n    \"risk_reviewed_at\": null,\n    \"balance_status\": \"reserved\",\n    \"balance_reserved_at\": \"2024-03-01T09:59:00.000Z\",\n    \"steps\": [\n      {\n        \"id\": \"4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a\",\n        \"payment_id\": \"5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e\",\n        \"step_sequence\": 1,\n        \"step_type\": \"transfer\",\n        \"estimated\": {\n          \"from\": {\n            \"account_id\": \"6c1e9a4f-3b8d-4f72-a0e5-7d2c1b9f3a8e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          },\n          \"to\": {\n            \"account_id\": \"8e2c6a9f-1b4d-4f83-a5e7-3d0c9b1f2a6e\",\n            \"amount\": \"10.00\",\n            \"currency\": \"USDC\",\n            \"network\": \"ETHEREUM\"\n          }\n        },\n        \"actual\": {\n          \"from\": {\n            \"account_id\": null,\n            \"amount\": null,\n            \"currency\": null,\n            \"network\": null\n          },\n          \"to\": {\n            \"account_id\": null,\n            \"amount\": null,\n            \"currency\": null,\n            \"network\": null\n          }\n        },\n        \"transaction_hash\": \"0xabc123\",\n        \"unsigned_transaction\": null,\n        \"fees\": [],\n        \"provider_key\": \"turnkey\",\n        \"status\": \"confirmed\",\n        \"status_reasons\": [],\n        \"created_at\": \"2024-03-01T10:00:00.000Z\",\n        \"updated_at\": \"2024-03-01T10:02:00.000Z\",\n        \"submitted_at\": \"2024-03-01T10:00:10.000Z\",\n        \"confirmed_at\": \"2024-03-01T10:02:00.000Z\",\n        \"completed_at\": null,\n        \"failed_at\": null\n      }\n    ],\n    \"created_at\": \"2024-03-01T10:00:00.000Z\",\n    \"updated_at\": \"2024-03-01T10:02:00.000Z\",\n    \"expires_at\": \"2024-03-04T10:00:00.000Z\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "231e5ec2-40d5-4be1-9709-27ab0e75f158",
+              "name": "Invalid request data",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "payments",
+                    ":paymentId",
+                    "steps",
+                    ":stepId",
+                    "sign"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "paymentId",
+                      "description": "(Required) Unique identifier of the payment"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<uuid>",
+                      "key": "stepId",
+                      "description": "(Required) Unique identifier of the payment step to sign"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"signature\": \"<base64({body, stamp})>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"errors\": [\n    {\n      \"error_code\": \"counterparties-3001\",\n      \"error_message\": \"classification must be one of: individual, business\"\n    },\n    {\n      \"error_code\": \"counterparties-3002\",\n      \"error_message\": \"business_legal_name is required when classification is business\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "/",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "af4c0515-5b63-449e-8e76-ba2840b7c7ab",
+    "name": "Tesser Accounts Payments API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Tesser Payments Platform API documentation.",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Tesser Accounts Counterparties API",
+    "version": "v1"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Counterparties",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List all counterparties",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/entities/counterparties",
+            "params": [
+              {
+                "name": "classification",
+                "value": "",
+                "type": "query",
+                "description": "Filter by classification"
+              },
+              {
+                "name": "search",
+                "value": "",
+                "type": "query",
+                "description": "Search by name"
+              },
+              {
+                "name": "include_secure",
+                "value": "",
+                "type": "query",
+                "description": "Include masked vault data (address, DOB, national ID, legal entity identifier)"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "Page number for pagination (1-based)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Number of items per page (default: 20)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve all counterparties for your workspace or a specific tenant."
+        },
+        {
+          "info": {
+            "name": "Create a new counterparty",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "{{baseUrl}}/v1/entities/counterparties",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Create a new counterparty for your workspace or a specific tenant."
+        },
+        {
+          "info": {
+            "name": "Get a counterparty by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "{{baseUrl}}/v1/entities/counterparties/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Counterparty ID (UUID)"
+              },
+              {
+                "name": "include_secure",
+                "value": "",
+                "type": "query",
+                "description": "Include masked vault data (address, DOB, national ID, legal entity identifier)"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "token": "{{bearerToken}}"
+            }
+          },
+          "docs": "Retrieve a specific counterparty by its unique identifier."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
