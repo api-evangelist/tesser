@@ -329,6 +329,9 @@ apis:
   - type: Authentication
     url: authentication/tesser-authentication.yml
 common:
+- type: CapabilityMap
+  url: capabilities/tesser-capability-edges.yml
+  name: Tesser Business Capability Map
 - type: DomainSecurity
   url: security/tesser-domain-security.yml
 - type: DeveloperPortal
