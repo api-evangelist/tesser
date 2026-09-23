@@ -1,28 +1,14 @@
 {
   "provider": "tesser",
   "sources": [
-    "tesser-accounts-api-openapi.yml",
-    "tesser-admin-api-openapi.yml",
-    "tesser-api-keys-api-openapi.yml",
-    "tesser-counterparties-api-openapi.yml",
-    "tesser-currencies-api-openapi.yml",
-    "tesser-health-api-openapi.yml",
-    "tesser-mcp-api-openapi.yml",
-    "tesser-networks-api-openapi.yml",
-    "tesser-organizations-api-openapi.yml",
-    "tesser-payments-api-openapi.yml",
-    "tesser-tenants-api-openapi.yml",
-    "tesser-treasury-api-openapi.yml",
-    "tesser-users-api-openapi.yml",
-    "tesser-webhooks-api-openapi.yml"
+    "_original/tesser-openapi-original.json"
   ],
   "outputs": [
+    "tesser-api-keys-api-openapi.yml",
     "tesser-accounts-api-openapi.yml",
     "tesser-admin-api-openapi.yml",
-    "tesser-api-keys-api-openapi.yml",
     "tesser-counterparties-api-openapi.yml",
     "tesser-currencies-api-openapi.yml",
-    "tesser-health-api-openapi.yml",
     "tesser-mcp-api-openapi.yml",
     "tesser-networks-api-openapi.yml",
     "tesser-organizations-api-openapi.yml",
@@ -30,11 +16,45 @@
     "tesser-tenants-api-openapi.yml",
     "tesser-treasury-api-openapi.yml",
     "tesser-users-api-openapi.yml",
+    "tesser-health-api-openapi.yml",
     "tesser-webhooks-api-openapi.yml"
   ],
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "tesser-openapi-original.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "tesser-openapi-original.json: declared missing tag: API Keys",
+    "tesser-openapi-original.json: declared missing tag: Accounts",
+    "tesser-openapi-original.json: declared missing tag: Admin",
+    "tesser-openapi-original.json: declared missing tag: Counterparties",
+    "tesser-openapi-original.json: declared missing tag: Currencies",
+    "tesser-openapi-original.json: declared missing tag: MCP",
+    "tesser-openapi-original.json: declared missing tag: Networks",
+    "tesser-openapi-original.json: declared missing tag: Organizations",
+    "tesser-openapi-original.json: declared missing tag: Payments",
+    "tesser-openapi-original.json: declared missing tag: Tenants",
+    "tesser-openapi-original.json: declared missing tag: Treasury",
+    "tesser-openapi-original.json: declared missing tag: Users",
+    "tesser-openapi-original.json: declared missing tag: health",
+    "tesser-openapi-original.json: declared missing tag: webhooks",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "tesser-accounts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-admin-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-api-keys-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-counterparties-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-currencies-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-health-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-mcp-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-networks-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-organizations-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-payments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-tenants-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-treasury-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-users-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "tesser-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

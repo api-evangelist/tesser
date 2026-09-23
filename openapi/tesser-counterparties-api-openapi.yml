@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Tesser Accounts Counterparties API
+  title: Tesser Counterparties API
   description: The Tesser Payments Platform API documentation.
   version: v1
   contact: {}
@@ -554,6 +554,137 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
+    CreateCounterpartyRequestDto:
+      type: object
+      properties:
+        classification:
+          type: string
+          description: 'Classification: ''individual'' or ''business''.'
+          enum:
+          - individual
+          - business
+          example: individual
+        tenant_id:
+          type: string
+          description: ID of the tenant entity (optional).
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$
+        individual_first_name:
+          type: string
+          description: First name (required if classification is 'individual'). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: John
+          nullable: true
+        individual_last_name:
+          type: string
+          description: Last name (required if classification is 'individual'). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: Doe
+          nullable: true
+        individual_address_country:
+          type: string
+          description: ISO 3166-1 alpha-2 or alpha-3 country code.
+          minLength: 2
+          maxLength: 3
+          pattern: ^[A-Za-z]{2,3}$
+          example: US
+          nullable: true
+        individual_date_of_birth:
+          type: string
+          description: Date of birth (for individuals).
+          maxLength: 255
+          example: '1980-01-01'
+          nullable: true
+        individual_national_identification_number:
+          type: string
+          description: National identification number (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: '123456789'
+          nullable: true
+        individual_street_address1:
+          type: string
+          description: Street address line 1 (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: 123 Main St
+          nullable: true
+        individual_street_address2:
+          type: string
+          description: Street address line 2 (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: Apt 4B
+          nullable: true
+        individual_city:
+          type: string
+          description: City (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: New York
+          nullable: true
+        individual_state:
+          type: string
+          description: State/region (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: NY
+          nullable: true
+        individual_postal_code:
+          type: string
+          description: Postal code (for individuals). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: '10001'
+          nullable: true
+        business_legal_name:
+          type: string
+          description: Legal business name (required if classification is 'business').
+          maxLength: 255
+          example: Acme Corporation
+          nullable: true
+        business_dba:
+          type: string
+          description: Doing Business As name (optional).
+          maxLength: 255
+          example: Acme Co
+          nullable: true
+        business_address_country:
+          type: string
+          description: ISO 3166-1 alpha-2 or alpha-3 country code.
+          minLength: 2
+          maxLength: 3
+          pattern: ^[A-Za-z]{2,3}$
+          example: US
+          nullable: true
+        business_street_address1:
+          type: string
+          description: Street address line 1 (for businesses).
+          maxLength: 255
+          example: 456 Corp Blvd
+          nullable: true
+        business_street_address2:
+          type: string
+          description: Street address line 2 (for businesses).
+          maxLength: 255
+          example: Suite 200
+          nullable: true
+        business_city:
+          type: string
+          description: City (for businesses).
+          maxLength: 255
+          example: San Francisco
+          nullable: true
+        business_state:
+          type: string
+          description: State/region (for businesses).
+          maxLength: 255
+          example: CA
+          nullable: true
+        business_legal_entity_identifier:
+          type: string
+          description: Legal Entity Identifier (for businesses). Secure field, returned based on include_secure.
+          maxLength: 255
+          example: '1234567890'
+          nullable: true
+      required:
+      - classification
     CounterpartyListResponse:
       type: object
       properties:
@@ -566,13 +697,6 @@ components:
       required:
       - data
       - pagination
-    CreateCounterpartyResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CounterpartyData'
-      required:
-      - data
     CounterpartyResponseDto:
       type: object
       properties:
@@ -735,137 +859,13 @@ components:
       - total_pages
       - has_next
       - has_prev
-    CreateCounterpartyRequestDto:
+    CreateCounterpartyResponseDto:
       type: object
       properties:
-        classification:
-          type: string
-          description: 'Classification: ''individual'' or ''business''.'
-          enum:
-          - individual
-          - business
-          example: individual
-        tenant_id:
-          type: string
-          description: ID of the tenant entity (optional).
-          example: 550e8400-e29b-41d4-a716-446655440002
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$
-        individual_first_name:
-          type: string
-          description: First name (required if classification is 'individual'). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: John
-          nullable: true
-        individual_last_name:
-          type: string
-          description: Last name (required if classification is 'individual'). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: Doe
-          nullable: true
-        individual_address_country:
-          type: string
-          description: ISO 3166-1 alpha-2 or alpha-3 country code.
-          minLength: 2
-          maxLength: 3
-          pattern: ^[A-Za-z]{2,3}$
-          example: US
-          nullable: true
-        individual_date_of_birth:
-          type: string
-          description: Date of birth (for individuals).
-          maxLength: 255
-          example: '1980-01-01'
-          nullable: true
-        individual_national_identification_number:
-          type: string
-          description: National identification number (for individuals). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: '123456789'
-          nullable: true
-        individual_street_address1:
-          type: string
-          description: Street address line 1 (for individuals). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: 123 Main St
-          nullable: true
-        individual_street_address2:
-          type: string
-          description: Street address line 2 (for individuals). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: Apt 4B
-          nullable: true
-        individual_city:
-          type: string
-          description: City (for individuals). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: New York
-          nullable: true
-        individual_state:
-          type: string
-          description: State/region (for individuals). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: NY
-          nullable: true
-        individual_postal_code:
-          type: string
-          description: Postal code (for individuals). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: '10001'
-          nullable: true
-        business_legal_name:
-          type: string
-          description: Legal business name (required if classification is 'business').
-          maxLength: 255
-          example: Acme Corporation
-          nullable: true
-        business_dba:
-          type: string
-          description: Doing Business As name (optional).
-          maxLength: 255
-          example: Acme Co
-          nullable: true
-        business_address_country:
-          type: string
-          description: ISO 3166-1 alpha-2 or alpha-3 country code.
-          minLength: 2
-          maxLength: 3
-          pattern: ^[A-Za-z]{2,3}$
-          example: US
-          nullable: true
-        business_street_address1:
-          type: string
-          description: Street address line 1 (for businesses).
-          maxLength: 255
-          example: 456 Corp Blvd
-          nullable: true
-        business_street_address2:
-          type: string
-          description: Street address line 2 (for businesses).
-          maxLength: 255
-          example: Suite 200
-          nullable: true
-        business_city:
-          type: string
-          description: City (for businesses).
-          maxLength: 255
-          example: San Francisco
-          nullable: true
-        business_state:
-          type: string
-          description: State/region (for businesses).
-          maxLength: 255
-          example: CA
-          nullable: true
-        business_legal_entity_identifier:
-          type: string
-          description: Legal Entity Identifier (for businesses). Secure field, returned based on include_secure.
-          maxLength: 255
-          example: '1234567890'
-          nullable: true
+        data:
+          $ref: '#/components/schemas/CounterpartyData'
       required:
-      - classification
+      - data
   securitySchemes:
     bearer:
       scheme: bearer

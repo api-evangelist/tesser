@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Tesser Accounts health API
+  title: Tesser Health API
   description: The Tesser Payments Platform API documentation.
   version: v1
   contact: {}
@@ -8,7 +8,7 @@ servers: []
 security:
 - bearer: []
 tags:
-- name: health
+- name: Health
 paths:
   /v1/health:
     get:
@@ -33,7 +33,7 @@ paths:
                     example: local
       summary: Health check endpoint
       tags:
-      - health
+      - Health
       x-internal: true
       x-zuplo-route:
         corsPolicy: anything-goes
@@ -49,7 +49,7 @@ paths:
       operationId: root_healthCheck
       summary: Root health check
       tags:
-      - health
+      - Health
       x-internal: true
       responses:
         '200':

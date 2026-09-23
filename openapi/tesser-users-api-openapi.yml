@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Tesser Accounts Users API
+  title: Tesser Users API
   description: The Tesser Payments Platform API documentation.
   version: v1
   contact: {}
@@ -200,49 +200,35 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
-    UserProfileDto:
+    UserProfileDataDto:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserProfileDto'
+        team:
+          $ref: '#/components/schemas/TeamDto'
+      required:
+      - user
+      - team
+    TeamDto:
       type: object
       properties:
         id:
           type: string
-        email:
+        name:
           type: string
-        teamId:
+        turnkeySubOrgId:
           type: string
+          nullable: true
         createdAt:
           type: string
         updatedAt:
           type: string
       required:
       - id
-      - email
-      - teamId
+      - name
       - createdAt
       - updatedAt
-    SignupRequestDto:
-      type: object
-      properties:
-        entityName:
-          type: string
-          minLength: 1
-          maxLength: 100
-        email:
-          type: string
-          format: email
-          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
-      required:
-      - entityName
-      - email
-    UserProfileResponseDto:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          $ref: '#/components/schemas/UserProfileDataDto'
-      required:
-      - message
-      - data
     SignupResponseDto:
       type: object
       properties:
@@ -286,35 +272,49 @@ components:
       required:
       - message
       - data
-    TeamDto:
+    SignupRequestDto:
+      type: object
+      properties:
+        entityName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+      required:
+      - entityName
+      - email
+    UserProfileDto:
       type: object
       properties:
         id:
           type: string
-        name:
+        email:
           type: string
-        turnkeySubOrgId:
+        teamId:
           type: string
-          nullable: true
         createdAt:
           type: string
         updatedAt:
           type: string
       required:
       - id
-      - name
+      - email
+      - teamId
       - createdAt
       - updatedAt
-    UserProfileDataDto:
+    UserProfileResponseDto:
       type: object
       properties:
-        user:
-          $ref: '#/components/schemas/UserProfileDto'
-        team:
-          $ref: '#/components/schemas/TeamDto'
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/UserProfileDataDto'
       required:
-      - user
-      - team
+      - message
+      - data
   securitySchemes:
     bearer:
       scheme: bearer
