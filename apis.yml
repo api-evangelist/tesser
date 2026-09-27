@@ -159,7 +159,7 @@ apis:
   - type: Authentication
     url: authentication/tesser-authentication.yml
 - aid: tesser:tesser-health-api
-  name: Tesser health API
+  name: Tesser Health API
   description: The health API from Tesser — 2 operation(s) for health.
   humanURL: https://docs.tesser.xyz
   baseURL: https://api.tesser.xyz
@@ -309,7 +309,7 @@ apis:
   - type: Authentication
     url: authentication/tesser-authentication.yml
 - aid: tesser:tesser-webhooks-api
-  name: Tesser webhooks API
+  name: Tesser Webhooks API
   description: The webhooks API from Tesser — 6 operation(s) for webhooks.
   humanURL: https://docs.tesser.xyz
   baseURL: https://api.tesser.xyz

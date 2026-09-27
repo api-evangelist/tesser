@@ -229,6 +229,20 @@ components:
       - name
       - createdAt
       - updatedAt
+    SignupRequestDto:
+      type: object
+      properties:
+        entityName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+      required:
+      - entityName
+      - email
     SignupResponseDto:
       type: object
       properties:
@@ -272,20 +286,16 @@ components:
       required:
       - message
       - data
-    SignupRequestDto:
+    UserProfileResponseDto:
       type: object
       properties:
-        entityName:
+        message:
           type: string
-          minLength: 1
-          maxLength: 100
-        email:
-          type: string
-          format: email
-          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+        data:
+          $ref: '#/components/schemas/UserProfileDataDto'
       required:
-      - entityName
-      - email
+      - message
+      - data
     UserProfileDto:
       type: object
       properties:
@@ -305,16 +315,6 @@ components:
       - teamId
       - createdAt
       - updatedAt
-    UserProfileResponseDto:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          $ref: '#/components/schemas/UserProfileDataDto'
-      required:
-      - message
-      - data
   securitySchemes:
     bearer:
       scheme: bearer

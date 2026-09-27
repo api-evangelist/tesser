@@ -1025,25 +1025,178 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
-    UpdateAccountRequestDto:
-      type: object
-      properties:
-        name:
-          type: string
-          minLength: 1
-          description: New account name
-    AccountListResponse:
+    AccountResponseDto:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountData'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
+          $ref: '#/components/schemas/AccountData'
       required:
       - data
-      - pagination
+    CreateWalletAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WalletAccountData'
+      required:
+      - data
+    UpdateAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AccountData'
+      required:
+      - data
+    AccountData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the account
+        workspace_id:
+          type: string
+          description: Workspace ID the account belongs to
+        tenant_id:
+          type: string
+          nullable: true
+          description: Tenant ID (if account belongs to a tenant)
+        counterparty_id:
+          type: string
+          nullable: true
+          description: Counterparty ID (if account belongs to a counterparty)
+        type:
+          type: string
+          description: Account type
+        name:
+          type: string
+          description: Account name
+        bank_name:
+          type: string
+          nullable: true
+          description: Bank name (only for fiat_bank accounts)
+        bank_code_type:
+          type: string
+          nullable: true
+          description: Bank code type (only for fiat_bank accounts)
+        bank_identifier_code:
+          type: string
+          nullable: true
+          description: Bank identifier code (only for fiat_bank accounts)
+        bank_swift_code:
+          type: string
+          nullable: true
+          description: SWIFT code (only for fiat_bank accounts)
+        bank_account_number:
+          type: string
+          nullable: true
+          description: Bank account number (masked, only with include_secure=true)
+        crypto_wallet_address:
+          type: string
+          nullable: true
+          description: Crypto wallet address (only for wallet accounts)
+        is_managed:
+          type: boolean
+          nullable: true
+          description: Is managed wallet (only for wallet accounts)
+        provider:
+          type: string
+          nullable: true
+          description: Ledger provider (only for ledger accounts)
+          enum:
+          - CIRCLE_MINT
+          - KRAKEN
+          - OPENFX
+        assets:
+          description: Account assets with balances (for wallet and ledger accounts)
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountAssetDto'
+        created_at:
+          type: string
+          description: Creation timestamp
+        updated_at:
+          type: string
+          description: Last update timestamp
+      required:
+      - id
+      - workspace_id
+      - type
+      - name
+      - created_at
+      - updated_at
+    WalletAccountData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the account
+        workspace_id:
+          type: string
+          description: Workspace ID the account belongs to
+        tenant_id:
+          type: string
+          nullable: true
+          description: Tenant ID (if account belongs to a tenant)
+        counterparty_id:
+          type: string
+          nullable: true
+          description: Counterparty ID (if account belongs to a counterparty)
+        type:
+          type: string
+          description: Account type
+        name:
+          type: string
+          description: Account name
+        created_at:
+          type: string
+          description: Creation timestamp
+        updated_at:
+          type: string
+          description: Last update timestamp
+        crypto_wallet_address:
+          type: string
+          description: Blockchain wallet address
+        is_managed:
+          type: boolean
+          description: Whether this is a managed wallet (provisioned by Tesser), or unmanaged (not provisioned by Tesser)
+        assets:
+          description: Wallet assets with balances
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletAssetDto'
+      required:
+      - id
+      - workspace_id
+      - type
+      - name
+      - created_at
+      - updated_at
+      - crypto_wallet_address
+      - is_managed
+    CreateBankAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/BankAccountData'
+      required:
+      - data
+    AccountAssetDto:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency symbol
+          example: USDC
+        network:
+          type: string
+          description: Blockchain network (only for wallet accounts)
+          example: POLYGON
+        available_balance:
+          type: string
+          description: Available balance in smallest unit
+          example: '1000000'
+      required:
+      - currency
+      - available_balance
     BankAccountData:
       type: object
       properties:
@@ -1100,6 +1253,75 @@ components:
       - bank_name
       - bank_code_type
       - bank_identifier_code
+    UpdateAccountRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: New account name
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
+    CreateLedgerAccountRequestDto:
+      type: object
+      properties:
+        tenant_id:
+          description: Tenant ID (mutually exclusive with counterparty_id). Links this ledger account to a specific tenant.
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        counterparty_id:
+          description: Counterparty ID (mutually exclusive with tenant_id). Links this ledger account to a specific counterparty.
+          example: 660e8400-e29b-41d4-a716-446655440003
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        name:
+          type: string
+          minLength: 1
+          description: Human-readable name for the ledger account
+          example: Circle USDC Account
+          maxLength: 255
+        provider:
+          type: string
+          enum:
+          - CIRCLE_MINT
+          - KRAKEN
+          - OPENFX
+          description: Liquidity provider that manages this ledger account. CIRCLE_MINT for Circle Mint accounts, KRAKEN for Kraken exchange accounts.
+          example: CIRCLE_MINT
+      required:
+      - name
+      - provider
     CreateLedgerAccountResponseDto:
       type: object
       properties:
@@ -1107,27 +1329,55 @@ components:
           $ref: '#/components/schemas/LedgerAccountData'
       required:
       - data
-    LedgerAssetDto:
+    LedgerAccountData:
       type: object
       properties:
-        currency:
+        id:
           type: string
-          description: Currency symbol
-          example: USDC
-        available_balance:
+          description: Unique identifier for the account
+        workspace_id:
           type: string
-          description: Available balance in smallest unit
-          example: '1000000'
+          description: Workspace ID the account belongs to
+        tenant_id:
+          type: string
+          nullable: true
+          description: Tenant ID (if account belongs to a tenant)
+        counterparty_id:
+          type: string
+          nullable: true
+          description: Counterparty ID (if account belongs to a counterparty)
+        type:
+          type: string
+          description: Account type
+        name:
+          type: string
+          description: Account name
+        created_at:
+          type: string
+          description: Creation timestamp
+        updated_at:
+          type: string
+          description: Last update timestamp
+        provider:
+          type: string
+          description: Liquidity provider that manages this ledger account
+          enum:
+          - CIRCLE_MINT
+          - KRAKEN
+          - OPENFX
+        assets:
+          description: Ledger assets with balances
+          type: array
+          items:
+            $ref: '#/components/schemas/LedgerAssetDto'
       required:
-      - currency
-      - available_balance
-    UpdateAccountResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AccountData'
-      required:
-      - data
+      - id
+      - workspace_id
+      - type
+      - name
+      - created_at
+      - updated_at
+      - provider
     CreateWalletAccountRequestDto:
       type: object
       properties:
@@ -1175,62 +1425,32 @@ components:
       required:
       - name
       - type
-    CreateWalletAccountResponseDto:
+    LedgerAssetDto:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency symbol
+          example: USDC
+        available_balance:
+          type: string
+          description: Available balance in smallest unit
+          example: '1000000'
+      required:
+      - currency
+      - available_balance
+    AccountListResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/WalletAccountData'
-      required:
-      - data
-    WalletAccountData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the account
-        workspace_id:
-          type: string
-          description: Workspace ID the account belongs to
-        tenant_id:
-          type: string
-          nullable: true
-          description: Tenant ID (if account belongs to a tenant)
-        counterparty_id:
-          type: string
-          nullable: true
-          description: Counterparty ID (if account belongs to a counterparty)
-        type:
-          type: string
-          description: Account type
-        name:
-          type: string
-          description: Account name
-        created_at:
-          type: string
-          description: Creation timestamp
-        updated_at:
-          type: string
-          description: Last update timestamp
-        crypto_wallet_address:
-          type: string
-          description: Blockchain wallet address
-        is_managed:
-          type: boolean
-          description: Whether this is a managed wallet (provisioned by Tesser), or unmanaged (not provisioned by Tesser)
-        assets:
-          description: Wallet assets with balances
           type: array
           items:
-            $ref: '#/components/schemas/WalletAssetDto'
+            $ref: '#/components/schemas/AccountData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
       required:
-      - id
-      - workspace_id
-      - type
-      - name
-      - created_at
-      - updated_at
-      - crypto_wallet_address
-      - is_managed
+      - data
+      - pagination
     WalletAssetDto:
       type: object
       properties:
@@ -1309,226 +1529,6 @@ components:
       - bank_code_type
       - bank_identifier_code
       - bank_account_number
-    LedgerAccountData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the account
-        workspace_id:
-          type: string
-          description: Workspace ID the account belongs to
-        tenant_id:
-          type: string
-          nullable: true
-          description: Tenant ID (if account belongs to a tenant)
-        counterparty_id:
-          type: string
-          nullable: true
-          description: Counterparty ID (if account belongs to a counterparty)
-        type:
-          type: string
-          description: Account type
-        name:
-          type: string
-          description: Account name
-        created_at:
-          type: string
-          description: Creation timestamp
-        updated_at:
-          type: string
-          description: Last update timestamp
-        provider:
-          type: string
-          description: Liquidity provider that manages this ledger account
-          enum:
-          - CIRCLE_MINT
-          - KRAKEN
-          - OPENFX
-        assets:
-          description: Ledger assets with balances
-          type: array
-          items:
-            $ref: '#/components/schemas/LedgerAssetDto'
-      required:
-      - id
-      - workspace_id
-      - type
-      - name
-      - created_at
-      - updated_at
-      - provider
-    CreateLedgerAccountRequestDto:
-      type: object
-      properties:
-        tenant_id:
-          description: Tenant ID (mutually exclusive with counterparty_id). Links this ledger account to a specific tenant.
-          example: 550e8400-e29b-41d4-a716-446655440002
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          type: string
-        counterparty_id:
-          description: Counterparty ID (mutually exclusive with tenant_id). Links this ledger account to a specific counterparty.
-          example: 660e8400-e29b-41d4-a716-446655440003
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          type: string
-        name:
-          type: string
-          minLength: 1
-          description: Human-readable name for the ledger account
-          example: Circle USDC Account
-          maxLength: 255
-        provider:
-          type: string
-          enum:
-          - CIRCLE_MINT
-          - KRAKEN
-          - OPENFX
-          description: Liquidity provider that manages this ledger account. CIRCLE_MINT for Circle Mint accounts, KRAKEN for Kraken exchange accounts.
-          example: CIRCLE_MINT
-      required:
-      - name
-      - provider
-    AccountResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AccountData'
-      required:
-      - data
-    AccountAssetDto:
-      type: object
-      properties:
-        currency:
-          type: string
-          description: Currency symbol
-          example: USDC
-        network:
-          type: string
-          description: Blockchain network (only for wallet accounts)
-          example: POLYGON
-        available_balance:
-          type: string
-          description: Available balance in smallest unit
-          example: '1000000'
-      required:
-      - currency
-      - available_balance
-    AccountData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the account
-        workspace_id:
-          type: string
-          description: Workspace ID the account belongs to
-        tenant_id:
-          type: string
-          nullable: true
-          description: Tenant ID (if account belongs to a tenant)
-        counterparty_id:
-          type: string
-          nullable: true
-          description: Counterparty ID (if account belongs to a counterparty)
-        type:
-          type: string
-          description: Account type
-        name:
-          type: string
-          description: Account name
-        bank_name:
-          type: string
-          nullable: true
-          description: Bank name (only for fiat_bank accounts)
-        bank_code_type:
-          type: string
-          nullable: true
-          description: Bank code type (only for fiat_bank accounts)
-        bank_identifier_code:
-          type: string
-          nullable: true
-          description: Bank identifier code (only for fiat_bank accounts)
-        bank_swift_code:
-          type: string
-          nullable: true
-          description: SWIFT code (only for fiat_bank accounts)
-        bank_account_number:
-          type: string
-          nullable: true
-          description: Bank account number (masked, only with include_secure=true)
-        crypto_wallet_address:
-          type: string
-          nullable: true
-          description: Crypto wallet address (only for wallet accounts)
-        is_managed:
-          type: boolean
-          nullable: true
-          description: Is managed wallet (only for wallet accounts)
-        provider:
-          type: string
-          nullable: true
-          description: Ledger provider (only for ledger accounts)
-          enum:
-          - CIRCLE_MINT
-          - KRAKEN
-          - OPENFX
-        assets:
-          description: Account assets with balances (for wallet and ledger accounts)
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountAssetDto'
-        created_at:
-          type: string
-          description: Creation timestamp
-        updated_at:
-          type: string
-          description: Last update timestamp
-      required:
-      - id
-      - workspace_id
-      - type
-      - name
-      - created_at
-      - updated_at
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: number
-          description: Current page number.
-        limit:
-          type: number
-          description: Number of items per page.
-        total:
-          type: number
-          description: Total number of items.
-        total_pages:
-          type: number
-          description: Total number of pages.
-        has_next:
-          type: boolean
-          description: Whether there is a next page.
-        has_prev:
-          type: boolean
-          description: Whether there is a previous page.
-      required:
-      - page
-      - limit
-      - total
-      - total_pages
-      - has_next
-      - has_prev
-    CreateBankAccountResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/BankAccountData'
-      required:
-      - data
   securitySchemes:
     bearer:
       scheme: bearer

@@ -492,6 +492,60 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
+    TenantListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    CreateTenantData:
+      type: object
+      properties:
+        tenant:
+          $ref: '#/components/schemas/TenantData'
+      required:
+      - tenant
+    CreateTenantResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateTenantData'
+      required:
+      - data
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
     CreateTenantRequestDto:
       type: object
       properties:
@@ -559,23 +613,11 @@ components:
           example: '1234567890'
       required:
       - business_legal_name
-    TenantListResponse:
+    TenantResponseDto:
       type: object
       properties:
         data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TenantData'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
-    CreateTenantResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateTenantData'
+          $ref: '#/components/schemas/TenantData'
       required:
       - data
     TenantData:
@@ -657,48 +699,6 @@ components:
       - name
       - created_at
       - updated_at
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: number
-          description: Current page number.
-        limit:
-          type: number
-          description: Number of items per page.
-        total:
-          type: number
-          description: Total number of items.
-        total_pages:
-          type: number
-          description: Total number of pages.
-        has_next:
-          type: boolean
-          description: Whether there is a next page.
-        has_prev:
-          type: boolean
-          description: Whether there is a previous page.
-      required:
-      - page
-      - limit
-      - total
-      - total_pages
-      - has_next
-      - has_prev
-    CreateTenantData:
-      type: object
-      properties:
-        tenant:
-          $ref: '#/components/schemas/TenantData'
-      required:
-      - tenant
-    TenantResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/TenantData'
-      required:
-      - data
   securitySchemes:
     bearer:
       scheme: bearer

@@ -554,6 +554,20 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
+    CreateCounterpartyResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CounterpartyData'
+      required:
+      - data
+    CounterpartyResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CounterpartyData'
+      required:
+      - data
     CreateCounterpartyRequestDto:
       type: object
       properties:
@@ -697,13 +711,34 @@ components:
       required:
       - data
       - pagination
-    CounterpartyResponseDto:
+    Pagination:
       type: object
       properties:
-        data:
-          $ref: '#/components/schemas/CounterpartyData'
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
       required:
-      - data
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
     CounterpartyData:
       type: object
       properties:
@@ -831,41 +866,6 @@ components:
       - classification
       - created_at
       - updated_at
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: number
-          description: Current page number.
-        limit:
-          type: number
-          description: Number of items per page.
-        total:
-          type: number
-          description: Total number of items.
-        total_pages:
-          type: number
-          description: Total number of pages.
-        has_next:
-          type: boolean
-          description: Whether there is a next page.
-        has_prev:
-          type: boolean
-          description: Whether there is a previous page.
-      required:
-      - page
-      - limit
-      - total
-      - total_pages
-      - has_next
-      - has_prev
-    CreateCounterpartyResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CounterpartyData'
-      required:
-      - data
   securitySchemes:
     bearer:
       scheme: bearer
