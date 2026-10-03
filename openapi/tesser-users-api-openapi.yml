@@ -200,35 +200,6 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
-    UserProfileDataDto:
-      type: object
-      properties:
-        user:
-          $ref: '#/components/schemas/UserProfileDto'
-        team:
-          $ref: '#/components/schemas/TeamDto'
-      required:
-      - user
-      - team
-    TeamDto:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        turnkeySubOrgId:
-          type: string
-          nullable: true
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
-      required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
     SignupRequestDto:
       type: object
       properties:
@@ -296,6 +267,35 @@ components:
       required:
       - message
       - data
+    TeamDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        turnkeySubOrgId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+    UserProfileDataDto:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserProfileDto'
+        team:
+          $ref: '#/components/schemas/TeamDto'
+      required:
+      - user
+      - team
     UserProfileDto:
       type: object
       properties:

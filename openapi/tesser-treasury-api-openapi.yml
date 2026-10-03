@@ -3067,7 +3067,64 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
-    StepActualToLeg:
+    WithdrawalDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source account ID.
+        amount:
+          type: string
+          description: Source amount.
+          example: '1000.00'
+        currency:
+          type: string
+          description: Source currency code.
+          example: USDC
+        network:
+          type: string
+          description: Source blockchain network. Required when source is a self-custodial wallet.
+      description: Source side of the withdrawal.
+      required:
+      - account_id
+      - amount
+      - currency
+    DesiredOverlayRequest:
+      type: object
+      properties:
+        from:
+          description: Source side of the deposit.
+          allOf:
+          - $ref: '#/components/schemas/DesiredFromLeg'
+        to:
+          description: Destination side of the deposit.
+          allOf:
+          - $ref: '#/components/schemas/DesiredToLeg'
+      description: Caller's stated intent for the deposit.
+      required:
+      - from
+      - to
+    SignRebalanceStepRequest:
+      type: object
+      properties:
+        signature:
+          type: string
+          minLength: 1
+          description: Base64-encoded JSON envelope `{ body, stamp }` where `body` is the JSON-encoded Turnkey ACTIVITY_TYPE_SIGN_TRANSACTION_V2 activity and `stamp` is the X-Stamp header value produced by stamping that body. Tesser forwards the envelope to Turnkey to obtain the signed transaction.
+      required:
+      - signature
+    WithdrawalStepEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalStepEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/WithdrawalStepEstimatedToLeg'
+      description: Planned values for this step.
+      required:
+      - from
+      - to
+    DepositEstimatedFromLeg:
       type: object
       properties:
         account_id:
@@ -3077,6 +3134,206 @@ components:
         amount:
           type: string
           description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceStepEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    CreateRebalanceRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional client-supplied identifier.
+        desired:
+          description: Caller's stated intent for the rebalance.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceDesiredOverlayRequest'
+      required:
+      - desired
+    DepositBankAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Account ID.
+        name:
+          type: string
+          description: Account name.
+        bank_name:
+          type: string
+          description: Bank name.
+        bank_account_number:
+          type: string
+          description: Bank account number.
+        bank_code_type:
+          type: string
+          description: Bank code type (e.g., 'routing').
+        bank_identifier_code:
+          type: string
+          description: Bank identifier code (routing number, sort code, etc.).
+        bank_swift_code:
+          type: string
+          description: Bank SWIFT code.
+          nullable: true
+      required:
+      - id
+      - name
+      - bank_name
+      - bank_account_number
+      - bank_code_type
+      - bank_identifier_code
+    Withdrawal:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique withdrawal identifier
+          example: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
+        workspace_id:
+          type: string
+          description: Workspace ID the withdrawal belongs to
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          description: External reference ID for tracking
+          nullable: true
+          example: null
+        direction:
+          type: string
+          description: Resource direction.
+          enum:
+          - outbound
+          example: outbound
+        desired:
+          description: Caller's stated intent at creation. Frozen, never overwritten.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalDesiredOverlay'
+        estimated:
+          description: Tesser's projection for how the withdrawal will proceed.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalEstimatedOverlay'
+        actual:
+          description: What actually settled. Populated when the withdrawal reaches a terminal state.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalActualOverlay'
+        balance_status:
+          type: string
+          description: Balance reservation status.
+          nullable: true
+          enum:
+          - unreserved
+          - awaiting_funds
+          - reserved
+          example: unreserved
+        balance_reserved_at:
+          type: string
+          description: Timestamp when balance was reserved.
+          format: date-time
+          nullable: true
+          example: null
+        steps:
+          description: Withdrawal execution steps.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/WithdrawalStep'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        expires_at:
+          type: string
+          description: ISO 8601 timestamp when the withdrawal expires.
+          example: '2024-03-01T14:00:00.000Z'
+          nullable: true
+      required:
+      - id
+      - workspace_id
+      - direction
+      - desired
+      - estimated
+      - actual
+      - balance_status
+      - balance_reserved_at
+      - steps
+      - created_at
+      - updated_at
+      - expires_at
+    WithdrawalStepActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Always null for deposits — see `estimated.to.amount` for the indicative target.
           nullable: true
         currency:
           type: string
@@ -3210,211 +3467,60 @@ components:
       - status
       - created_at
       - updated_at
-    RebalanceStepActualFromLeg:
+    TreasuryBalancesResponseDto:
       type: object
       properties:
-        account_id:
+        message:
           type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
+        data:
+          $ref: '#/components/schemas/TreasuryBalancesDataDto'
       required:
-      - account_id
-      - amount
-      - currency
-      - network
-    WithdrawalDesiredFromLegResponse:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DepositDesiredToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Always null for deposits — see `estimated.to.amount` for the indicative target.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    CreateRebalanceRequest:
-      type: object
-      properties:
-        organization_reference_id:
-          type: string
-          description: Optional client-supplied identifier.
-        desired:
-          description: Caller's stated intent for the rebalance.
-          allOf:
-          - $ref: '#/components/schemas/RebalanceDesiredOverlayRequest'
-      required:
-      - desired
-    SignRebalanceStepRequest:
-      type: object
-      properties:
-        signature:
-          type: string
-          minLength: 1
-          description: Base64-encoded JSON envelope `{ body, stamp }` where `body` is the JSON-encoded Turnkey ACTIVITY_TYPE_SIGN_TRANSACTION_V2 activity and `stamp` is the X-Stamp header value produced by stamping that body. Tesser forwards the envelope to Turnkey to obtain the signed transaction.
-      required:
-      - signature
-    RebalanceDesiredToLegResponse:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DepositDesiredFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DepositInstructionsData:
-      type: object
-      properties:
-        from_account:
-          description: Source account information (for reference).
-          allOf:
-          - $ref: '#/components/schemas/DepositBankAccount'
-        to_account:
-          description: Wire instructions for completing the deposit.
-          allOf:
-          - $ref: '#/components/schemas/WireInstructionsBankAccount'
-        amount:
-          type: string
-          description: Deposit amount.
-        currency:
-          type: string
-          description: Deposit currency.
-      required:
-      - from_account
-      - to_account
-      - amount
-      - currency
-    WithdrawalDesiredToLegResponse:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DepositDesiredOverlay:
+      - message
+      - data
+    WithdrawalEstimatedOverlay:
       type: object
       properties:
         from:
-          $ref: '#/components/schemas/DepositDesiredFromLeg'
+          $ref: '#/components/schemas/WithdrawalEstimatedFromLeg'
         to:
-          $ref: '#/components/schemas/DepositDesiredToLeg'
-      description: Caller's stated intent at creation. Frozen, never overwritten.
+          $ref: '#/components/schemas/WithdrawalEstimatedToLeg'
+      description: Tesser's projection for how the withdrawal will proceed.
       required:
       - from
       - to
-    StepEstimatedFromLeg:
+    BeneficiaryBusinessInfo:
+      type: object
+      properties:
+        business_legal_name:
+          type: string
+          description: Business legal name.
+        business_street_address1:
+          type: string
+          description: Street address line 1.
+          nullable: true
+        business_street_address2:
+          type: string
+          description: Street address line 2.
+          nullable: true
+        business_city:
+          type: string
+          description: City (null when address isn't structured).
+          nullable: true
+        business_state:
+          type: string
+          description: State (null when address isn't structured).
+          nullable: true
+        business_postal_code:
+          type: string
+          description: Postal code (null when address isn't structured).
+          nullable: true
+        business_country:
+          type: string
+          description: Country code (null when address isn't structured).
+          nullable: true
+      required:
+      - business_legal_name
+    DepositEstimatedToLeg:
       type: object
       properties:
         account_id:
@@ -3433,7 +3539,7 @@ components:
           type: string
           description: Blockchain network.
           nullable: true
-      description: Source side.
+      description: Destination side.
       required:
       - account_id
       - amount
@@ -3556,1174 +3662,6 @@ components:
       - status
       - created_at
       - updated_at
-    CreateWithdrawalRequest:
-      type: object
-      properties:
-        organization_reference_id:
-          type: string
-          description: Optional client-supplied identifier.
-        desired:
-          description: Caller's stated intent for the withdrawal.
-          allOf:
-          - $ref: '#/components/schemas/WithdrawalDesiredOverlayRequest'
-      required:
-      - desired
-    RebalanceEstimatedToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DepositEstimatedFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    RebalanceDesiredFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Source account ID.
-        amount:
-          type: string
-          description: Source amount.
-          example: '1000.00'
-        currency:
-          type: string
-          description: Source currency code.
-          example: USDC
-        network:
-          type: string
-          description: Source blockchain network.
-      description: Source side of the rebalance.
-      required:
-      - account_id
-      - amount
-      - currency
-    WithdrawalStepEstimatedFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    CreateDepositResponse:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/Deposit'
-      required:
-      - data
-    Rebalance:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique rebalance identifier
-          example: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
-        workspace_id:
-          type: string
-          description: Workspace ID the rebalance belongs to
-          example: b53f6690-3242-4942-9907-885779632832
-        organization_reference_id:
-          type: string
-          description: External reference ID for tracking
-          nullable: true
-          example: null
-        direction:
-          type: string
-          description: Resource direction.
-          enum:
-          - rebalance
-          example: rebalance
-        desired:
-          description: Caller's stated intent at creation. Frozen, never overwritten.
-          allOf:
-          - $ref: '#/components/schemas/RebalanceDesiredOverlay'
-        estimated:
-          description: Tesser's projection for how the rebalance will proceed.
-          allOf:
-          - $ref: '#/components/schemas/RebalanceEstimatedOverlay'
-        actual:
-          description: What actually settled. Populated when the rebalance reaches a terminal state.
-          allOf:
-          - $ref: '#/components/schemas/RebalanceActualOverlay'
-        balance_status:
-          type: string
-          description: Balance reservation status.
-          nullable: true
-          enum:
-          - unreserved
-          - awaiting_funds
-          - reserved
-          example: null
-        balance_reserved_at:
-          type: string
-          description: Timestamp when balance was reserved.
-          format: date-time
-          nullable: true
-          example: null
-        steps:
-          description: Rebalance execution steps.
-          example: []
-          type: array
-          items:
-            $ref: '#/components/schemas/RebalanceStep'
-        created_at:
-          type: string
-          description: ISO 8601 timestamp of creation.
-          example: '2024-03-01T10:00:00.000Z'
-        updated_at:
-          type: string
-          description: ISO 8601 timestamp of last update.
-          example: '2024-03-01T10:00:00.000Z'
-        expires_at:
-          type: string
-          description: ISO 8601 timestamp when the rebalance expires.
-          example: '2024-03-04T10:00:00.000Z'
-          nullable: true
-      required:
-      - id
-      - workspace_id
-      - direction
-      - desired
-      - estimated
-      - actual
-      - balance_status
-      - balance_reserved_at
-      - steps
-      - created_at
-      - updated_at
-      - expires_at
-    WithdrawalResponse:
-      type: object
-      properties:
-        data:
-          description: Withdrawal data
-          allOf:
-          - $ref: '#/components/schemas/Withdrawal'
-      required:
-      - data
-    WithdrawalActualToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    WithdrawalActualOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/WithdrawalActualFromLeg'
-        to:
-          $ref: '#/components/schemas/WithdrawalActualToLeg'
-      description: What actually settled. Populated when the withdrawal reaches a terminal state.
-      required:
-      - from
-      - to
-    CreateDepositRequest:
-      type: object
-      properties:
-        organization_reference_id:
-          type: string
-          description: Optional client-supplied identifier.
-        desired:
-          description: Caller's stated intent for the deposit.
-          allOf:
-          - $ref: '#/components/schemas/DesiredOverlayRequest'
-      required:
-      - desired
-    StepFee:
-      type: object
-      properties:
-        fee_amount:
-          type: string
-          description: Fee amount.
-        fee_currency:
-          type: string
-          description: Fee currency code.
-        fee_type:
-          type: string
-          description: Fee type (e.g., 'gas', 'provider').
-        fee_metadata:
-          type: object
-          description: Additional metadata for the fee (JSON object).
-          additionalProperties: true
-      required:
-      - fee_amount
-      - fee_currency
-      - fee_type
-    WithdrawalStepEstimatedToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    WithdrawalEstimatedToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    WithdrawalActualFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    StepActualFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    RebalanceStepEstimatedToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    WithdrawalDesiredToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Destination bank account ID.
-        currency:
-          type: string
-          description: Destination currency code.
-          example: USD
-      description: Destination side of the withdrawal.
-      required:
-      - account_id
-      - currency
-    StepEstimatedToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    WithdrawalEstimatedFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    RebalanceActualOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/RebalanceActualFromLeg'
-        to:
-          $ref: '#/components/schemas/RebalanceActualToLeg'
-      description: What actually settled. Populated when the rebalance reaches a terminal state.
-      required:
-      - from
-      - to
-    WithdrawalStepActualOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/WithdrawalStepActualFromLeg'
-        to:
-          $ref: '#/components/schemas/WithdrawalStepActualToLeg'
-      description: Settled values once the step reaches a terminal state. All-null until then.
-      required:
-      - from
-      - to
-    TreasuryBalancesResponseDto:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          $ref: '#/components/schemas/TreasuryBalancesDataDto'
-      required:
-      - message
-      - data
-    WithdrawalStepActualFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    Deposit:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the deposit.
-          example: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
-        workspace_id:
-          type: string
-          description: Workspace ID the deposit belongs to.
-          example: b53f6690-3242-4942-9907-885779632832
-        organization_reference_id:
-          type: string
-          description: Optional external reference ID.
-          example: null
-          nullable: true
-        direction:
-          type: string
-          description: Resource direction.
-          enum:
-          - inbound
-          example: inbound
-        desired:
-          description: Caller's stated intent at creation. Frozen, never overwritten.
-          allOf:
-          - $ref: '#/components/schemas/DepositDesiredOverlay'
-        estimated:
-          description: Tesser's projection for how the deposit will proceed.
-          allOf:
-          - $ref: '#/components/schemas/DepositEstimatedOverlay'
-        actual:
-          description: What actually settled. Populated when the deposit reaches a terminal state.
-          allOf:
-          - $ref: '#/components/schemas/DepositActualOverlay'
-        steps:
-          description: Optional list of system-generated steps that make up this deposit route.
-          example: []
-          type: array
-          items:
-            $ref: '#/components/schemas/DepositStep'
-        created_at:
-          type: string
-          description: ISO 8601 timestamp of creation.
-          example: '2024-03-01T10:00:00.000Z'
-        updated_at:
-          type: string
-          description: ISO 8601 timestamp of last update.
-          example: '2024-03-01T10:00:00.000Z'
-        expires_at:
-          type: string
-          description: ISO 8601 timestamp when the deposit expires, or null for auto-created deposits.
-          example: '2024-03-01T14:00:00.000Z'
-          nullable: true
-      required:
-      - id
-      - workspace_id
-      - direction
-      - desired
-      - estimated
-      - actual
-      - created_at
-      - updated_at
-    WithdrawalDesiredOverlayRequest:
-      type: object
-      properties:
-        from:
-          description: Source side of the withdrawal.
-          allOf:
-          - $ref: '#/components/schemas/WithdrawalDesiredFromLeg'
-        to:
-          description: Destination side of the withdrawal.
-          allOf:
-          - $ref: '#/components/schemas/WithdrawalDesiredToLeg'
-      description: Caller's stated intent for the withdrawal.
-      required:
-      - from
-      - to
-    RebalanceDesiredFromLegResponse:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    ListDepositsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Deposit'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
-    Withdrawal:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique withdrawal identifier
-          example: 6a2f8c1e-3b9d-4e74-b5a0-7c4d2e1f9b3a
-        workspace_id:
-          type: string
-          description: Workspace ID the withdrawal belongs to
-          example: b53f6690-3242-4942-9907-885779632832
-        organization_reference_id:
-          type: string
-          description: External reference ID for tracking
-          nullable: true
-          example: null
-        direction:
-          type: string
-          description: Resource direction.
-          enum:
-          - outbound
-          example: outbound
-        desired:
-          description: Caller's stated intent at creation. Frozen, never overwritten.
-          allOf:
-          - $ref: '#/components/schemas/WithdrawalDesiredOverlay'
-        estimated:
-          description: Tesser's projection for how the withdrawal will proceed.
-          allOf:
-          - $ref: '#/components/schemas/WithdrawalEstimatedOverlay'
-        actual:
-          description: What actually settled. Populated when the withdrawal reaches a terminal state.
-          allOf:
-          - $ref: '#/components/schemas/WithdrawalActualOverlay'
-        balance_status:
-          type: string
-          description: Balance reservation status.
-          nullable: true
-          enum:
-          - unreserved
-          - awaiting_funds
-          - reserved
-          example: unreserved
-        balance_reserved_at:
-          type: string
-          description: Timestamp when balance was reserved.
-          format: date-time
-          nullable: true
-          example: null
-        steps:
-          description: Withdrawal execution steps.
-          example: []
-          type: array
-          items:
-            $ref: '#/components/schemas/WithdrawalStep'
-        created_at:
-          type: string
-          description: ISO 8601 timestamp of creation.
-          example: '2024-03-01T10:00:00.000Z'
-        updated_at:
-          type: string
-          description: ISO 8601 timestamp of last update.
-          example: '2024-03-01T10:00:00.000Z'
-        expires_at:
-          type: string
-          description: ISO 8601 timestamp when the withdrawal expires.
-          example: '2024-03-01T14:00:00.000Z'
-          nullable: true
-      required:
-      - id
-      - workspace_id
-      - direction
-      - desired
-      - estimated
-      - actual
-      - balance_status
-      - balance_reserved_at
-      - steps
-      - created_at
-      - updated_at
-      - expires_at
-    DesiredToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Destination account ID.
-        currency:
-          type: string
-          description: Destination currency code.
-          example: USDC
-        network:
-          type: string
-          description: Destination blockchain network.
-      description: Destination side of the deposit.
-      required:
-      - account_id
-      - currency
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: number
-          description: Current page number.
-        limit:
-          type: number
-          description: Number of items per page.
-        total:
-          type: number
-          description: Total number of items.
-        total_pages:
-          type: number
-          description: Total number of pages.
-        has_next:
-          type: boolean
-          description: Whether there is a next page.
-        has_prev:
-          type: boolean
-          description: Whether there is a previous page.
-      required:
-      - page
-      - limit
-      - total
-      - total_pages
-      - has_next
-      - has_prev
-    WithdrawalEstimatedOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/WithdrawalEstimatedFromLeg'
-        to:
-          $ref: '#/components/schemas/WithdrawalEstimatedToLeg'
-      description: Tesser's projection for how the withdrawal will proceed.
-      required:
-      - from
-      - to
-    WithdrawalDesiredOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/WithdrawalDesiredFromLegResponse'
-        to:
-          $ref: '#/components/schemas/WithdrawalDesiredToLegResponse'
-      description: Caller's stated intent at creation. Frozen, never overwritten.
-      required:
-      - from
-      - to
-    DepositBankAccount:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Account ID.
-        name:
-          type: string
-          description: Account name.
-        bank_name:
-          type: string
-          description: Bank name.
-        bank_account_number:
-          type: string
-          description: Bank account number.
-        bank_code_type:
-          type: string
-          description: Bank code type (e.g., 'routing').
-        bank_identifier_code:
-          type: string
-          description: Bank identifier code (routing number, sort code, etc.).
-        bank_swift_code:
-          type: string
-          description: Bank SWIFT code.
-          nullable: true
-      required:
-      - id
-      - name
-      - bank_name
-      - bank_account_number
-      - bank_code_type
-      - bank_identifier_code
-    RebalanceDesiredOverlayRequest:
-      type: object
-      properties:
-        from:
-          description: Source side of the rebalance.
-          allOf:
-          - $ref: '#/components/schemas/RebalanceDesiredFromLeg'
-        to:
-          description: Destination side of the rebalance.
-          allOf:
-          - $ref: '#/components/schemas/RebalanceDesiredToLeg'
-      description: Caller's stated intent for the rebalance.
-      required:
-      - from
-      - to
-    RebalanceDesiredOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/RebalanceDesiredFromLegResponse'
-        to:
-          $ref: '#/components/schemas/RebalanceDesiredToLegResponse'
-      description: Caller's stated intent at creation. Frozen, never overwritten.
-      required:
-      - from
-      - to
-    RebalanceStepActualToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DepositActualToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    RebalanceResponse:
-      type: object
-      properties:
-        data:
-          description: Rebalance data
-          allOf:
-          - $ref: '#/components/schemas/Rebalance'
-      required:
-      - data
-    DepositActualOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/DepositActualFromLeg'
-        to:
-          $ref: '#/components/schemas/DepositActualToLeg'
-      description: What actually settled. Populated when the deposit reaches a terminal state.
-      required:
-      - from
-      - to
-    WireInstructionsBankAccount:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Account ID.
-        name:
-          type: string
-          description: Account name.
-        bank_name:
-          type: string
-          description: Bank name.
-        bank_account_number:
-          type: string
-          description: Bank account number (VAN).
-        bank_code_type:
-          type: string
-          description: Bank code type (e.g., ROUTING).
-        bank_identifier_code:
-          type: string
-          description: Bank identifier code (routing number).
-        bank_swift_code:
-          type: string
-          description: Bank SWIFT code (null for non-SWIFT rails like SPEI/SEPA).
-          nullable: true
-        tracking_reference:
-          type: string
-          description: Wire transfer tracking reference.
-          nullable: true
-        belongs_to:
-          description: Beneficiary business info (legal entity receiving the wire).
-          allOf:
-          - $ref: '#/components/schemas/BeneficiaryBusinessInfo'
-      required:
-      - id
-      - name
-      - bank_name
-      - bank_account_number
-      - bank_code_type
-      - bank_identifier_code
-      - belongs_to
-    RebalanceStepEstimatedOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/RebalanceStepEstimatedFromLeg'
-        to:
-          $ref: '#/components/schemas/RebalanceStepEstimatedToLeg'
-      description: Planned values for this step.
-      required:
-      - from
-      - to
-    ListWithdrawalsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Withdrawal'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
-    RebalanceActualToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DesiredOverlayRequest:
-      type: object
-      properties:
-        from:
-          description: Source side of the deposit.
-          allOf:
-          - $ref: '#/components/schemas/DesiredFromLeg'
-        to:
-          description: Destination side of the deposit.
-          allOf:
-          - $ref: '#/components/schemas/DesiredToLeg'
-      description: Caller's stated intent for the deposit.
-      required:
-      - from
-      - to
-    DepositEstimatedToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    WithdrawalStepEstimatedOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/WithdrawalStepEstimatedFromLeg'
-        to:
-          $ref: '#/components/schemas/WithdrawalStepEstimatedToLeg'
-      description: Planned values for this step.
-      required:
-      - from
-      - to
-    StepActualOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/StepActualFromLeg'
-        to:
-          $ref: '#/components/schemas/StepActualToLeg'
-      description: Settled values once the step reaches a terminal state. All-null until then.
-      required:
-      - from
-      - to
-    StatusReason:
-      type: object
-      properties:
-        error_code:
-          type: string
-          example: transfers-9201
-        error_message:
-          type: string
-          example: An upstream step failed, so this step was not executed
-      required:
-      - error_code
-      - error_message
-    RebalanceEstimatedFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DepositActualFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    DepositEstimatedOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/DepositEstimatedFromLeg'
-        to:
-          $ref: '#/components/schemas/DepositEstimatedToLeg'
-      description: Tesser's projection for how the deposit will proceed.
-      required:
-      - from
-      - to
-    WithdrawalDesiredFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Source account ID.
-        amount:
-          type: string
-          description: Source amount.
-          example: '1000.00'
-        currency:
-          type: string
-          description: Source currency code.
-          example: USDC
-        network:
-          type: string
-          description: Source blockchain network. Required when source is a self-custodial wallet.
-      description: Source side of the withdrawal.
-      required:
-      - account_id
-      - amount
-      - currency
-    ListRebalancesResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Rebalance'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
     RebalanceActualFromLeg:
       type: object
       properties:
@@ -4749,93 +3687,24 @@ components:
       - amount
       - currency
       - network
-    WithdrawalStepActualToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    StepEstimatedOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/StepEstimatedFromLeg'
-        to:
-          $ref: '#/components/schemas/StepEstimatedToLeg'
-      description: Planned values for this step.
-      required:
-      - from
-      - to
-    DepositInstructionsResponse:
+    RebalanceResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/DepositInstructionsData'
+          description: Rebalance data
+          allOf:
+          - $ref: '#/components/schemas/Rebalance'
       required:
       - data
-    RebalanceEstimatedOverlay:
+    TreasuryBalancesDataDto:
       type: object
       properties:
-        from:
-          $ref: '#/components/schemas/RebalanceEstimatedFromLeg'
-        to:
-          $ref: '#/components/schemas/RebalanceEstimatedToLeg'
-      description: Tesser's projection for how the rebalance will proceed.
+        balances:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyBalanceDto'
       required:
-      - from
-      - to
-    CurrencyBalanceDto:
-      type: object
-      properties:
-        currency:
-          type: string
-          description: Currency symbol
-          example: USDC
-        available:
-          type: string
-          description: Available balance from managed accounts (sum across all networks)
-          example: '250000000'
-        pendingReview:
-          type: string
-          description: Total payment amount pending review
-          example: '50000000'
-        rejected:
-          type: string
-          description: Total payment amount rejected
-          example: '20000000'
-      required:
-      - currency
-      - available
-      - pendingReview
-      - rejected
-    SignWithdrawalStepRequest:
-      type: object
-      properties:
-        signature:
-          type: string
-          minLength: 1
-          description: Base64-encoded JSON envelope `{ body, stamp }` where `body` is the JSON-encoded Turnkey ACTIVITY_TYPE_SIGN_TRANSACTION_V2 activity and `stamp` is the X-Stamp header value produced by stamping that body. Tesser forwards the envelope to Turnkey to obtain the signed transaction.
-      required:
-      - signature
+      - balances
     DepositStep:
       type: object
       properties:
@@ -4944,15 +3813,724 @@ components:
       - status
       - created_at
       - updated_at
-    TreasuryBalancesDataDto:
+    DepositActualToLeg:
       type: object
       properties:
-        balances:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WireInstructionsBankAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Account ID.
+        name:
+          type: string
+          description: Account name.
+        bank_name:
+          type: string
+          description: Bank name.
+        bank_account_number:
+          type: string
+          description: Bank account number (VAN).
+        bank_code_type:
+          type: string
+          description: Bank code type (e.g., ROUTING).
+        bank_identifier_code:
+          type: string
+          description: Bank identifier code (routing number).
+        bank_swift_code:
+          type: string
+          description: Bank SWIFT code (null for non-SWIFT rails like SPEI/SEPA).
+          nullable: true
+        tracking_reference:
+          type: string
+          description: Wire transfer tracking reference.
+          nullable: true
+        belongs_to:
+          description: Beneficiary business info (legal entity receiving the wire).
+          allOf:
+          - $ref: '#/components/schemas/BeneficiaryBusinessInfo'
+      required:
+      - id
+      - name
+      - bank_name
+      - bank_account_number
+      - bank_code_type
+      - bank_identifier_code
+      - belongs_to
+    RebalanceDesiredToLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source bank account ID.
+        amount:
+          type: string
+          description: Source amount.
+          example: '1000.00'
+        currency:
+          type: string
+          description: Source currency code.
+          example: USD
+      description: Source side of the deposit.
+      required:
+      - account_id
+      - amount
+      - currency
+    WithdrawalDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination bank account ID.
+        currency:
+          type: string
+          description: Destination currency code.
+          example: USD
+      description: Destination side of the withdrawal.
+      required:
+      - account_id
+      - currency
+    RebalanceEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/RebalanceEstimatedToLeg'
+      description: Tesser's projection for how the rebalance will proceed.
+      required:
+      - from
+      - to
+    RebalanceStepActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceDesiredFromLegResponse'
+        to:
+          $ref: '#/components/schemas/RebalanceDesiredToLegResponse'
+      description: Caller's stated intent at creation. Frozen, never overwritten.
+      required:
+      - from
+      - to
+    StepActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    CreateWithdrawalRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional client-supplied identifier.
+        desired:
+          description: Caller's stated intent for the withdrawal.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalDesiredOverlayRequest'
+      required:
+      - desired
+    CurrencyBalanceDto:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency symbol
+          example: USDC
+        available:
+          type: string
+          description: Available balance from managed accounts (sum across all networks)
+          example: '250000000'
+        pendingReview:
+          type: string
+          description: Total payment amount pending review
+          example: '50000000'
+        rejected:
+          type: string
+          description: Total payment amount rejected
+          example: '20000000'
+      required:
+      - currency
+      - available
+      - pendingReview
+      - rejected
+    WithdrawalDesiredFromLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    CreateDepositResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Deposit'
+      required:
+      - data
+    WithdrawalDesiredOverlayRequest:
+      type: object
+      properties:
+        from:
+          description: Source side of the withdrawal.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalDesiredFromLeg'
+        to:
+          description: Destination side of the withdrawal.
+          allOf:
+          - $ref: '#/components/schemas/WithdrawalDesiredToLeg'
+      description: Caller's stated intent for the withdrawal.
+      required:
+      - from
+      - to
+    WithdrawalActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalActualFromLeg'
+        to:
+          $ref: '#/components/schemas/WithdrawalActualToLeg'
+      description: What actually settled. Populated when the withdrawal reaches a terminal state.
+      required:
+      - from
+      - to
+    WithdrawalDesiredToLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StatusReason:
+      type: object
+      properties:
+        error_code:
+          type: string
+          example: transfers-9201
+        error_message:
+          type: string
+          example: An upstream step failed, so this step was not executed
+      required:
+      - error_code
+      - error_message
+    WithdrawalStepActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalStepActualFromLeg'
+        to:
+          $ref: '#/components/schemas/WithdrawalStepActualToLeg'
+      description: Settled values once the step reaches a terminal state. All-null until then.
+      required:
+      - from
+      - to
+    ListWithdrawalsResponse:
+      type: object
+      properties:
+        data:
           type: array
           items:
-            $ref: '#/components/schemas/CurrencyBalanceDto'
+            $ref: '#/components/schemas/Withdrawal'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
       required:
-      - balances
+      - data
+      - pagination
+    DepositInstructionsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/DepositInstructionsData'
+      required:
+      - data
+    WithdrawalStepEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StepActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StepEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/StepEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/StepEstimatedToLeg'
+      description: Planned values for this step.
+      required:
+      - from
+      - to
+    RebalanceStepActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositInstructionsData:
+      type: object
+      properties:
+        from_account:
+          description: Source account information (for reference).
+          allOf:
+          - $ref: '#/components/schemas/DepositBankAccount'
+        to_account:
+          description: Wire instructions for completing the deposit.
+          allOf:
+          - $ref: '#/components/schemas/WireInstructionsBankAccount'
+        amount:
+          type: string
+          description: Deposit amount.
+        currency:
+          type: string
+          description: Deposit currency.
+      required:
+      - from_account
+      - to_account
+      - amount
+      - currency
+    RebalanceActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceDesiredFromLegResponse:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    DepositActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/DepositActualFromLeg'
+        to:
+          $ref: '#/components/schemas/DepositActualToLeg'
+      description: What actually settled. Populated when the deposit reaches a terminal state.
+      required:
+      - from
+      - to
+    DesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination account ID.
+        currency:
+          type: string
+          description: Destination currency code.
+          example: USDC
+        network:
+          type: string
+          description: Destination blockchain network.
+      description: Destination side of the deposit.
+      required:
+      - account_id
+      - currency
+    ListDepositsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Deposit'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    DepositActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StepFee:
+      type: object
+      properties:
+        fee_amount:
+          type: string
+          description: Fee amount.
+        fee_currency:
+          type: string
+          description: Fee currency code.
+        fee_type:
+          type: string
+          description: Fee type (e.g., 'gas', 'provider').
+        fee_metadata:
+          type: object
+          description: Additional metadata for the fee (JSON object).
+          additionalProperties: true
+      required:
+      - fee_amount
+      - fee_currency
+      - fee_type
+    CreateDepositRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional client-supplied identifier.
+        desired:
+          description: Caller's stated intent for the deposit.
+          allOf:
+          - $ref: '#/components/schemas/DesiredOverlayRequest'
+      required:
+      - desired
+    RebalanceEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/WithdrawalDesiredFromLegResponse'
+        to:
+          $ref: '#/components/schemas/WithdrawalDesiredToLegResponse'
+      description: Caller's stated intent at creation. Frozen, never overwritten.
+      required:
+      - from
+      - to
+    WithdrawalResponse:
+      type: object
+      properties:
+        data:
+          description: Withdrawal data
+          allOf:
+          - $ref: '#/components/schemas/Withdrawal'
+      required:
+      - data
+    DepositDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/DepositDesiredFromLeg'
+        to:
+          $ref: '#/components/schemas/DepositDesiredToLeg'
+      description: Caller's stated intent at creation. Frozen, never overwritten.
+      required:
+      - from
+      - to
+    WithdrawalStepEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
     RebalanceStepEstimatedFromLeg:
       type: object
       properties:
@@ -4978,68 +4556,6 @@ components:
       - amount
       - currency
       - network
-    RebalanceStepActualOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/RebalanceStepActualFromLeg'
-        to:
-          $ref: '#/components/schemas/RebalanceStepActualToLeg'
-      description: Settled values once the step reaches a terminal state. All-null until then.
-      required:
-      - from
-      - to
-    DesiredFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Source bank account ID.
-        amount:
-          type: string
-          description: Source amount.
-          example: '1000.00'
-        currency:
-          type: string
-          description: Source currency code.
-          example: USD
-      description: Source side of the deposit.
-      required:
-      - account_id
-      - amount
-      - currency
-    BeneficiaryBusinessInfo:
-      type: object
-      properties:
-        business_legal_name:
-          type: string
-          description: Business legal name.
-        business_street_address1:
-          type: string
-          description: Street address line 1.
-          nullable: true
-        business_street_address2:
-          type: string
-          description: Street address line 2.
-          nullable: true
-        business_city:
-          type: string
-          description: City (null when address isn't structured).
-          nullable: true
-        business_state:
-          type: string
-          description: State (null when address isn't structured).
-          nullable: true
-        business_postal_code:
-          type: string
-          description: Postal code (null when address isn't structured).
-          nullable: true
-        business_country:
-          type: string
-          description: Country code (null when address isn't structured).
-          nullable: true
-      required:
-      - business_legal_name
     RebalanceDesiredToLeg:
       type: object
       properties:
@@ -5057,6 +4573,490 @@ components:
       required:
       - account_id
       - currency
+    Rebalance:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique rebalance identifier
+          example: e4a1b7c3-9f2d-4e56-a8b0-3c5d1e7f9a2b
+        workspace_id:
+          type: string
+          description: Workspace ID the rebalance belongs to
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          description: External reference ID for tracking
+          nullable: true
+          example: null
+        direction:
+          type: string
+          description: Resource direction.
+          enum:
+          - rebalance
+          example: rebalance
+        desired:
+          description: Caller's stated intent at creation. Frozen, never overwritten.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceDesiredOverlay'
+        estimated:
+          description: Tesser's projection for how the rebalance will proceed.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceEstimatedOverlay'
+        actual:
+          description: What actually settled. Populated when the rebalance reaches a terminal state.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceActualOverlay'
+        balance_status:
+          type: string
+          description: Balance reservation status.
+          nullable: true
+          enum:
+          - unreserved
+          - awaiting_funds
+          - reserved
+          example: null
+        balance_reserved_at:
+          type: string
+          description: Timestamp when balance was reserved.
+          format: date-time
+          nullable: true
+          example: null
+        steps:
+          description: Rebalance execution steps.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/RebalanceStep'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        expires_at:
+          type: string
+          description: ISO 8601 timestamp when the rebalance expires.
+          example: '2024-03-04T10:00:00.000Z'
+          nullable: true
+      required:
+      - id
+      - workspace_id
+      - direction
+      - desired
+      - estimated
+      - actual
+      - balance_status
+      - balance_reserved_at
+      - steps
+      - created_at
+      - updated_at
+      - expires_at
+    RebalanceStepActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceStepActualFromLeg'
+        to:
+          $ref: '#/components/schemas/RebalanceStepActualToLeg'
+      description: Settled values once the step reaches a terminal state. All-null until then.
+      required:
+      - from
+      - to
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
+    StepEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    ListRebalancesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rebalance'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    RebalanceStepEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceStepEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/RebalanceStepEstimatedToLeg'
+      description: Planned values for this step.
+      required:
+      - from
+      - to
+    DepositDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    SignWithdrawalStepRequest:
+      type: object
+      properties:
+        signature:
+          type: string
+          minLength: 1
+          description: Base64-encoded JSON envelope `{ body, stamp }` where `body` is the JSON-encoded Turnkey ACTIVITY_TYPE_SIGN_TRANSACTION_V2 activity and `stamp` is the X-Stamp header value produced by stamping that body. Tesser forwards the envelope to Turnkey to obtain the signed transaction.
+      required:
+      - signature
+    Deposit:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the deposit.
+          example: 1c8e4a6f-9b2d-4f53-a0e7-5d3c1b9f2a8e
+        workspace_id:
+          type: string
+          description: Workspace ID the deposit belongs to.
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          description: Optional external reference ID.
+          example: null
+          nullable: true
+        direction:
+          type: string
+          description: Resource direction.
+          enum:
+          - inbound
+          example: inbound
+        desired:
+          description: Caller's stated intent at creation. Frozen, never overwritten.
+          allOf:
+          - $ref: '#/components/schemas/DepositDesiredOverlay'
+        estimated:
+          description: Tesser's projection for how the deposit will proceed.
+          allOf:
+          - $ref: '#/components/schemas/DepositEstimatedOverlay'
+        actual:
+          description: What actually settled. Populated when the deposit reaches a terminal state.
+          allOf:
+          - $ref: '#/components/schemas/DepositActualOverlay'
+        steps:
+          description: Optional list of system-generated steps that make up this deposit route.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/DepositStep'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        expires_at:
+          type: string
+          description: ISO 8601 timestamp when the deposit expires, or null for auto-created deposits.
+          example: '2024-03-01T14:00:00.000Z'
+          nullable: true
+      required:
+      - id
+      - workspace_id
+      - direction
+      - desired
+      - estimated
+      - actual
+      - created_at
+      - updated_at
+    StepActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/StepActualFromLeg'
+        to:
+          $ref: '#/components/schemas/StepActualToLeg'
+      description: Settled values once the step reaches a terminal state. All-null until then.
+      required:
+      - from
+      - to
+    RebalanceDesiredOverlayRequest:
+      type: object
+      properties:
+        from:
+          description: Source side of the rebalance.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceDesiredFromLeg'
+        to:
+          description: Destination side of the rebalance.
+          allOf:
+          - $ref: '#/components/schemas/RebalanceDesiredToLeg'
+      description: Caller's stated intent for the rebalance.
+      required:
+      - from
+      - to
+    RebalanceDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source account ID.
+        amount:
+          type: string
+          description: Source amount.
+          example: '1000.00'
+        currency:
+          type: string
+          description: Source currency code.
+          example: USDC
+        network:
+          type: string
+          description: Source blockchain network.
+      description: Source side of the rebalance.
+      required:
+      - account_id
+      - amount
+      - currency
+    DepositEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/DepositEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/DepositEstimatedToLeg'
+      description: Tesser's projection for how the deposit will proceed.
+      required:
+      - from
+      - to
+    WithdrawalStepActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    StepEstimatedFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalActualFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    RebalanceActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/RebalanceActualFromLeg'
+        to:
+          $ref: '#/components/schemas/RebalanceActualToLeg'
+      description: What actually settled. Populated when the rebalance reaches a terminal state.
+      required:
+      - from
+      - to
+    RebalanceEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    WithdrawalActualToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
   securitySchemes:
     bearer:
       scheme: bearer

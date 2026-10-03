@@ -554,20 +554,18 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
-    CreateCounterpartyResponseDto:
+    CounterpartyListResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/CounterpartyData'
+          type: array
+          items:
+            $ref: '#/components/schemas/CounterpartyData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
       required:
       - data
-    CounterpartyResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CounterpartyData'
-      required:
-      - data
+      - pagination
     CreateCounterpartyRequestDto:
       type: object
       properties:
@@ -699,46 +697,6 @@ components:
           nullable: true
       required:
       - classification
-    CounterpartyListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/CounterpartyData'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: number
-          description: Current page number.
-        limit:
-          type: number
-          description: Number of items per page.
-        total:
-          type: number
-          description: Total number of items.
-        total_pages:
-          type: number
-          description: Total number of pages.
-        has_next:
-          type: boolean
-          description: Whether there is a next page.
-        has_prev:
-          type: boolean
-          description: Whether there is a previous page.
-      required:
-      - page
-      - limit
-      - total
-      - total_pages
-      - has_next
-      - has_prev
     CounterpartyData:
       type: object
       properties:
@@ -866,6 +824,48 @@ components:
       - classification
       - created_at
       - updated_at
+    CounterpartyResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CounterpartyData'
+      required:
+      - data
+    CreateCounterpartyResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CounterpartyData'
+      required:
+      - data
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
   securitySchemes:
     bearer:
       scheme: bearer
