@@ -492,32 +492,6 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
-    TenantListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TenantData'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
-    CreateTenantResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateTenantData'
-      required:
-      - data
-    CreateTenantData:
-      type: object
-      properties:
-        tenant:
-          $ref: '#/components/schemas/TenantData'
-      required:
-      - tenant
     TenantData:
       type: object
       properties:
@@ -597,11 +571,23 @@ components:
       - name
       - created_at
       - updated_at
-    TenantResponseDto:
+    TenantListResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/TenantData'
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    CreateTenantResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateTenantData'
       required:
       - data
     CreateTenantRequestDto:
@@ -671,6 +657,13 @@ components:
           example: '1234567890'
       required:
       - business_legal_name
+    CreateTenantData:
+      type: object
+      properties:
+        tenant:
+          $ref: '#/components/schemas/TenantData'
+      required:
+      - tenant
     Pagination:
       type: object
       properties:
@@ -699,6 +692,13 @@ components:
       - total_pages
       - has_next
       - has_prev
+    TenantResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TenantData'
+      required:
+      - data
   securitySchemes:
     bearer:
       scheme: bearer

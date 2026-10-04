@@ -554,6 +554,140 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
+    CounterpartyData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the counterparty
+          example: 550e8400-e29b-41d4-a716-446655440000
+        workspace_id:
+          type: string
+          description: Workspace ID the counterparty belongs to
+          example: 550e8400-e29b-41d4-a716-446655440001
+        classification:
+          type: string
+          description: 'Classification: individual (person) or business (company)'
+          enum:
+          - individual
+          - business
+          example: business
+        tenant_id:
+          type: string
+          nullable: true
+          description: Optional reference to a tenant entity this counterparty belongs to
+          example: 550e8400-e29b-41d4-a716-446655440002
+        individual_first_name:
+          type: string
+          nullable: true
+          description: First name (for individuals)
+          example: John
+        individual_last_name:
+          type: string
+          nullable: true
+          description: Last name (for individuals)
+          example: Doe
+        individual_address_country:
+          type: string
+          nullable: true
+          description: Country code in ISO 3166-1 format (for individuals)
+          example: US
+        individual_date_of_birth:
+          type: string
+          nullable: true
+          description: Date of birth (for individuals)
+          example: '1980-01-01'
+        individual_national_identification_number:
+          type: string
+          nullable: true
+          description: National identification number (for individuals)
+          example: '123456789'
+        individual_street_address1:
+          type: string
+          nullable: true
+          description: Street address line 1 (for individuals)
+          example: 123 Main St
+        individual_street_address2:
+          type: string
+          nullable: true
+          description: Street address line 2 (for individuals)
+          example: Apt 4B
+        individual_city:
+          type: string
+          nullable: true
+          description: City (for individuals)
+          example: New York
+        individual_state:
+          type: string
+          nullable: true
+          description: State/region (for individuals)
+          example: NY
+        individual_postal_code:
+          type: string
+          nullable: true
+          description: Postal code (for individuals)
+          example: '10001'
+        business_legal_name:
+          type: string
+          nullable: true
+          description: Legal business name (for businesses)
+          example: Acme Corporation
+        business_dba:
+          type: string
+          nullable: true
+          description: DBA - Doing Business As (for businesses)
+          example: Acme Co
+        business_address_country:
+          type: string
+          nullable: true
+          description: Country code in ISO 3166-1 format (for businesses)
+          example: US
+        business_street_address1:
+          type: string
+          nullable: true
+          description: Street address line 1 (for businesses)
+          example: 456 Corp Blvd
+        business_street_address2:
+          type: string
+          nullable: true
+          description: Street address line 2 (for businesses)
+          example: Suite 200
+        business_city:
+          type: string
+          nullable: true
+          description: City (for businesses)
+          example: San Francisco
+        business_state:
+          type: string
+          nullable: true
+          description: State/region (for businesses)
+          example: CA
+        business_legal_entity_identifier:
+          type: string
+          nullable: true
+          description: Legal Entity Identifier (for businesses)
+          example: '1234567890'
+        created_at:
+          type: string
+          description: Creation timestamp in ISO 8601 format
+          example: '2024-01-15T10:30:00.000Z'
+        updated_at:
+          type: string
+          description: Last update timestamp in ISO 8601 format
+          example: '2024-01-15T10:30:00.000Z'
+      required:
+      - id
+      - workspace_id
+      - classification
+      - created_at
+      - updated_at
+    CounterpartyResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CounterpartyData'
+      required:
+      - data
     CounterpartyListResponse:
       type: object
       properties:
@@ -697,140 +831,6 @@ components:
           nullable: true
       required:
       - classification
-    CounterpartyData:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier for the counterparty
-          example: 550e8400-e29b-41d4-a716-446655440000
-        workspace_id:
-          type: string
-          description: Workspace ID the counterparty belongs to
-          example: 550e8400-e29b-41d4-a716-446655440001
-        classification:
-          type: string
-          description: 'Classification: individual (person) or business (company)'
-          enum:
-          - individual
-          - business
-          example: business
-        tenant_id:
-          type: string
-          nullable: true
-          description: Optional reference to a tenant entity this counterparty belongs to
-          example: 550e8400-e29b-41d4-a716-446655440002
-        individual_first_name:
-          type: string
-          nullable: true
-          description: First name (for individuals)
-          example: John
-        individual_last_name:
-          type: string
-          nullable: true
-          description: Last name (for individuals)
-          example: Doe
-        individual_address_country:
-          type: string
-          nullable: true
-          description: Country code in ISO 3166-1 format (for individuals)
-          example: US
-        individual_date_of_birth:
-          type: string
-          nullable: true
-          description: Date of birth (for individuals)
-          example: '1980-01-01'
-        individual_national_identification_number:
-          type: string
-          nullable: true
-          description: National identification number (for individuals)
-          example: '123456789'
-        individual_street_address1:
-          type: string
-          nullable: true
-          description: Street address line 1 (for individuals)
-          example: 123 Main St
-        individual_street_address2:
-          type: string
-          nullable: true
-          description: Street address line 2 (for individuals)
-          example: Apt 4B
-        individual_city:
-          type: string
-          nullable: true
-          description: City (for individuals)
-          example: New York
-        individual_state:
-          type: string
-          nullable: true
-          description: State/region (for individuals)
-          example: NY
-        individual_postal_code:
-          type: string
-          nullable: true
-          description: Postal code (for individuals)
-          example: '10001'
-        business_legal_name:
-          type: string
-          nullable: true
-          description: Legal business name (for businesses)
-          example: Acme Corporation
-        business_dba:
-          type: string
-          nullable: true
-          description: DBA - Doing Business As (for businesses)
-          example: Acme Co
-        business_address_country:
-          type: string
-          nullable: true
-          description: Country code in ISO 3166-1 format (for businesses)
-          example: US
-        business_street_address1:
-          type: string
-          nullable: true
-          description: Street address line 1 (for businesses)
-          example: 456 Corp Blvd
-        business_street_address2:
-          type: string
-          nullable: true
-          description: Street address line 2 (for businesses)
-          example: Suite 200
-        business_city:
-          type: string
-          nullable: true
-          description: City (for businesses)
-          example: San Francisco
-        business_state:
-          type: string
-          nullable: true
-          description: State/region (for businesses)
-          example: CA
-        business_legal_entity_identifier:
-          type: string
-          nullable: true
-          description: Legal Entity Identifier (for businesses)
-          example: '1234567890'
-        created_at:
-          type: string
-          description: Creation timestamp in ISO 8601 format
-          example: '2024-01-15T10:30:00.000Z'
-        updated_at:
-          type: string
-          description: Last update timestamp in ISO 8601 format
-          example: '2024-01-15T10:30:00.000Z'
-      required:
-      - id
-      - workspace_id
-      - classification
-      - created_at
-      - updated_at
-    CounterpartyResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CounterpartyData'
-      required:
-      - data
     CreateCounterpartyResponseDto:
       type: object
       properties:

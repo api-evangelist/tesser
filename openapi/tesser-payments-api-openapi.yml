@@ -1202,14 +1202,99 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
-    ReviewPaymentRequest:
+    ListPaymentsResponse:
       type: object
       properties:
-        is_approved:
-          type: boolean
-          description: Approve (true) or reject (false) the payment.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
       required:
-      - is_approved
+      - data
+      - pagination
+    PaymentEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
+    PaymentStepEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentStepEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/PaymentStepEstimatedToLeg'
+      description: Planned values for this step.
+      required:
+      - from
+      - to
+    PaymentDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source account ID. May be omitted at POST and supplied later via PATCH (two-step PATCH flow).
+        amount:
+          type: string
+          description: Source amount. Exactly one of `desired.from.amount` or `desired.to.amount` must be supplied.
+          example: '10.00'
+        currency:
+          type: string
+          description: Source currency code.
+          example: USDC
+        network:
+          type: string
+          description: Source blockchain network. Required when `desired.from.currency` is a stablecoin.
+      description: Source side of the payment.
+      required:
+      - currency
+    PaymentStepEstimatedToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Account ID.
+          nullable: true
+        amount:
+          type: string
+          description: Amount.
+          nullable: true
+        currency:
+          type: string
+          description: Currency code.
+          nullable: true
+        network:
+          type: string
+          description: Blockchain network.
+          nullable: true
+      description: Destination side.
+      required:
+      - account_id
+      - amount
+      - currency
+      - network
     SignPaymentStepRequest:
       type: object
       properties:
@@ -1220,6 +1305,26 @@ components:
           example: <base64({body, stamp})>
       required:
       - signature
+    UpdatePaymentDesiredFromLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Source account ID.
+      description: Source side of the payment (account-only update).
+      required:
+      - account_id
+    PaymentStepActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentStepActualFromLeg'
+        to:
+          $ref: '#/components/schemas/PaymentStepActualToLeg'
+      description: 'Settled values once the step reaches `status: completed`. All-null until then; remains all-null on failure.'
+      required:
+      - from
+      - to
     PaymentTableEntity:
       type: object
       properties:
@@ -1253,7 +1358,286 @@ components:
       required:
       - id
       - classification
-    PaymentStepEstimatedToLeg:
+    PaymentActualOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentActualFromLeg'
+        to:
+          $ref: '#/components/schemas/PaymentActualToLeg'
+      description: 'What actually settled. Populated once at least one step has `status: completed`.'
+      required:
+      - from
+      - to
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique payment identifier
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+        workspace_id:
+          type: string
+          description: Workspace ID the payment belongs to
+          example: b53f6690-3242-4942-9907-885779632832
+        organization_reference_id:
+          type: string
+          description: External reference ID for tracking.
+          nullable: true
+          example: ref_123
+        direction:
+          type: string
+          description: Payment direction.
+          enum:
+          - inbound
+          - outbound
+          - rebalance
+          example: outbound
+        funding_account_id:
+          type: string
+          description: Funding account ID. Payment-only field. Top-level (not part of any overlay).
+          nullable: true
+          example: 2a8f4c1e-9b3d-4e56-b7a0-5c6d2e1f9b3a
+        desired:
+          description: Caller's stated intent at creation. Frozen except by the two-step PATCH flow which fills account IDs.
+          allOf:
+          - $ref: '#/components/schemas/PaymentDesiredOverlay'
+        estimated:
+          description: Tesser's projection for how the payment will proceed.
+          allOf:
+          - $ref: '#/components/schemas/PaymentEstimatedOverlay'
+        actual:
+          description: 'What actually settled. Populated once at least one step has `status: completed`.'
+          allOf:
+          - $ref: '#/components/schemas/PaymentActualOverlay'
+        risk_status:
+          type: string
+          description: Risk assessment status.
+          enum:
+          - unchecked
+          - awaiting_decision
+          - automatically_approved
+          - manually_approved
+          - automatically_rejected
+          - manually_rejected
+          example: unchecked
+        risk_status_reasons:
+          description: Reasons for risk status.
+          nullable: true
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskStatusReason'
+        risk_reviewed_by:
+          type: string
+          description: User ID who reviewed the risk.
+          nullable: true
+          example: null
+        risk_reviewed_at:
+          type: string
+          description: Timestamp when risk was reviewed.
+          format: date-time
+          nullable: true
+          example: null
+        balance_status:
+          type: string
+          description: Balance reservation status.
+          nullable: true
+          enum:
+          - unreserved
+          - awaiting_funds
+          - reserved
+          example: unreserved
+        balance_reserved_at:
+          type: string
+          description: Timestamp when balance was reserved.
+          format: date-time
+          nullable: true
+          example: null
+        steps:
+          description: Payment execution steps.
+          example: []
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentStep'
+        created_at:
+          type: string
+          description: ISO 8601 timestamp of creation.
+          example: '2024-03-01T10:00:00.000Z'
+        updated_at:
+          type: string
+          description: ISO 8601 timestamp of last update.
+          example: '2024-03-01T10:00:00.000Z'
+        expires_at:
+          type: string
+          description: ISO 8601 timestamp when the payment expires.
+          format: date-time
+          nullable: true
+          example: '2024-03-02T10:00:00.000Z'
+      required:
+      - id
+      - workspace_id
+      - direction
+      - funding_account_id
+      - desired
+      - estimated
+      - actual
+      - risk_status
+      - balance_status
+      - balance_reserved_at
+      - steps
+      - created_at
+      - updated_at
+      - expires_at
+    PaymentEstimatedOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentEstimatedFromLeg'
+        to:
+          $ref: '#/components/schemas/PaymentEstimatedToLeg'
+      description: Tesser's projection for how the payment will proceed.
+      required:
+      - from
+      - to
+    UpdatePaymentRequest:
+      type: object
+      properties:
+        organization_reference_id:
+          type: string
+          description: Optional external reference ID for tracking.
+        funding_account_id:
+          type: string
+          description: Funding account ID for the payment.
+        desired:
+          description: Account IDs to attach to the payment.
+          allOf:
+          - $ref: '#/components/schemas/UpdatePaymentDesiredOverlay'
+      required:
+      - funding_account_id
+      - desired
+    PaymentDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination account ID. May be omitted at POST and supplied later via PATCH (two-step PATCH flow).
+        amount:
+          type: string
+          description: Destination amount. Exactly one of `desired.from.amount` or `desired.to.amount` must be supplied.
+          example: '10.00'
+        currency:
+          type: string
+          description: Destination currency code.
+          example: USDC
+        network:
+          type: string
+          description: Destination blockchain network. Required for crypto-to-crypto payments.
+      description: Destination side of the payment.
+      required:
+      - currency
+    RiskStatusReason:
+      type: object
+      properties:
+        risk_status_reason_type:
+          type: string
+        risk_status_reason_category:
+          type: string
+        risk_status_reason_message:
+          type: string
+        risk_status_reason_severity:
+          type: string
+      required:
+      - risk_status_reason_type
+      - risk_status_reason_category
+      - risk_status_reason_message
+      - risk_status_reason_severity
+    StepFee:
+      type: object
+      properties:
+        fee_amount:
+          type: string
+          description: Fee amount.
+        fee_currency:
+          type: string
+          description: Fee currency code.
+        fee_type:
+          type: string
+          description: Fee type (e.g., 'gas', 'provider').
+        fee_metadata:
+          type: object
+          description: Additional metadata for the fee (JSON object).
+          additionalProperties: true
+      required:
+      - fee_amount
+      - fee_currency
+      - fee_type
+    UpdatePaymentDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/UpdatePaymentDesiredFromLeg'
+        to:
+          $ref: '#/components/schemas/UpdatePaymentDesiredToLeg'
+      description: Account-only update to the payment's desired overlay (two-step PATCH flow).
+      required:
+      - from
+      - to
+    UpdatePaymentDesiredToLeg:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Destination account ID.
+      description: Destination side of the payment (account-only update).
+      required:
+      - account_id
+    ReviewPaymentRequest:
+      type: object
+      properties:
+        is_approved:
+          type: boolean
+          description: Approve (true) or reject (false) the payment.
+      required:
+      - is_approved
+    SimulateInboundPaymentRequest:
+      type: object
+      properties:
+        to_account:
+          type: string
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          description: Managed account ID that should receive the simulated inbound.
+        mocked_risk_status:
+          type: string
+          enum:
+          - automatically_approved
+          - awaiting_decision
+          - automatically_rejected
+          description: The risk_status the screening verdict should be forced to.
+        network:
+          description: EVM testnet to send on. Defaults to BASE_SEPOLIA.
+          type: string
+          enum:
+          - BASE_SEPOLIA
+          - ETHEREUM_SEPOLIA
+          - POLYGON_AMOY
+      required:
+      - to_account
+      - mocked_risk_status
+    InternalPaymentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InternalPaymentFull'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    PaymentStepActualToLeg:
       type: object
       properties:
         account_id:
@@ -1278,31 +1662,51 @@ components:
       - amount
       - currency
       - network
-    PaymentDesiredFromLegResponse:
+    CreatePaymentRequest:
       type: object
       properties:
-        account_id:
+        organization_reference_id:
           type: string
-          description: Account ID.
-          nullable: true
-        amount:
+          description: Optional external reference ID for tracking.
+        funding_account_id:
           type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Source side.
+          description: Funding account ID. Optional at POST to support the two-step PATCH creation flow; required together with `desired.from.account_id` and `desired.to.account_id` once any of the three is supplied.
+        desired:
+          description: Caller's stated intent for the payment.
+          allOf:
+          - $ref: '#/components/schemas/PaymentDesiredOverlayRequest'
       required:
-      - account_id
-      - amount
-      - currency
-      - network
+      - desired
+    FundingAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Account unique identifier
+        name:
+          type: string
+          description: Account name
+        bank_name:
+          type: string
+          nullable: true
+        bank_identifier_code:
+          type: string
+          nullable: true
+        bank_swift_code:
+          type: string
+          nullable: true
+      required:
+      - id
+      - name
+    PaymentResponse:
+      type: object
+      properties:
+        data:
+          description: Payment data
+          allOf:
+          - $ref: '#/components/schemas/Payment'
+      required:
+      - data
     PaymentStepEstimatedFromLeg:
       type: object
       properties:
@@ -1328,32 +1732,111 @@ components:
       - amount
       - currency
       - network
-    PaymentStepActualFromLeg:
+    LegacyPaymentStep:
       type: object
       properties:
-        account_id:
+        id:
           type: string
-          description: Account ID.
-          nullable: true
-        amount:
+          example: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
+        payment_id:
           type: string
-          description: Amount.
-          nullable: true
-        currency:
+          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
+        step_sequence:
+          type: integer
+          example: 1
+        step_type:
           type: string
-          description: Currency code.
-          nullable: true
-        network:
+          enum:
+          - transfer
+          - swap
+          example: transfer
+        from_account_id:
           type: string
-          description: Blockchain network.
           nullable: true
-      description: Source side.
+        from_amount:
+          type: string
+          example: '1000000'
+        from_network:
+          type: string
+          nullable: true
+        from_currency:
+          type: string
+          example: USDC
+        to_account_id:
+          type: string
+          nullable: true
+        to_amount:
+          type: string
+          example: '999000'
+        to_network:
+          type: string
+          nullable: true
+        to_currency:
+          type: string
+          example: USDC
+        transaction_hash:
+          type: string
+          nullable: true
+        fees:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegacyPaymentFee'
+        provider_key:
+          type: string
+          nullable: true
+          enum:
+          - circle_mint
+          - turnkey
+        status:
+          type: string
+          enum:
+          - created
+          - signature_requested
+          - signed
+          - submitted
+          - confirmed
+          - completed
+          - failed
+        status_reasons:
+          nullable: true
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusReason'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        submitted_at:
+          type: string
+          format: date-time
+          nullable: true
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+        failed_at:
+          type: string
+          format: date-time
+          nullable: true
       required:
-      - account_id
-      - amount
-      - currency
-      - network
-    PaymentDesiredToLegResponse:
+      - id
+      - payment_id
+      - step_sequence
+      - step_type
+      - from_amount
+      - from_currency
+      - to_amount
+      - to_currency
+      - status
+      - created_at
+      - updated_at
+    PaymentActualToLeg:
       type: object
       properties:
         account_id:
@@ -1378,36 +1861,6 @@ components:
       - amount
       - currency
       - network
-    LegacyPaymentFee:
-      type: object
-      properties:
-        fee_amount:
-          type: string
-          example: '1000'
-        fee_currency:
-          type: string
-          example: USDC
-        fee_type:
-          type: string
-          example: gas
-        fee_metadata:
-          type: object
-          nullable: true
-          additionalProperties: true
-          example: {}
-      required:
-      - fee_amount
-      - fee_currency
-      - fee_type
-    PaymentResponse:
-      type: object
-      properties:
-        data:
-          description: Payment data
-          allOf:
-          - $ref: '#/components/schemas/Payment'
-      required:
-      - data
     PaymentStep:
       type: object
       properties:
@@ -1526,7 +1979,7 @@ components:
       - status
       - created_at
       - updated_at
-    PaymentActualToLeg:
+    PaymentDesiredToLegResponse:
       type: object
       properties:
         account_id:
@@ -1551,45 +2004,6 @@ components:
       - amount
       - currency
       - network
-    PaymentDesiredOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/PaymentDesiredFromLegResponse'
-        to:
-          $ref: '#/components/schemas/PaymentDesiredToLegResponse'
-      description: Caller's stated intent at creation. Frozen except by the two-step PATCH flow which fills account IDs.
-      required:
-      - from
-      - to
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: number
-          description: Current page number.
-        limit:
-          type: number
-          description: Number of items per page.
-        total:
-          type: number
-          description: Total number of items.
-        total_pages:
-          type: number
-          description: Total number of pages.
-        has_next:
-          type: boolean
-          description: Whether there is a next page.
-        has_prev:
-          type: boolean
-          description: Whether there is a previous page.
-      required:
-      - page
-      - limit
-      - total
-      - total_pages
-      - has_next
-      - has_prev
     PaymentDesiredOverlayRequest:
       type: object
       properties:
@@ -1602,17 +2016,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/PaymentDesiredToLeg'
       description: Caller's stated intent for the payment.
-      required:
-      - from
-      - to
-    PaymentActualOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/PaymentActualFromLeg'
-        to:
-          $ref: '#/components/schemas/PaymentActualToLeg'
-      description: 'What actually settled. Populated once at least one step has `status: completed`.'
       required:
       - from
       - to
@@ -1748,206 +2151,7 @@ components:
       - updated_at
       - expires_at
       - status
-    InternalPaymentListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/InternalPaymentFull'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
-    RiskStatusReason:
-      type: object
-      properties:
-        risk_status_reason_type:
-          type: string
-        risk_status_reason_category:
-          type: string
-        risk_status_reason_message:
-          type: string
-        risk_status_reason_severity:
-          type: string
-      required:
-      - risk_status_reason_type
-      - risk_status_reason_category
-      - risk_status_reason_message
-      - risk_status_reason_severity
-    PaymentStepEstimatedOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/PaymentStepEstimatedFromLeg'
-        to:
-          $ref: '#/components/schemas/PaymentStepEstimatedToLeg'
-      description: Planned values for this step.
-      required:
-      - from
-      - to
-    PaymentEstimatedOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/PaymentEstimatedFromLeg'
-        to:
-          $ref: '#/components/schemas/PaymentEstimatedToLeg'
-      description: Tesser's projection for how the payment will proceed.
-      required:
-      - from
-      - to
-    UpdatePaymentDesiredToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Destination account ID.
-      description: Destination side of the payment (account-only update).
-      required:
-      - account_id
-    Payment:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique payment identifier
-          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
-        workspace_id:
-          type: string
-          description: Workspace ID the payment belongs to
-          example: b53f6690-3242-4942-9907-885779632832
-        organization_reference_id:
-          type: string
-          description: External reference ID for tracking.
-          nullable: true
-          example: ref_123
-        direction:
-          type: string
-          description: Payment direction.
-          enum:
-          - inbound
-          - outbound
-          - rebalance
-          example: outbound
-        funding_account_id:
-          type: string
-          description: Funding account ID. Payment-only field. Top-level (not part of any overlay).
-          nullable: true
-          example: 2a8f4c1e-9b3d-4e56-b7a0-5c6d2e1f9b3a
-        desired:
-          description: Caller's stated intent at creation. Frozen except by the two-step PATCH flow which fills account IDs.
-          allOf:
-          - $ref: '#/components/schemas/PaymentDesiredOverlay'
-        estimated:
-          description: Tesser's projection for how the payment will proceed.
-          allOf:
-          - $ref: '#/components/schemas/PaymentEstimatedOverlay'
-        actual:
-          description: 'What actually settled. Populated once at least one step has `status: completed`.'
-          allOf:
-          - $ref: '#/components/schemas/PaymentActualOverlay'
-        risk_status:
-          type: string
-          description: Risk assessment status.
-          enum:
-          - unchecked
-          - awaiting_decision
-          - automatically_approved
-          - manually_approved
-          - automatically_rejected
-          - manually_rejected
-          example: unchecked
-        risk_status_reasons:
-          description: Reasons for risk status.
-          nullable: true
-          example: []
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskStatusReason'
-        risk_reviewed_by:
-          type: string
-          description: User ID who reviewed the risk.
-          nullable: true
-          example: null
-        risk_reviewed_at:
-          type: string
-          description: Timestamp when risk was reviewed.
-          format: date-time
-          nullable: true
-          example: null
-        balance_status:
-          type: string
-          description: Balance reservation status.
-          nullable: true
-          enum:
-          - unreserved
-          - awaiting_funds
-          - reserved
-          example: unreserved
-        balance_reserved_at:
-          type: string
-          description: Timestamp when balance was reserved.
-          format: date-time
-          nullable: true
-          example: null
-        steps:
-          description: Payment execution steps.
-          example: []
-          type: array
-          items:
-            $ref: '#/components/schemas/PaymentStep'
-        created_at:
-          type: string
-          description: ISO 8601 timestamp of creation.
-          example: '2024-03-01T10:00:00.000Z'
-        updated_at:
-          type: string
-          description: ISO 8601 timestamp of last update.
-          example: '2024-03-01T10:00:00.000Z'
-        expires_at:
-          type: string
-          description: ISO 8601 timestamp when the payment expires.
-          format: date-time
-          nullable: true
-          example: '2024-03-02T10:00:00.000Z'
-      required:
-      - id
-      - workspace_id
-      - direction
-      - funding_account_id
-      - desired
-      - estimated
-      - actual
-      - risk_status
-      - balance_status
-      - balance_reserved_at
-      - steps
-      - created_at
-      - updated_at
-      - expires_at
-    StepFee:
-      type: object
-      properties:
-        fee_amount:
-          type: string
-          description: Fee amount.
-        fee_currency:
-          type: string
-          description: Fee currency code.
-        fee_type:
-          type: string
-          description: Fee type (e.g., 'gas', 'provider').
-        fee_metadata:
-          type: object
-          description: Additional metadata for the fee (JSON object).
-          additionalProperties: true
-      required:
-      - fee_amount
-      - fee_currency
-      - fee_type
-    PaymentStepActualToLeg:
+    PaymentDesiredFromLegResponse:
       type: object
       properties:
         account_id:
@@ -1966,216 +2170,12 @@ components:
           type: string
           description: Blockchain network.
           nullable: true
-      description: Destination side.
+      description: Source side.
       required:
       - account_id
       - amount
       - currency
       - network
-    UpdatePaymentRequest:
-      type: object
-      properties:
-        organization_reference_id:
-          type: string
-          description: Optional external reference ID for tracking.
-        funding_account_id:
-          type: string
-          description: Funding account ID for the payment.
-        desired:
-          description: Account IDs to attach to the payment.
-          allOf:
-          - $ref: '#/components/schemas/UpdatePaymentDesiredOverlay'
-      required:
-      - funding_account_id
-      - desired
-    SimulateInboundPaymentRequest:
-      type: object
-      properties:
-        to_account:
-          type: string
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          description: Managed account ID that should receive the simulated inbound.
-        mocked_risk_status:
-          type: string
-          enum:
-          - automatically_approved
-          - awaiting_decision
-          - automatically_rejected
-          description: The risk_status the screening verdict should be forced to.
-        network:
-          description: EVM testnet to send on. Defaults to BASE_SEPOLIA.
-          type: string
-          enum:
-          - BASE_SEPOLIA
-          - ETHEREUM_SEPOLIA
-          - POLYGON_AMOY
-      required:
-      - to_account
-      - mocked_risk_status
-    FundingAccount:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Account unique identifier
-        name:
-          type: string
-          description: Account name
-        bank_name:
-          type: string
-          nullable: true
-        bank_identifier_code:
-          type: string
-          nullable: true
-        bank_swift_code:
-          type: string
-          nullable: true
-      required:
-      - id
-      - name
-    LegacyPaymentStep:
-      type: object
-      properties:
-        id:
-          type: string
-          example: 4f7c1a9e-2b3d-4e85-b0a6-8d5c2e1f3b9a
-        payment_id:
-          type: string
-          example: 5a9c3e7f-2b1d-4f48-a6e0-8c4b2d1f9a3e
-        step_sequence:
-          type: integer
-          example: 1
-        step_type:
-          type: string
-          enum:
-          - transfer
-          - swap
-          example: transfer
-        from_account_id:
-          type: string
-          nullable: true
-        from_amount:
-          type: string
-          example: '1000000'
-        from_network:
-          type: string
-          nullable: true
-        from_currency:
-          type: string
-          example: USDC
-        to_account_id:
-          type: string
-          nullable: true
-        to_amount:
-          type: string
-          example: '999000'
-        to_network:
-          type: string
-          nullable: true
-        to_currency:
-          type: string
-          example: USDC
-        transaction_hash:
-          type: string
-          nullable: true
-        fees:
-          type: array
-          items:
-            $ref: '#/components/schemas/LegacyPaymentFee'
-        provider_key:
-          type: string
-          nullable: true
-          enum:
-          - circle_mint
-          - turnkey
-        status:
-          type: string
-          enum:
-          - created
-          - signature_requested
-          - signed
-          - submitted
-          - confirmed
-          - completed
-          - failed
-        status_reasons:
-          nullable: true
-          type: array
-          items:
-            $ref: '#/components/schemas/StatusReason'
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        submitted_at:
-          type: string
-          format: date-time
-          nullable: true
-        confirmed_at:
-          type: string
-          format: date-time
-          nullable: true
-        completed_at:
-          type: string
-          format: date-time
-          nullable: true
-        failed_at:
-          type: string
-          format: date-time
-          nullable: true
-      required:
-      - id
-      - payment_id
-      - step_sequence
-      - step_type
-      - from_amount
-      - from_currency
-      - to_amount
-      - to_currency
-      - status
-      - created_at
-      - updated_at
-    PaymentStepActualOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/PaymentStepActualFromLeg'
-        to:
-          $ref: '#/components/schemas/PaymentStepActualToLeg'
-      description: 'Settled values once the step reaches `status: completed`. All-null until then; remains all-null on failure.'
-      required:
-      - from
-      - to
-    ListPaymentsResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Payment'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
-    CreatePaymentRequest:
-      type: object
-      properties:
-        organization_reference_id:
-          type: string
-          description: Optional external reference ID for tracking.
-        funding_account_id:
-          type: string
-          description: Funding account ID. Optional at POST to support the two-step PATCH creation flow; required together with `desired.from.account_id` and `desired.to.account_id` once any of the three is supplied.
-        desired:
-          description: Caller's stated intent for the payment.
-          allOf:
-          - $ref: '#/components/schemas/PaymentDesiredOverlayRequest'
-      required:
-      - desired
     StatusReason:
       type: object
       properties:
@@ -2188,6 +2188,17 @@ components:
       required:
       - error_code
       - error_message
+    PaymentDesiredOverlay:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/PaymentDesiredFromLegResponse'
+        to:
+          $ref: '#/components/schemas/PaymentDesiredToLegResponse'
+      description: Caller's stated intent at creation. Frozen except by the two-step PATCH flow which fills account IDs.
+      required:
+      - from
+      - to
     PaymentEstimatedFromLeg:
       type: object
       properties:
@@ -2213,71 +2224,6 @@ components:
       - amount
       - currency
       - network
-    UpdatePaymentDesiredFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Source account ID.
-      description: Source side of the payment (account-only update).
-      required:
-      - account_id
-    PaymentDesiredFromLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Source account ID. May be omitted at POST and supplied later via PATCH (two-step PATCH flow).
-        amount:
-          type: string
-          description: Source amount. Exactly one of `desired.from.amount` or `desired.to.amount` must be supplied.
-          example: '10.00'
-        currency:
-          type: string
-          description: Source currency code.
-          example: USDC
-        network:
-          type: string
-          description: Source blockchain network. Required when `desired.from.currency` is a stablecoin.
-      description: Source side of the payment.
-      required:
-      - currency
-    PaymentEstimatedToLeg:
-      type: object
-      properties:
-        account_id:
-          type: string
-          description: Account ID.
-          nullable: true
-        amount:
-          type: string
-          description: Amount.
-          nullable: true
-        currency:
-          type: string
-          description: Currency code.
-          nullable: true
-        network:
-          type: string
-          description: Blockchain network.
-          nullable: true
-      description: Destination side.
-      required:
-      - account_id
-      - amount
-      - currency
-      - network
-    UpdatePaymentDesiredOverlay:
-      type: object
-      properties:
-        from:
-          $ref: '#/components/schemas/UpdatePaymentDesiredFromLeg'
-        to:
-          $ref: '#/components/schemas/UpdatePaymentDesiredToLeg'
-      description: Account-only update to the payment's desired overlay (two-step PATCH flow).
-      required:
-      - from
-      - to
     PaymentActualFromLeg:
       type: object
       properties:
@@ -2303,26 +2249,80 @@ components:
       - amount
       - currency
       - network
-    PaymentDesiredToLeg:
+    PaymentStepActualFromLeg:
       type: object
       properties:
         account_id:
           type: string
-          description: Destination account ID. May be omitted at POST and supplied later via PATCH (two-step PATCH flow).
+          description: Account ID.
+          nullable: true
         amount:
           type: string
-          description: Destination amount. Exactly one of `desired.from.amount` or `desired.to.amount` must be supplied.
-          example: '10.00'
+          description: Amount.
+          nullable: true
         currency:
           type: string
-          description: Destination currency code.
-          example: USDC
+          description: Currency code.
+          nullable: true
         network:
           type: string
-          description: Destination blockchain network. Required for crypto-to-crypto payments.
-      description: Destination side of the payment.
+          description: Blockchain network.
+          nullable: true
+      description: Source side.
       required:
+      - account_id
+      - amount
       - currency
+      - network
+    LegacyPaymentFee:
+      type: object
+      properties:
+        fee_amount:
+          type: string
+          example: '1000'
+        fee_currency:
+          type: string
+          example: USDC
+        fee_type:
+          type: string
+          example: gas
+        fee_metadata:
+          type: object
+          nullable: true
+          additionalProperties: true
+          example: {}
+      required:
+      - fee_amount
+      - fee_currency
+      - fee_type
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
   securitySchemes:
     bearer:
       scheme: bearer

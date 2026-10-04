@@ -1025,6 +1025,159 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
+    AccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AccountData'
+      required:
+      - data
+    CreateBankAccountRequestDto:
+      type: object
+      properties:
+        tenant_id:
+          description: Tenant ID (mutually exclusive with counterparty_id). Links this account to a specific tenant.
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        counterparty_id:
+          description: Counterparty ID (mutually exclusive with tenant_id). Links this account to a specific counterparty.
+          example: 660e8400-e29b-41d4-a716-446655440003
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        name:
+          type: string
+          minLength: 1
+          description: Human-readable name for the bank account
+          example: Operating Account - EU
+          maxLength: 255
+        bank_name:
+          type: string
+          minLength: 1
+          description: Name of the financial institution
+          example: Chase Bank
+          maxLength: 255
+        bank_code_type:
+          type: string
+          minLength: 1
+          description: Type of bank code (e.g., SWIFT, BIC, IBAN, ROUTING, SORT_CODE)
+          example: SWIFT
+          maxLength: 50
+        bank_identifier_code:
+          type: string
+          minLength: 1
+          description: Bank identifier code value
+          example: CHASUS33
+          maxLength: 255
+        bank_swift_code:
+          description: SWIFT code
+          example: CHASUS33XXX
+          type: string
+          minLength: 1
+          nullable: true
+        bank_account_number:
+          type: string
+          minLength: 1
+          description: 'Bank account number. SECURE FIELD: Encrypted and stored in vault, never returned in responses. Required in API request.'
+          example: '1234567890'
+          maxLength: 255
+      required:
+      - name
+      - bank_name
+      - bank_code_type
+      - bank_identifier_code
+      - bank_account_number
+    AccountAssetDto:
+      type: object
+      properties:
+        currency:
+          type: string
+          description: Currency symbol
+          example: USDC
+        network:
+          type: string
+          description: Blockchain network (only for wallet accounts)
+          example: POLYGON
+        available_balance:
+          type: string
+          description: Available balance in smallest unit
+          example: '1000000'
+      required:
+      - currency
+      - available_balance
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: number
+          description: Current page number.
+        limit:
+          type: number
+          description: Number of items per page.
+        total:
+          type: number
+          description: Total number of items.
+        total_pages:
+          type: number
+          description: Total number of pages.
+        has_next:
+          type: boolean
+          description: Whether there is a next page.
+        has_prev:
+          type: boolean
+          description: Whether there is a previous page.
+      required:
+      - page
+      - limit
+      - total
+      - total_pages
+      - has_next
+      - has_prev
+    CreateWalletAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/WalletAccountData'
+      required:
+      - data
+    CreateLedgerAccountRequestDto:
+      type: object
+      properties:
+        tenant_id:
+          description: Tenant ID (mutually exclusive with counterparty_id). Links this ledger account to a specific tenant.
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        counterparty_id:
+          description: Counterparty ID (mutually exclusive with tenant_id). Links this ledger account to a specific counterparty.
+          example: 660e8400-e29b-41d4-a716-446655440003
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        name:
+          type: string
+          minLength: 1
+          description: Human-readable name for the ledger account
+          example: Circle USDC Account
+          maxLength: 255
+        provider:
+          type: string
+          enum:
+          - CIRCLE_MINT
+          - KRAKEN
+          - OPENFX
+          description: Liquidity provider that manages this ledger account. CIRCLE_MINT for Circle Mint accounts, KRAKEN for Kraken exchange accounts.
+          example: CIRCLE_MINT
+      required:
+      - name
+      - provider
     AccountData:
       type: object
       properties:
@@ -1102,87 +1255,6 @@ components:
       - name
       - created_at
       - updated_at
-    CreateWalletAccountRequestDto:
-      type: object
-      properties:
-        tenant_id:
-          description: Tenant ID (mutually exclusive with counterparty_id). Links this wallet to a specific tenant.
-          example: 550e8400-e29b-41d4-a716-446655440002
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          type: string
-        counterparty_id:
-          description: Counterparty ID (mutually exclusive with tenant_id). Links this wallet to a specific counterparty.
-          example: 660e8400-e29b-41d4-a716-446655440003
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          type: string
-        name:
-          type: string
-          minLength: 1
-          description: Human-readable name for the wallet account
-          example: Treasury Wallet - Ethereum
-          maxLength: 255
-        type:
-          type: string
-          enum:
-          - stablecoin_ethereum
-          - stablecoin_solana
-          - stablecoin_stellar
-          description: Stablecoin network type. Determines which blockchain network the wallet operates on.
-          example: stablecoin_ethereum
-        signature:
-          type: string
-          description: A cryptographic stamp used to verify the integrity and authenticity of the request. This ensures the request was signed by an authorized key. Required for managed wallets (is_managed=true). See Documentation > Signing for more details.
-          example: eyJwdWJsaWNLZXkiOiJwdWJfZXhhbXBsZSIsInNpZ25hdHVyZSI6InNpZ19leGFtcGxlIiwic2NoZW1lIjoiRUQyNTUxOSJ9
-        is_managed:
-          default: false
-          type: boolean
-          description: Whether this is a managed wallet (provisioned by Tesser), or unmanaged (not provisioned by Tesser). Managed wallets (true) require a signature and automatically create USDC/USDT assets. Unmanaged wallets (false) require a wallet_address. Defaults to false.
-          example: false
-        wallet_address:
-          type: string
-          description: Blockchain wallet address. Required for unmanaged wallets (is_managed=false). Auto-generated for managed wallets.
-          example: '0x742d35CC6634C0532925a3B844BC9e7595f8fe0B'
-      required:
-      - name
-      - type
-    CreateLedgerAccountRequestDto:
-      type: object
-      properties:
-        tenant_id:
-          description: Tenant ID (mutually exclusive with counterparty_id). Links this ledger account to a specific tenant.
-          example: 550e8400-e29b-41d4-a716-446655440002
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          type: string
-        counterparty_id:
-          description: Counterparty ID (mutually exclusive with tenant_id). Links this ledger account to a specific counterparty.
-          example: 660e8400-e29b-41d4-a716-446655440003
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          type: string
-        name:
-          type: string
-          minLength: 1
-          description: Human-readable name for the ledger account
-          example: Circle USDC Account
-          maxLength: 255
-        provider:
-          type: string
-          enum:
-          - CIRCLE_MINT
-          - KRAKEN
-          - OPENFX
-          description: Liquidity provider that manages this ledger account. CIRCLE_MINT for Circle Mint accounts, KRAKEN for Kraken exchange accounts.
-          example: CIRCLE_MINT
-      required:
-      - name
-      - provider
     UpdateAccountRequestDto:
       type: object
       properties:
@@ -1209,6 +1281,13 @@ components:
       - currency
       - network
       - available_balance
+    CreateBankAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/BankAccountData'
+      required:
+      - data
     LedgerAccountData:
       type: object
       properties:
@@ -1258,24 +1337,6 @@ components:
       - created_at
       - updated_at
       - provider
-    AccountAssetDto:
-      type: object
-      properties:
-        currency:
-          type: string
-          description: Currency symbol
-          example: USDC
-        network:
-          type: string
-          description: Blockchain network (only for wallet accounts)
-          example: POLYGON
-        available_balance:
-          type: string
-          description: Available balance in smallest unit
-          example: '1000000'
-      required:
-      - currency
-      - available_balance
     WalletAccountData:
       type: object
       properties:
@@ -1325,41 +1386,6 @@ components:
       - updated_at
       - crypto_wallet_address
       - is_managed
-    UpdateAccountResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AccountData'
-      required:
-      - data
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: number
-          description: Current page number.
-        limit:
-          type: number
-          description: Number of items per page.
-        total:
-          type: number
-          description: Total number of items.
-        total_pages:
-          type: number
-          description: Total number of pages.
-        has_next:
-          type: boolean
-          description: Whether there is a next page.
-        has_prev:
-          type: boolean
-          description: Whether there is a previous page.
-      required:
-      - page
-      - limit
-      - total
-      - total_pages
-      - has_next
-      - has_prev
     BankAccountData:
       type: object
       properties:
@@ -1416,39 +1442,53 @@ components:
       - bank_name
       - bank_code_type
       - bank_identifier_code
-    AccountListResponse:
+    CreateWalletAccountRequestDto:
       type: object
       properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/AccountData'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
+        tenant_id:
+          description: Tenant ID (mutually exclusive with counterparty_id). Links this wallet to a specific tenant.
+          example: 550e8400-e29b-41d4-a716-446655440002
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        counterparty_id:
+          description: Counterparty ID (mutually exclusive with tenant_id). Links this wallet to a specific counterparty.
+          example: 660e8400-e29b-41d4-a716-446655440003
+          nullable: true
+          format: uuid
+          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
+          type: string
+        name:
+          type: string
+          minLength: 1
+          description: Human-readable name for the wallet account
+          example: Treasury Wallet - Ethereum
+          maxLength: 255
+        type:
+          type: string
+          enum:
+          - stablecoin_ethereum
+          - stablecoin_solana
+          - stablecoin_stellar
+          description: Stablecoin network type. Determines which blockchain network the wallet operates on.
+          example: stablecoin_ethereum
+        signature:
+          type: string
+          description: A cryptographic stamp used to verify the integrity and authenticity of the request. This ensures the request was signed by an authorized key. Required for managed wallets (is_managed=true). See Documentation > Signing for more details.
+          example: eyJwdWJsaWNLZXkiOiJwdWJfZXhhbXBsZSIsInNpZ25hdHVyZSI6InNpZ19leGFtcGxlIiwic2NoZW1lIjoiRUQyNTUxOSJ9
+        is_managed:
+          default: false
+          type: boolean
+          description: Whether this is a managed wallet (provisioned by Tesser), or unmanaged (not provisioned by Tesser). Managed wallets (true) require a signature and automatically create USDC/USDT assets. Unmanaged wallets (false) require a wallet_address. Defaults to false.
+          example: false
+        wallet_address:
+          type: string
+          description: Blockchain wallet address. Required for unmanaged wallets (is_managed=false). Auto-generated for managed wallets.
+          example: '0x742d35CC6634C0532925a3B844BC9e7595f8fe0B'
       required:
-      - data
-      - pagination
-    AccountResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/AccountData'
-      required:
-      - data
-    CreateBankAccountResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/BankAccountData'
-      required:
-      - data
-    CreateLedgerAccountResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/LedgerAccountData'
-      required:
-      - data
+      - name
+      - type
     LedgerAssetDto:
       type: object
       properties:
@@ -1463,70 +1503,30 @@ components:
       required:
       - currency
       - available_balance
-    CreateBankAccountRequestDto:
-      type: object
-      properties:
-        tenant_id:
-          description: Tenant ID (mutually exclusive with counterparty_id). Links this account to a specific tenant.
-          example: 550e8400-e29b-41d4-a716-446655440002
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          type: string
-        counterparty_id:
-          description: Counterparty ID (mutually exclusive with tenant_id). Links this account to a specific counterparty.
-          example: 660e8400-e29b-41d4-a716-446655440003
-          nullable: true
-          format: uuid
-          pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$
-          type: string
-        name:
-          type: string
-          minLength: 1
-          description: Human-readable name for the bank account
-          example: Operating Account - EU
-          maxLength: 255
-        bank_name:
-          type: string
-          minLength: 1
-          description: Name of the financial institution
-          example: Chase Bank
-          maxLength: 255
-        bank_code_type:
-          type: string
-          minLength: 1
-          description: Type of bank code (e.g., SWIFT, BIC, IBAN, ROUTING, SORT_CODE)
-          example: SWIFT
-          maxLength: 50
-        bank_identifier_code:
-          type: string
-          minLength: 1
-          description: Bank identifier code value
-          example: CHASUS33
-          maxLength: 255
-        bank_swift_code:
-          description: SWIFT code
-          example: CHASUS33XXX
-          type: string
-          minLength: 1
-          nullable: true
-        bank_account_number:
-          type: string
-          minLength: 1
-          description: 'Bank account number. SECURE FIELD: Encrypted and stored in vault, never returned in responses. Required in API request.'
-          example: '1234567890'
-          maxLength: 255
-      required:
-      - name
-      - bank_name
-      - bank_code_type
-      - bank_identifier_code
-      - bank_account_number
-    CreateWalletAccountResponseDto:
+    AccountListResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/WalletAccountData'
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+    UpdateAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/AccountData'
+      required:
+      - data
+    CreateLedgerAccountResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/LedgerAccountData'
       required:
       - data
   securitySchemes:
