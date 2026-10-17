@@ -492,6 +492,87 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
+    TenantResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TenantData'
+      required:
+      - data
+    CreateTenantRequestDto:
+      type: object
+      properties:
+        business_legal_name:
+          type: string
+          description: Legal business name (required)
+          example: Acme Corporation
+          minLength: 1
+          maxLength: 255
+        business_dba:
+          type: string
+          nullable: true
+          description: DBA - Doing Business As name
+          example: Acme Co
+          maxLength: 255
+        business_address_country:
+          type: string
+          nullable: true
+          description: Country code in ISO 3166-1 alpha-2 or alpha-3 format
+          example: US
+          minLength: 2
+          maxLength: 3
+          pattern: ^[A-Za-z]{2,3}$
+        webhook_url:
+          type: string
+          nullable: true
+          description: Webhook URL for payment creation notifications
+          example: https://your-api.com/webhooks/tesser
+          format: uri
+        business_street_address1:
+          type: string
+          nullable: true
+          description: Street address line 1
+          maxLength: 255
+          example: 456 Corp Blvd
+        business_street_address2:
+          type: string
+          nullable: true
+          description: Street address line 2
+          maxLength: 255
+          example: Suite 200
+        business_city:
+          type: string
+          nullable: true
+          description: City
+          maxLength: 255
+          example: San Francisco
+        business_state:
+          type: string
+          nullable: true
+          description: State/region
+          maxLength: 255
+          example: CA
+        business_postal_code:
+          type: string
+          nullable: true
+          description: Postal code
+          maxLength: 50
+          example: '94105'
+        business_legal_entity_identifier:
+          type: string
+          nullable: true
+          description: Legal Entity Identifier
+          maxLength: 255
+          example: '1234567890'
+      required:
+      - business_legal_name
+    CreateTenantResponseDto:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/CreateTenantData'
+      required:
+      - data
     TenantData:
       type: object
       properties:
@@ -571,99 +652,6 @@ components:
       - name
       - created_at
       - updated_at
-    TenantListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/TenantData'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-      - data
-      - pagination
-    CreateTenantResponseDto:
-      type: object
-      properties:
-        data:
-          $ref: '#/components/schemas/CreateTenantData'
-      required:
-      - data
-    CreateTenantRequestDto:
-      type: object
-      properties:
-        business_legal_name:
-          type: string
-          description: Legal business name (required)
-          example: Acme Corporation
-          minLength: 1
-          maxLength: 255
-        business_dba:
-          type: string
-          nullable: true
-          description: DBA - Doing Business As name
-          example: Acme Co
-          maxLength: 255
-        business_address_country:
-          type: string
-          nullable: true
-          description: Country code in ISO 3166-1 alpha-2 or alpha-3 format
-          example: US
-          minLength: 2
-          maxLength: 3
-          pattern: ^[A-Za-z]{2,3}$
-        webhook_url:
-          type: string
-          nullable: true
-          description: Webhook URL for payment creation notifications
-          example: https://your-api.com/webhooks/tesser
-          format: uri
-        business_street_address1:
-          type: string
-          nullable: true
-          description: Street address line 1
-          maxLength: 255
-          example: 456 Corp Blvd
-        business_street_address2:
-          type: string
-          nullable: true
-          description: Street address line 2
-          maxLength: 255
-          example: Suite 200
-        business_city:
-          type: string
-          nullable: true
-          description: City
-          maxLength: 255
-          example: San Francisco
-        business_state:
-          type: string
-          nullable: true
-          description: State/region
-          maxLength: 255
-          example: CA
-        business_postal_code:
-          type: string
-          nullable: true
-          description: Postal code
-          maxLength: 50
-          example: '94105'
-        business_legal_entity_identifier:
-          type: string
-          nullable: true
-          description: Legal Entity Identifier
-          maxLength: 255
-          example: '1234567890'
-      required:
-      - business_legal_name
-    CreateTenantData:
-      type: object
-      properties:
-        tenant:
-          $ref: '#/components/schemas/TenantData'
-      required:
-      - tenant
     Pagination:
       type: object
       properties:
@@ -692,13 +680,25 @@ components:
       - total_pages
       - has_next
       - has_prev
-    TenantResponseDto:
+    TenantListResponse:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/TenantData'
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantData'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
       required:
       - data
+      - pagination
+    CreateTenantData:
+      type: object
+      properties:
+        tenant:
+          $ref: '#/components/schemas/TenantData'
+      required:
+      - tenant
   securitySchemes:
     bearer:
       scheme: bearer

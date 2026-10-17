@@ -200,49 +200,6 @@ paths:
           - forward-user-info-inbound
 components:
   schemas:
-    UserProfileDataDto:
-      type: object
-      properties:
-        user:
-          $ref: '#/components/schemas/UserProfileDto'
-        team:
-          $ref: '#/components/schemas/TeamDto'
-      required:
-      - user
-      - team
-    TeamDto:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        turnkeySubOrgId:
-          type: string
-          nullable: true
-        createdAt:
-          type: string
-        updatedAt:
-          type: string
-      required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
-    SignupRequestDto:
-      type: object
-      properties:
-        entityName:
-          type: string
-          minLength: 1
-          maxLength: 100
-        email:
-          type: string
-          format: email
-          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
-      required:
-      - entityName
-      - email
     SignupResponseDto:
       type: object
       properties:
@@ -286,6 +243,20 @@ components:
       required:
       - message
       - data
+    SignupRequestDto:
+      type: object
+      properties:
+        entityName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+      required:
+      - entityName
+      - email
     UserProfileDto:
       type: object
       properties:
@@ -305,6 +276,16 @@ components:
       - teamId
       - createdAt
       - updatedAt
+    UserProfileDataDto:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/UserProfileDto'
+        team:
+          $ref: '#/components/schemas/TeamDto'
+      required:
+      - user
+      - team
     UserProfileResponseDto:
       type: object
       properties:
@@ -315,6 +296,25 @@ components:
       required:
       - message
       - data
+    TeamDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        turnkeySubOrgId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
   securitySchemes:
     bearer:
       scheme: bearer
